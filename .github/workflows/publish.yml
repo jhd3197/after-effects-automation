@@ -86,6 +86,7 @@ jobs:
 
       ### Step 9: Install Build Dependencies ###
       - name: Install Build Dependencies
+        run: |
           python -m pip install --upgrade pip
           pip install setuptools wheel twine
 
