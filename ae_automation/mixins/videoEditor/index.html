@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Editor</title>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Video Editor</h1>
+        <div id="project-settings">
+            <div id="project-resources">
+                <h2>Resources</h2>
+                <div id="resources-list">
+                    <!-- Resources list will be dynamically generated -->
+                </div>
+            </div>
+            <div id="project-details">
+                <h2>Project Settings</h2>
+                <form id="project-form">
+                    <label>Project File:</label>
+                    <input type="text" name="project_file" value="{{ data.get('project', {}).get('project_file', '') }}">
+                    <label>Comp Name:</label>
+                    <input type="text" name="comp_name" value="{{ data.get('project', {}).get('comp_name', '') }}">
+                    <!-- Add more fields as needed -->
+                    <button type="submit">Update Project</button>
+                </form>
+            </div>
+        </div>
+        <div id="timeline">
+            <h2>Timeline</h2>
+            <div id="zoom-controls">
+                <button id="zoom-out">-</button>
+                <input type="range" id="zoom-slider" min="0.5" max="5" step="0.1" value="1">
+                <button id="zoom-in">+</button>
+            </div>
+            <div id="timeline-current-position">00:00s</div>
+            <div class="timeline-container-wrapper">
+                <div class="timeline-container">
+                    <div id="timer">
+                        <!-- Timer elements will be dynamically generated -->
+                    </div>
+                    <div class="tracks">
+                        {% for scene in data.get('timeline', []) %}
+                            <div class="track">
+                                <div class="scene" 
+                                     data-name="{{ scene.get('name', '') }}" 
+                                     data-duration="{{ scene.get('duration', 0) }}" 
+                                     data-starttime="{{ scene.get('startTime', 0) }}" 
+                                     data-template_comp="{{ scene.get('template_comp', '') }}"
+                                     data-reverse="{{ scene.get('reverse', false) }}"
+                                     data-custom_actions="{{ scene.get('custom_actions', []) | tojson }}" 
+                                     style="left: {{ scene.get('startTime', 0) }}px; width: {{ scene.get('duration', 0) }}px;">
+                                    <div class="scene-info">
+                                        <p>{{ scene['name'] }}</p>
+                                        <span class="toggle-arrow">&#9660;</span>
+                                    </div>
+                                    <div class="accordion-content">
+                                        <h3>Custom Actions</h3>
+                                        <ul class="custom-actions-list">
+                                            {% for action in scene['custom_actions'] %}
+                                                <li>
+                                                    <strong>Change Type:</strong> {{ action['change_type'] }}<br>
+                                                    <strong>Layer Name:</strong> {{ action['layer_name'] }}<br>
+                                                    <strong>Comp Name:</strong> {{ action['comp_name'] }}<br>
+                                                    <strong>Layer Index:</strong> {{ action['layer_index'] }}
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div id="drag-line"></div>
+                    <div id="drag-time"></div>
+                </div>
+            </div>
+            <button id="add-scene">Add Scene</button>
+            <button id="add-custom-action">Add Custom Action</button>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Pass the data with defaults
+        var projectData = {{ data.get('project', {}) | tojson }};
+        var data = {{ data | default({}) | tojson }};
+    </script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

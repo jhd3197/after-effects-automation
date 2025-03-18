@@ -1,0 +1,19 @@
+include README.md
+include LICENSE
+include requirements.txt
+include .env.example
+
+# Include all JavaScript files
+recursive-include ae_automation/mixins/js *.js
+recursive-include ae_automation/mixins/js *.jsx
+
+# Include web editor files
+recursive-include ae_automation/mixins/videoEditor *
+
+# Exclude cache and development files
+global-exclude *.pyc
+global-exclude __pycache__
+global-exclude *.pyo
+global-exclude .git*
+global-exclude .env
+global-exclude .DS_Store

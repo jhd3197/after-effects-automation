@@ -1,0 +1,173 @@
+{
+    "project": {
+        "project_file": "C:/Users/username/Projects/VideoAutomation/project_file.aep",
+        "comp_name": "main_automation_comp",
+        "comp_fps": 29.97,
+        "comp_width": 1920,
+        "comp_height": 1080,
+        "auto_time": true,
+        "comp_start_time": "00:00:00",
+        "comp_end_time": 60.5,
+        "output_file": "final_render.mp4",
+        "output_dir": "C:/Users/username/Projects/VideoAutomation/renders/project123",
+        "renderComp": true,
+        "debug": false,
+        "resources": [
+            {
+                "type": "audio",
+                "name": "intro_voice",
+                "path": "C:/Users/username/Projects/VideoAutomation/assets/intro_voice.mp3",
+                "duration": 5.2
+            },
+            {
+                "type": "audio",
+                "name": "background_music",
+                "path": "C:/Users/username/Projects/VideoAutomation/assets/background_music.mp3",
+                "duration": 45.8
+            },
+            {
+                "type": "image",
+                "name": "hero_image",
+                "path": "C:/Users/username/Projects/VideoAutomation/assets/hero_image.png"
+            },
+            {
+                "type": "image",
+                "name": "product_image",
+                "path": "C:/Users/username/Projects/VideoAutomation/assets/product_image.png"
+            },
+            {
+                "type": "image",
+                "name": "logo_image",
+                "path": "C:/Users/username/Projects/VideoAutomation/assets/logo_image.png"
+            }
+        ]
+    },
+    "timeline": [
+        {
+            "name": "intro",
+            "duration": 8,
+            "startTime": 0,
+            "template_comp": "BrandIntroAnimation",
+            "reverse": false,
+            "custom_actions": []
+        },
+        {
+            "name": "title sequence",
+            "duration": 6.2,
+            "startTime": 7.5,
+            "template_comp": "TitleSequence",
+            "reverse": false,
+            "custom_actions": [
+                {
+                    "change_type": "update_layer_property",
+                    "comp_name": "TitleSequence",
+                    "layer_name": "MainTitle",
+                    "property_name": "Text.Source Text",
+                    "property_type": "string",
+                    "value": "Product Launch 2025<br>New Features Revealed"
+                },
+                {
+                    "change_type": "update_layer_property",
+                    "comp_name": "TitleSequence",
+                    "layer_name": "Subtitle",
+                    "property_name": "Text.Source Text",
+                    "property_type": "string",
+                    "value": "Technology"
+                },
+                {
+                    "change_type": "swap_items_by_index",
+                    "layer_name": "hero_image",
+                    "comp_name": "TitleSequence",
+                    "layer_index": "4",
+                    "fit_to_screen": false,
+                    "fit_to_screen_width": true,
+                    "fit_to_screen_height": false
+                },
+                {
+                    "change_type": "add_resource",
+                    "resource_name": "intro_voice",
+                    "comp_name": "TitleSequence",
+                    "startTime": "1.5",
+                    "duration": "0"
+                }
+            ]
+        },
+        {
+            "name": "main content",
+            "duration": 46.8,
+            "startTime": 13.7,
+            "template_comp": "ContentDisplay",
+            "reverse": false,
+            "custom_actions": [
+                {
+                    "change_type": "update_layer_property",
+                    "comp_name": "ContentDisplay",
+                    "layer_name": "ContentText",
+                    "property_name": "Text.Source Text",
+                    "property_type": "string",
+                    "value": "Our new product features enhanced performance with 50% faster processing speeds.<br>The redesigned interface offers intuitive navigation and customizable dashboards.<br>Advanced AI capabilities provide predictive analytics and automated reporting.<br>Cloud integration enables seamless collaboration across teams and devices.<br>New security protocols ensure data protection with end-to-end encryption.<br>The expanded app ecosystem includes over 200 third-party integrations.<br>Improved battery efficiency extends usage time by up to 8 hours.<br>Lightweight design reduces overall weight by 15% compared to previous models."
+                },
+                {
+                    "change_type": "swap_items_by_index",
+                    "layer_name": "product_image",
+                    "comp_name": "ContentDisplay",
+                    "layer_index": "6",
+                    "fit_to_screen": false,
+                    "fit_to_screen_width": true,
+                    "fit_to_screen_height": false
+                },
+                {
+                    "change_type": "add_resource",
+                    "resource_name": "background_music",
+                    "comp_name": "ContentDisplay",
+                    "startTime": "0.5",
+                    "duration": "0"
+                }
+            ]
+        },
+        {
+            "name": "transition",
+            "duration": 8,
+            "startTime": 30.5,
+            "template_comp": "SlideTransition",
+            "reverse": false,
+            "custom_actions": [
+                {
+                    "change_type": "swap_items_by_index",
+                    "layer_name": "hero_image",
+                    "comp_name": "SlideTransition",
+                    "layer_index": "3",
+                    "fit_to_screen": false,
+                    "fit_to_screen_width": true,
+                    "fit_to_screen_height": false
+                }
+            ]
+        },
+        {
+            "name": "product showcase",
+            "duration": 8,
+            "startTime": 40.5,
+            "template_comp": "ProductShowcase",
+            "reverse": false,
+            "custom_actions": [
+                {
+                    "change_type": "swap_items_by_index",
+                    "layer_name": "logo_image",
+                    "comp_name": "ProductShowcase",
+                    "layer_index": "2",
+                    "fit_to_screen": false,
+                    "fit_to_screen_width": true,
+                    "fit_to_screen_height": false
+                }
+            ]
+        },
+        {
+            "name": "outro",
+            "duration": 12,
+            "startTime": 48.5,
+            "template_comp": "BrandOutroAnimation",
+            "reverse": false,
+            "custom_actions": []
+        }
+    ]
+}
