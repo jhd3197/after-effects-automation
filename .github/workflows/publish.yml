@@ -70,35 +70,34 @@ jobs:
           prerelease: false
 
       ### Step 7: Set Up Python ###
-      #- name: Set up Python
-      #  uses: actions/setup-python@v4
-      #  with:
-      #    python-version: '3.x'  # Specify your Python version
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'  # Specify your Python version
 
       ### Step 8: Cache pip ###
-      #- name: Cache pip
-      #  uses: actions/cache@v3
-      #  with:
-      #    path: ~/.cache/pip
-      #    key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-      #    restore-keys: |
-      #      ${{ runner.os }}-pip-
+      - name: Cache pip
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
 
       ### Step 9: Install Build Dependencies ###
-      #- name: Install Build Dependencies
-      #  run: |
-      #    python -m pip install --upgrade pip
-      #    pip install setuptools wheel twine
+      - name: Install Build Dependencies
+          python -m pip install --upgrade pip
+          pip install setuptools wheel twine
 
       ### Step 10: Build the Package ###
-      #- name: Build Package
-      #  run: |
-      #    python setup.py sdist bdist_wheel
-      #
+      - name: Build Package
+        run: |
+          python setup.py sdist bdist_wheel
+
       ### Step 11: Publish to PyPI ###
-      #- name: Publish to PyPI
-      #  env:
-      #    TWINE_USERNAME: __token__
-      #    TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
-      #  run: |
-      #    twine upload dist/*
+      - name: Publish to PyPI
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+        run: |
+          twine upload dist/*
