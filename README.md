@@ -6,6 +6,16 @@
 
 After Effects Automation is a powerful Python-based tool that automates the creation and rendering of Adobe After Effects compositions. It allows you to programmatically control Adobe After Effects, making it perfect for batch processing and automated video production workflows.
 
+<br>
+
+> [!TIP]
+> Starring this repo helps more developers discover after-effects-automation ✨
+> 
+>![after-effects-automation](https://github.com/user-attachments/assets/ed2e4f26-4e0e-493f-8f80-33a4e9b9299f)
+> 
+>  🔥 Also check out my other project [RepoGif](https://github.com/jhd3197/RepoGif) – the tool I used to generate the GIF above!
+<br>
+
 ## ✨ Features
 
 - Automated composition creation and management
