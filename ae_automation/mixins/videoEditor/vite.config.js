@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 
 // Determine if we're building for demo mode (GitHub Pages)
 const isDemoMode = process.env.VITE_DEMO_MODE === 'true'
+console.log('Building in demo mode:', isDemoMode)
 
 export default defineConfig({
   // Base path for GitHub Pages (repository name)
