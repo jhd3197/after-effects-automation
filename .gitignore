@@ -143,3 +143,4 @@ output/
 *.mp4
 cachefile_map.json
 automation_config.json
+.claude*

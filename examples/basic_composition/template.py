@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 Basic Composition - Template Creator
 =====================================
@@ -10,7 +11,15 @@ This template includes:
 """
 
 import os
+import sys
 from ae_automation import Client
+
+# Fix Windows console encoding for Unicode characters
+if sys.platform == 'win32':
+    import codecs
+    if hasattr(sys.stdout, 'buffer'):
+        sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, 'strict')
+        sys.stderr = codecs.getwriter('utf-8')(sys.stderr.buffer, 'strict')
 
 
 def create_template(output_path=None):

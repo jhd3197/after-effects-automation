@@ -1,328 +1,412 @@
 # After Effects Automation - Examples
 
-Practical, self-contained examples demonstrating After Effects automation capabilities.
+Quick, practical examples showing what you can build with After Effects automation.
 
-## 📁 Structure
-
-Each example is in its own folder with:
-- **template.py** - Creates the After Effects template (.aep)
-- **run.py** - Runs the automation workflow
-- **README.md** - Detailed instructions and explanations
-
-## 🎯 Quick Start
+## 🚀 Quick Start
 
 ```bash
-# Pick an example
+# 1. Pick an example
 cd examples/basic_composition
 
-# Step 1: Create the template
-python template.py
-
-# Step 2: Run the automation
+# 2. Run it (auto-creates template if needed)
 python run.py
 ```
 
-That's it! The automation will create compositions, update text, and optionally render video.
+**That's it!** The script will:
+- Create the After Effects template automatically
+- Open After Effects
+- Build your composition
+- Render the final video
+
+Perfect for creating GIF demos! 🎬
 
 ---
 
-## 📚 Examples
+## 📊 Examples at a Glance
+
+| Example | What It Does | Time | Command |
+|---------|-------------|------|---------|
+| **basic_composition** | Creates intro + outro scenes | ~2 min | `python run.py` |
+| **text_animation** | Multi-layer text with styles | ~2 min | `python run.py` |
+| **render_only** | Renders .aep files (no automation) | ~10 sec | `python render.py` |
+
+---
+
+## 📚 Detailed Examples
 
 ### 1. Basic Composition
-**Path:** `examples/basic_composition/`
-**Difficulty:** ⭐ Beginner
-**Time:** ~5 minutes
+**📁** `examples/basic_composition/` | **⭐ Beginner** | **⏱️ 2 minutes**
 
-Learn the fundamentals:
-- Creating templates with multiple compositions
-- Setting up a timeline with scenes
-- Updating text properties
-- Complete automation workflow
+**What You'll Learn:**
+- Automated template creation
+- Timeline setup with scenes
+- Text property updates
+- Full automation workflow
 
-**Perfect for:** First-time users
-
+**Quick Start:**
 ```bash
 cd examples/basic_composition
-python template.py
 python run.py
 ```
 
-[Full Instructions →](basic_composition/README.md)
+**Output:** 10-second video with intro and outro scenes
+
+**What Happens:**
+1. Checks for template, creates if missing
+2. Opens After Effects
+3. Creates FinalComposition with 2 scenes
+4. Updates text in each scene
+5. Renders to `output/FinalComposition.mp4`
+
+[📖 Full Guide →](basic_composition/README.md)
 
 ---
 
 ### 2. Text Animation
-**Path:** `examples/text_animation/`
-**Difficulty:** ⭐ Beginner
-**Time:** ~10 minutes
+**📁** `examples/text_animation/` | **⭐ Beginner** | **⏱️ 2 minutes**
 
-Master text manipulation:
-- Multiple text layers with different styles
+**What You'll Learn:**
+- Multiple text layers
+- Different text styles
 - Multi-line text with line breaks
-- Dynamic content from Python variables
-- Advanced text property updates
+- Dynamic content from Python
 
-**Perfect for:** Tutorial videos, social media posts
-
+**Quick Start:**
 ```bash
 cd examples/text_animation
-python template.py
 python run.py
 ```
 
-[Full Instructions →](text_animation/README.md)
+**Perfect For:** Tutorial videos, social media posts
+
+**Output:** Video with multiple styled text layers
+
+[📖 Full Guide →](text_animation/README.md)
 
 ---
 
-## 🗂️ Legacy Examples
+### 3. Render Only
+**📁** `examples/render_only/` | **⭐ Beginner** | **⏱️ 10 seconds**
 
-Older numbered examples are still available in the examples folder:
-- `01_basic_composition.py` - Generates config only
-- `02_text_animation.py` - Generates config only
-- `03_resource_management.py` - Resource imports
-- `04_markers_and_timing.py` - Precise timing
-- `05_advanced_templates.py` - Template system
-- `06_complete_workflow.py` - Full production workflow
+**What You'll Learn:**
+- Rendering .aep files without automation
+- Interactive vs command-line modes
+- Smart composition defaults
+- Batch rendering workflows
 
-**Note:** Legacy examples only generate JSON configs. Use the new folder-based examples for complete workflows.
+**Quick Start:**
+```bash
+cd examples/render_only
+
+# Interactive mode (prompts for file)
+python render.py
+
+# Direct mode (renders immediately)
+python render.py path/to/file.aep
+
+# Specify composition
+python render.py file.aep --comp "MyComp"
+```
+
+**Perfect For:** Quick renders when you already have .aep files
+
+**Key Features:**
+- Auto-detects composition type (template vs automation output)
+- Outputs to current directory by default
+- Smart defaults: `ae_automation.aep` → FinalComposition, `basic_template.aep` → IntroTemplate
+
+[📖 Full Guide →](render_only/README.md)
 
 ---
 
 ## 🎓 Learning Path
 
-### Beginner Path
-1. **basic_composition** - Start here to learn the basics
-2. **text_animation** - Learn text manipulation
+### Beginner (Start Here)
+1. **basic_composition** - Learn the automation workflow
+2. **text_animation** - Master text manipulation
+3. **render_only** - Understand rendering workflows
 
-### Intermediate Path (Coming Soon)
-3. **resource_management** - Work with images, video, audio
-4. **markers_and_timing** - Precise timing control
-
-### Advanced Path (Coming Soon)
-5. **template_system** - Reusable templates
-6. **complete_workflow** - Production-ready example
+### Next Steps
+- Modify the examples to fit your needs
+- Combine techniques from multiple examples
+- Build your own automation scripts
 
 ---
 
-## 🛠️ Example Structure
+## 🛠️ How Examples Work
 
-Each example folder contains:
+### Automation Examples (basic_composition, text_animation)
 
+**Folder Structure:**
 ```
 example_name/
-├── template.py              # Creates the .aep template
-├── run.py                   # Runs the automation
-├── README.md                # Detailed instructions
-├── example_template.aep     # Generated template (git-ignored)
-├── automation_config.json   # Generated config (git-ignored)
-└── output/                  # Output folder (git-ignored)
-    └── final_video.mp4      # Rendered video
+├── run.py                   # Main script (auto-creates template & runs automation)
+├── template.py              # Template builder (auto-called by run.py if needed)
+├── README.md                # Documentation
+└── output/                  # Generated files (git-ignored)
+    ├── basic_template.aep   # Auto-created template
+    ├── ae_automation.aep    # Automation working file
+    └── FinalComposition.mp4 # Rendered video
 ```
+
+**Workflow (Fully Automatic):**
+1. Run `python run.py`
+2. Script auto-creates template if missing
+3. Opens After Effects and loads template
+4. Builds compositions and updates properties
+5. Renders final video to `output/`
+
+**No manual steps - just run and go!**
 
 ---
 
-## 🚀 Common Workflows
+### Render-Only Example
 
-### Create Template Only
-
-```bash
-cd examples/basic_composition
-python template.py
+**Folder Structure:**
+```
+render_only/
+├── render.py                # Rendering script
+├── README.md                # Documentation
+└── output/                  # Rendered videos (git-ignored)
+    └── *.mp4                # Output files
 ```
 
-Then open `basic_template.aep` in After Effects to customize.
+**Workflow:**
+1. Run `python render.py`
+2. Select .aep file (or provide path)
+3. Choose composition (or use smart default)
+4. Video renders to `output/`
 
-### Run Automation Without Rendering
-
-In `run.py`, set:
-```python
-"renderComp": False
-```
-
-### Render Video
-
-In `run.py`, set:
-```python
-"renderComp": True
-```
-
-The video will be saved to the `output/` folder.
-
-### Customize Template
-
-1. Run `template.py` to create the .aep file
-2. Open in After Effects
-3. Customize colors, fonts, animations
-4. Save
-5. Run `run.py` - it will use your customized template
+**Use when:** You have existing .aep files and just need video output
 
 ---
 
-## 📖 Configuration Reference
+## ⚙️ Configuration
+
+Examples use Python dictionaries for configuration:
 
 ### Project Settings
-
 ```python
 "project": {
-    "project_file": "path/to/template.aep",  # Template path
-    "comp_name": "FinalComposition",         # Output comp name
-    "comp_fps": 29.97,                       # Frame rate
-    "comp_width": 1920,                      # Resolution width
-    "comp_height": 1080,                     # Resolution height
-    "auto_time": True,                       # Auto-calculate timing
-    "comp_end_time": 10,                     # Total duration (seconds)
-    "renderComp": True,                      # Render video?
-    "output_file": "output.mp4",             # Output filename
-    "output_dir": "./output"                 # Output directory
+    "project_file": "./template.aep",    # Template to use
+    "comp_name": "FinalComposition",     # Output composition
+    "comp_fps": 29.97,                   # Frame rate
+    "comp_width": 1920,                  # Width
+    "comp_height": 1080,                 # Height
+    "comp_end_time": 10,                 # Duration (seconds)
+    "renderComp": True,                  # Render video?
+    "output_dir": "."                    # Output directory
 }
 ```
 
 ### Timeline Scene
-
 ```python
 {
-    "name": "scene_name",              # Scene identifier
-    "duration": 5,                     # Duration in seconds
-    "startTime": 0,                    # Start time in timeline
-    "template_comp": "TemplateName",   # Source composition from template
-    "custom_actions": [...]            # Actions to perform on this scene
+    "name": "intro",                     # Scene name
+    "duration": 5,                       # Duration
+    "startTime": 0,                      # Start time
+    "template_comp": "IntroTemplate",    # Source composition
+    "custom_actions": [...]              # What to do
 }
 ```
 
-### Update Text Action
-
+### Update Text
 ```python
 {
     "change_type": "update_layer_property",
-    "comp_name": "CompositionName",
-    "layer_name": "LayerName",
+    "comp_name": "IntroTemplate",
+    "layer_name": "MainTitle",
     "property_name": "Text.Source Text",
-    "property_type": "string",
-    "value": "Your text here"
+    "value": "My Amazing Video"
 }
+```
+
+---
+
+## 🚀 Common Customizations
+
+### Change Video Duration
+In `run.py`, modify:
+```python
+"comp_end_time": 20  # 20 seconds instead of 10
+```
+
+### Disable Rendering
+To build compositions without rendering:
+```python
+"renderComp": False
+```
+
+Then use `render_only` to render later.
+
+### Update Text Content
+In the timeline config:
+```python
+{
+    "change_type": "update_layer_property",
+    "layer_name": "MainTitle",
+    "value": "Your Custom Text Here"
+}
+```
+
+### Change Output Location
+```python
+"output_dir": "C:/MyVideos"  # Custom directory
 ```
 
 ---
 
 ## 🔧 Prerequisites
 
-### Required
-
-1. **After Effects** installed (2024 or 2025)
-2. **Python 3.7+** with `ae-automation` package
-3. **Startup Script** installed:
+1. **After Effects** (2024, 2025, or 2025 Beta)
+2. **Python 3.7+**
+3. **Package installed:**
+   ```bash
+   pip install after-effects-automation
+   ```
+4. **Startup script installed:**
    ```bash
    python install_ae_runner.py
    ```
-
-### Setup
-
-1. **Configure environment:**
+5. **Environment configured:**
    ```bash
    cp .env.example .env
-   # Edit .env with your After Effects path
+   # Edit .env with your AE path
    ```
 
-2. **Install the package:**
-   ```bash
-   pip install -e .
-   ```
-
-3. **Verify setup:**
-   ```bash
-   ae-automation diagnose
-   ```
+**📖 Full Setup:** See [Installation Guide](../INSTALLATION.md)
 
 ---
 
 ## ❓ Troubleshooting
 
-### "Template not found" error
-**Solution:** Run `python template.py` first
+### "Template not found" then auto-creates it
+**This is normal!** First run creates the template automatically.
 
 ### After Effects doesn't start
-**Solutions:**
 1. Check `.env` has correct `AFTER_EFFECT_FOLDER`
-2. Install startup script: `python install_ae_runner.py`
-3. Restart After Effects
+2. Verify AE version matches path (2024 vs 2025)
+3. Install startup script: `python install_ae_runner.py`
 
 ### "Composition not found"
-**Solution:** Template creation may have failed. Delete the .aep file and run `template.py` again.
+- For `basic_template.aep` → Use `IntroTemplate` or `OutroTemplate`
+- For `ae_automation.aep` → Use `FinalComposition`
+- Composition names are case-sensitive
 
-### Scripts don't execute in After Effects
-**Solutions:**
-1. Make sure startup script is installed
-2. Check **Window > Info** panel in AE for "AE Command Runner" messages
-3. Verify scripting is enabled: Edit > Preferences > Scripting & Expressions
+### Scripts don't execute
+1. Enable scripting in AE: Edit > Preferences > Scripting & Expressions
+2. Check "Allow Scripts to Write Files and Access Network"
+3. Restart After Effects
+4. Verify startup script: Look for "AE Command Runner" in Window > Info
 
-### Render fails
-**Solutions:**
-1. Make sure composition name is correct
-2. Check output directory exists and is writable
-3. Verify `aerender.exe` path in `.env`
+### Empty/black video
+Update to latest version (bug was fixed in v0.0.4):
+```bash
+pip install --upgrade after-effects-automation
+```
+
+**📖 More Help:** See [Troubleshooting Guide](../TROUBLESHOOTING.md)
 
 ---
 
 ## 📝 Creating Your Own Example
 
-Want to create a custom example? Here's the template:
+### Basic Structure
 
 ```bash
 # Create folder
 mkdir examples/my_example
+cd examples/my_example
 
-# Create files
-touch examples/my_example/template.py
-touch examples/my_example/run.py
-touch examples/my_example/README.md
+# Create main script
+touch run.py
+touch template.py  # Optional: if you need custom templates
+touch README.md
 ```
 
-### template.py structure:
+### Simple run.py Template
+
 ```python
+#!/usr/bin/env python3
+import os
 from ae_automation import Client
 
-def create_template():
-    client = Client()
-    template_config = { ... }
-    client.buildTemplate(template_config, "my_template.aep")
+# Initialize
+client = Client()
 
+# Configuration
+config = {
+    "project": {
+        "project_file": "./my_template.aep",
+        "comp_name": "FinalComposition",
+        "comp_fps": 29.97,
+        "comp_width": 1920,
+        "comp_height": 1080,
+        "comp_end_time": 10,
+        "renderComp": True,
+        "output_dir": ".",
+        "debug": False,
+        "resources": []
+    },
+    "timeline": [
+        {
+            "name": "scene1",
+            "duration": 10,
+            "startTime": 0,
+            "template_comp": "MyTemplate",
+            "custom_actions": []
+        }
+    ]
+}
+
+# Run
 if __name__ == "__main__":
-    create_template()
+    # Save config
+    import json
+    with open("config.json", "w") as f:
+        json.dump(config, f, indent=2)
+
+    # Run automation
+    client.startBot("config.json")
 ```
 
-### run.py structure:
-```python
-from ae_automation import Client
+### Tips
 
-def run_automation():
-    client = Client()
-    config = { ... }
-    client.startBot(config)
-
-if __name__ == "__main__":
-    run_automation()
-```
+- Start by copying an existing example
+- Modify gradually to understand what each part does
+- Use `"debug": True` to keep AE open for inspection
+- Test with short durations first
+- Read the generated `ae_automation.aep` file to understand structure
 
 ---
 
 ## 🔗 Related Documentation
 
 - [Main README](../README.md) - Package overview
-- [Export Guide](../EXPORT_GUIDE.md) - Template export workflow
+- [Installation Guide](../INSTALLATION.md) - Setup instructions
 - [CLI Guide](../CLI_GUIDE.md) - Command-line usage
-- [Installation](../install_ae_runner.py) - Startup script setup
+- [Troubleshooting](../TROUBLESHOOTING.md) - Problem solving
+- [Process Management](../PROCESS_MANAGEMENT.md) - How it works
 
 ---
 
-## 🤝 Contributing
+## 🤝 Contributing Examples
 
-Have a useful example? We'd love to include it!
+Have a useful example? Share it!
 
-1. Create a new folder: `examples/your_example/`
-2. Include `template.py`, `run.py`, and `README.md`
-3. Follow the existing structure
-4. Test with After Effects 2024/2025
-5. Submit a pull request
+**What makes a good example:**
+- Solves a real problem
+- Well documented
+- Single, clear purpose
+- Works with latest version
+- Includes output samples/screenshots
+
+**How to contribute:**
+1. Create example folder in `examples/`
+2. Add `run.py`, `README.md`, and any other files
+3. Test with AE 2024/2025
+4. Include clear documentation
+5. Submit pull request
 
 ---
 

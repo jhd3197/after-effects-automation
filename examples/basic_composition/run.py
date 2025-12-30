@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 Basic Composition - Automation Runner
 ======================================
@@ -16,6 +17,13 @@ import sys
 import time
 from ae_automation import Client
 import template
+
+# Fix Windows console encoding for Unicode characters
+if sys.platform == 'win32':
+    import codecs
+    if hasattr(sys.stdout, 'buffer'):
+        sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, 'strict')
+        sys.stderr = codecs.getwriter('utf-8')(sys.stderr.buffer, 'strict')
 
 
 def run_automation():

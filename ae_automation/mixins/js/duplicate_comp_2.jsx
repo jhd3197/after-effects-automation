@@ -67,4 +67,4 @@ function copyCompAndAddToTimeline(CompTemplateName, CopyCompName, FolderName, st
     _comp.layers[1].outPoint = outPoint;
 }
 
-copyCompAndAddToTimeline("{CompTemplateName}", "{CopyCompName}", "{FolderName}", { startTime }, { inPoint }, { stretch }, { outPoint });
+copyCompAndAddToTimeline("{CompTemplateName}", "{CopyCompName}", "{FolderName}", {startTime}, {inPoint}, {stretch}, {outPoint});
