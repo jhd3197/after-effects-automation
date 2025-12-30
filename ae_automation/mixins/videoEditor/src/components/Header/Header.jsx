@@ -63,7 +63,7 @@ function Header() {
     <header className={styles.header}>
       <div className={styles.logo}>
         <FaVideo className={styles.icon} />
-        <h1>Video Editor</h1>
+        <h1>After Effects Automation</h1>
         {isDemoMode && <span className={styles.demoBadge}>Demo Mode</span>}
       </div>
       <div className={styles.projectInfo}>

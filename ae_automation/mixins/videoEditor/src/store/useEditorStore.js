@@ -79,10 +79,11 @@ const useEditorStore = create(
         })
 
         // Trigger initial zoom logic for demo
-        // Aim to show project duration + 20% padding in ~1000px viewport
+        // Use a moderate zoom level that shows context without being too zoomed in
         const projectDuration = 30
-        const viewportWidth = 1000
-        const idealZoom = viewportWidth / (projectDuration * 1.2)
+        const viewportWidth = 1200 // Typical screen width for timeline
+        const displayDuration = projectDuration * 1.8 // Show 1.8x project duration
+        const idealZoom = viewportWidth / displayDuration
         const clampedZoom = Math.max(0.5, Math.min(10, idealZoom))
         set({ zoomLevel: clampedZoom, initialZoomSet: true })
 
@@ -108,10 +109,11 @@ const useEditorStore = create(
           // Check all locations for duration (comp_end_time is used in some templates)
           const projectDuration = projectData.project?.comp_end_time || projectData.project?.duration || projectData.duration || 60
 
-          // Calculate zoom so project fits nicely (showing ~20% extra)
-          // Aim to show project duration + 20% padding in ~1000px viewport
-          const viewportWidth = 1000
-          const idealZoom = viewportWidth / (projectDuration * 1.2)
+          // Calculate zoom so project fits nicely with context
+          // Show 1.8x project duration for comfortable viewing
+          const viewportWidth = 1200 // Typical screen width for timeline
+          const displayDuration = projectDuration * 1.8
+          const idealZoom = viewportWidth / displayDuration
           const clampedZoom = Math.max(0.5, Math.min(10, idealZoom))
 
           set({
