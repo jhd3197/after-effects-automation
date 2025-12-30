@@ -26,6 +26,17 @@
   }
 }
 
+.demoBadge {
+  background-color: $accent-warning;
+  color: #1a1a1a;
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $radius-sm;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
 .projectInfo {
   display: flex;
   align-items: center;

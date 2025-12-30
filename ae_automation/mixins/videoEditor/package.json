@@ -6,23 +6,25 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:demo": "cross-env VITE_DEMO_MODE=true vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
+    "axios": "^1.7.2",
+    "clsx": "^2.1.1",
+    "framer-motion": "^11.3.0",
+    "immer": "^10.1.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "axios": "^1.7.2",
-    "framer-motion": "^11.3.0",
-    "zustand": "^4.5.2",
     "react-icons": "^5.2.1",
-    "clsx": "^2.1.1",
-    "immer": "^10.1.1"
+    "zustand": "^4.5.2"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
+    "cross-env": "^10.1.0",
     "eslint": "^8.57.0",
     "eslint-plugin-react": "^7.34.2",
     "eslint-plugin-react-hooks": "^4.6.2",

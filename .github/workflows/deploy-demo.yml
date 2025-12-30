@@ -23,11 +23,9 @@ jobs:
 
       - name: Install and Build (Demo Mode)
         working-directory: ae_automation/mixins/videoEditor
-        env:
-          VITE_DEMO_MODE: "true"
         run: |
           npm install
-          npm run build
+          npm run build:demo
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3

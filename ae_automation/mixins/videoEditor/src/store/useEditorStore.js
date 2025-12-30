@@ -130,6 +130,13 @@ const useEditorStore = create(
     },
 
     updateProject: async () => {
+      const isDemo = get().isDemoMode
+      if (isDemo) {
+        // In demo mode, just update local state without API call
+        console.log("Demo mode: Project updated locally")
+        return
+      }
+
       try {
         const { project } = get()
         const response = await axios.post(`${API_BASE}/project`, { data: project })
@@ -143,6 +150,13 @@ const useEditorStore = create(
     },
 
     undo: async () => {
+      const isDemo = get().isDemoMode
+      if (isDemo) {
+        // Demo mode: Undo not supported
+        console.log("Demo mode: Undo not available")
+        return
+      }
+
       try {
         const response = await axios.post(`${API_BASE}/undo`)
         set({
@@ -156,6 +170,13 @@ const useEditorStore = create(
     },
 
     redo: async () => {
+      const isDemo = get().isDemoMode
+      if (isDemo) {
+        // Demo mode: Redo not supported
+        console.log("Demo mode: Redo not available")
+        return
+      }
+
       try {
         const response = await axios.post(`${API_BASE}/redo`)
         set({
@@ -171,6 +192,13 @@ const useEditorStore = create(
 
 
     renderProject: async (outputPath = 'output.mp4') => {
+      const isDemo = get().isDemoMode
+      if (isDemo) {
+        // Demo mode: Rendering not available
+        console.log("Demo mode: Rendering not available without backend")
+        return { success: false, error: "Rendering not available in demo mode" }
+      }
+
       set({ isRendering: true, error: null })
       try {
         const response = await axios.post(`${API_BASE}/render`, { output_path: outputPath })
