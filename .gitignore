@@ -136,3 +136,5 @@ templates/
 main.py
 playground.py
 /.vscode
+
+test_report_*.json

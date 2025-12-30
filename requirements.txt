@@ -9,3 +9,4 @@ pywinauto
 flask
 python-dotenv>=0.19.0
 mutagen
+psutil>=5.8.0

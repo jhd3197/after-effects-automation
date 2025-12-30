@@ -55,7 +55,9 @@ class afterEffectMixin:
         
         if data["project"]["debug"] == False:
             os.startfile(filePath)
-            time.sleep(60)
+            # Wait for After Effects to be fully loaded and ready
+            if not self.wait_for_after_effects_ready(timeout=120):
+                raise Exception("After Effects failed to start or become ready")
 
         self.deselectAll()
 

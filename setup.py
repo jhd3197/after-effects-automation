@@ -36,7 +36,8 @@ setup(
         "mutagen>=1.45.1",
         "moviepy>=1.0.3",
         "flask>=2.0.0",
-        "werkzeug>=2.0.0"
+        "werkzeug>=2.0.0",
+        "psutil>=5.8.0"
     ],
     package_data={
         "ae_automation": [
@@ -48,8 +49,9 @@ setup(
     include_package_data=True,
     entry_points={
         "console_scripts": [
-            "ae-automate=ae_automation.run:main",
-            "ae-editor=app:main"
+            "ae-automation=cli:main",
+            # Legacy aliases for backward compatibility
+            "ae-automate=cli:main",
         ],
     }
 )

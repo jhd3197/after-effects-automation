@@ -7,6 +7,8 @@ from ae_automation.mixins.afterEffect import afterEffectMixin
 from ae_automation.mixins.tools import ToolsMixin
 from ae_automation.mixins.bot import botMixin
 from ae_automation.mixins.VideoEditorApp import VideoEditorAppMixin
+from ae_automation.mixins.templateGenerator import TemplateGeneratorMixin
+from ae_automation.mixins.processManager import ProcessManagerMixin
 
 # Load environment variables from .env file
 load_dotenv()
@@ -16,6 +18,8 @@ class Client(
     ToolsMixin,
     botMixin,
     VideoEditorAppMixin,
+    TemplateGeneratorMixin,
+    ProcessManagerMixin,
 ):
     JS_FRAMEWORK=""
   

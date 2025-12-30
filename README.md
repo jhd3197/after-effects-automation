@@ -32,6 +32,7 @@ After Effects Automation is a powerful Python-based tool that automates the crea
 
 This tool has been thoroughly tested with:
 - Adobe After Effects 2024
+- Adobe After Effects 2025
 - Adobe After Effects 2025 (Beta)
 
 While specifically tested on these versions, the tool should theoretically work with any Adobe After Effects CC version. The JavaScript integration is based on the ExtendScript technology which has been consistent across Creative Cloud releases. If you encounter version-specific issues, please report them in the issue tracker.
