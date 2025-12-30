@@ -1,0 +1,168 @@
+@use '../../styles/variables.scss' as *;
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: $z-modal;
+}
+
+.player {
+  background-color: $bg-secondary;
+  border-radius: $radius-lg;
+  width: 90%;
+  max-width: 1200px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-lg $spacing-xl;
+  border-bottom: 1px solid $border-color;
+
+  h2 {
+    font-size: 18px;
+  }
+
+  .closeButton {
+    padding: $spacing-sm;
+    color: $text-secondary;
+    font-size: 18px;
+    transition: all $transition-fast;
+
+    &:hover {
+      color: $text-primary;
+    }
+  }
+}
+
+.videoContainer {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #000;
+  min-height: 400px;
+  overflow: hidden;
+}
+
+.video {
+  max-width: 100%;
+  max-height: 70vh;
+  cursor: pointer;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-lg $spacing-xl;
+  background-color: $bg-tertiary;
+  border-top: 1px solid $border-color;
+}
+
+.controlButton {
+  padding: $spacing-sm;
+  background-color: transparent;
+  color: $text-primary;
+  font-size: 18px;
+  transition: all $transition-fast;
+
+  &:hover {
+    color: $accent-primary;
+  }
+}
+
+.progressBar {
+  flex: 1;
+  height: 6px;
+  background-color: $bg-hover;
+  border-radius: 3px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+
+  &:hover {
+    height: 8px;
+  }
+}
+
+.progress {
+  height: 100%;
+  background-color: $accent-primary;
+  border-radius: 3px;
+  transition: width 0.1s linear;
+}
+
+.time {
+  font-size: 12px;
+  color: $text-secondary;
+  min-width: 80px;
+  text-align: center;
+  font-family: $font-mono;
+}
+
+.volumeSlider {
+  width: 80px;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: $bg-hover;
+  border-radius: 2px;
+  outline: none;
+
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    background: $accent-primary;
+    border-radius: 50%;
+    cursor: pointer;
+
+    &:hover {
+      background: $accent-hover;
+    }
+  }
+
+  &::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    background: $accent-primary;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+
+    &:hover {
+      background: $accent-hover;
+    }
+  }
+}
+
+.path {
+  padding: $spacing-sm $spacing-xl;
+  background-color: $bg-primary;
+  border-top: 1px solid $border-color;
+  font-size: 11px;
+  color: $text-tertiary;
+  font-family: $font-mono;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  strong {
+    color: $text-secondary;
+    margin-right: $spacing-sm;
+  }
+}

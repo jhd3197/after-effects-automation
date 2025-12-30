@@ -7,15 +7,22 @@ env_path = Path('.env')
 load_dotenv(dotenv_path=env_path)
 
 # Get environment variables with defaults
-CACHE_FOLDER = os.getenv('CACHE_FOLDER', os.path.join(os.getcwd(), 'cache'))
+# Use APPDATA for cache folder to ensure consistent location regardless of where scripts run from
+CACHE_FOLDER = os.getenv('CACHE_FOLDER', os.path.join(os.getenv('APPDATA'), 'ae_automation', 'cache'))
 AFTER_EFFECT_FOLDER = os.getenv('AFTER_EFFECT_FOLDER', 'C:/Program Files/Adobe/Adobe After Effects 2025/Support Files')
 AFTER_EFFECT_PROJECT_FOLDER = os.getenv('AFTER_EFFECT_PROJECT_FOLDER', 'au-automate')
+
+# Queue folder for file-based communication with After Effects
+QUEUE_FOLDER = os.path.join(os.getenv('APPDATA'), 'ae_automation', 'queue')
 
 # Derive AERENDER_PATH from AFTER_EFFECT_FOLDER
 AERENDER_PATH = os.getenv('AERENDER_PATH', os.path.join(AFTER_EFFECT_FOLDER, 'aerender.exe'))
 
 # Ensure cache directory exists
 os.makedirs(CACHE_FOLDER, exist_ok=True)
+
+# Ensure queue directory exists
+os.makedirs(QUEUE_FOLDER, exist_ok=True)
 
 # Package resources path
 PACKAGE_DIR = os.path.dirname(os.path.abspath(__file__))

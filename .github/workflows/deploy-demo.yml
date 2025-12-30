@@ -1,0 +1,64 @@
+name: Deploy Demo to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main  # Deploys when changes are pushed to the main branch
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: ae_automation/mixins/videoEditor/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ae_automation/mixins/videoEditor
+        run: npm ci
+
+      - name: Build for demo mode
+        working-directory: ae_automation/mixins/videoEditor
+        run: npm run build:demo
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo-build
+          path: ae_automation/mixins/videoEditor/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: demo-build
+          path: dist
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          publish_branch: gh-pages
+          force_orphan: true

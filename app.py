@@ -11,13 +11,26 @@ def main():
     """
     parser = argparse.ArgumentParser(
         description='After Effects Video Editor',
-        formatter_class=argparse.RawDescriptionHelpFormatter
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  ae-editor config.json
+  ae-editor example.json --host 0.0.0.0 --port 8080
+  ae-editor --config myproject.json
+        """
     )
-    
+
+    parser.add_argument(
+        'config_file',
+        nargs='?',
+        default=None,
+        help='Path to the JSON configuration file to edit'
+    )
+
     parser.add_argument(
         '--config',
-        default='config.json',
-        help='Path to the JSON configuration file to edit (default: config.json)'
+        default=None,
+        help='Path to the JSON configuration file to edit (alternative to positional arg)'
     )
     
     parser.add_argument(
@@ -34,9 +47,12 @@ def main():
     )
     
     args = parser.parse_args()
-    
+
+    # Determine which config file to use (positional arg takes precedence)
+    config_file = args.config_file or args.config or 'config.json'
+
     # Create default config if it doesn't exist
-    if not os.path.exists(args.config):
+    if not os.path.exists(config_file):
         default_config = {
             "project": {
                 "project_file": "",
@@ -50,16 +66,16 @@ def main():
             },
             "timeline": []
         }
-        with open(args.config, 'w') as f:
+        with open(config_file, 'w') as f:
             json.dump(default_config, f, indent=4)
-        print(f"Created default config file: {args.config}")
-    
+        print(f"Created default config file: {config_file}")
+
     editor = VideoEditorAppMixin()
-    
+
     try:
         print(f"\nStarting Video Editor at http://{args.host}:{args.port}")
-        print(f"Using configuration file: {args.config}")
-        editor.runVideoEditor(args.config, host=args.host, port=args.port)
+        print(f"Using configuration file: {config_file}")
+        editor.runVideoEditor(config_file, host=args.host, port=args.port)
     except Exception as e:
         print(f"Error starting video editor: {e}")
         sys.exit(1)

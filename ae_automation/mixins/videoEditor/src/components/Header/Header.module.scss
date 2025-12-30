@@ -1,0 +1,303 @@
+@use '../../styles/variables.scss' as *;
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-lg $spacing-xl;
+  background-color: $bg-secondary;
+  border-bottom: 1px solid $border-color;
+  height: 60px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  color: $accent-primary;
+
+  svg {
+    font-size: 24px;
+  }
+
+  h1 {
+    font-size: 20px;
+    font-weight: 600;
+  }
+}
+
+.demoBadge {
+  background-color: $accent-warning;
+  color: #1a1a1a;
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $radius-sm;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.projectInfo {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  flex: 1;
+  margin-left: $spacing-xxl;
+  padding: $spacing-sm $spacing-md;
+  background-color: $bg-tertiary;
+  border-radius: $radius-md;
+  max-width: 600px;
+
+  .label {
+    color: $text-tertiary;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .path {
+    color: $text-secondary;
+    font-size: 14px;
+    font-family: $font-mono;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .statusIndicator {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+  }
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+}
+
+.iconButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-sm;
+  color: $text-secondary;
+  font-size: 20px;
+  transition: all $transition-fast;
+
+  &:hover {
+    color: $text-primary;
+    transform: translateY(-1px);
+  }
+}
+
+.exportButton {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-md $spacing-lg;
+  background-color: $accent-primary;
+  color: white;
+  border-radius: $radius-md;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all $transition-fast;
+  margin-right: $spacing-sm;
+
+  svg {
+    font-size: 14px;
+  }
+
+  &:hover {
+    background-color: $accent-hover;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba($accent-primary, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.renderButton {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-md $spacing-lg;
+  background-color: $accent-success;
+  color: white;
+  border-radius: $radius-md;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all $transition-fast;
+
+  svg {
+    font-size: 14px;
+  }
+
+  &:hover:not(:disabled) {
+    background-color: #218838;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba($accent-success, 0.3);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    background-color: $bg-hover;
+  }
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: $z-modal;
+  animation: fadeIn 0.2s ease;
+}
+
+.modalContent {
+  background-color: $bg-secondary;
+  border-radius: $radius-lg;
+  padding: $spacing-xl;
+  min-width: 500px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+
+  h2 {
+    margin-bottom: $spacing-lg;
+    color: $text-primary;
+  }
+}
+
+.formGroup {
+  margin-bottom: $spacing-lg;
+
+  label {
+    display: block;
+    margin-bottom: $spacing-sm;
+    color: $text-secondary;
+    font-size: 14px;
+  }
+
+  input {
+    width: 100%;
+  }
+}
+
+.status {
+  padding: $spacing-md;
+  background-color: $bg-tertiary;
+  border-radius: $radius-sm;
+  margin-top: $spacing-md;
+  color: $accent-primary;
+  font-size: 13px;
+  max-height: 200px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  font-family: $font-mono;
+  line-height: 1.5;
+}
+
+.modalActions {
+  display: flex;
+  gap: $spacing-md;
+  margin-top: $spacing-xl;
+
+  button {
+    flex: 1;
+    padding: $spacing-md;
+    border-radius: $radius-sm;
+    font-weight: 600;
+
+    &:first-child {
+      background-color: $accent-primary;
+      color: white;
+
+      &:hover:not(:disabled) {
+        background-color: $accent-hover;
+      }
+    }
+
+    &:last-child {
+      background-color: $bg-hover;
+      color: $text-primary;
+
+      &:hover {
+        background-color: #3d3d3d;
+      }
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-lg;
+
+  h2 {
+    margin: 0;
+  }
+}
+
+.closeButton {
+  padding: $spacing-xs;
+  color: $text-secondary;
+  font-size: 16px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color $transition-fast;
+
+  &:hover {
+    color: $text-primary;
+  }
+}
+
+.jsonTextarea {
+  width: 100%;
+  height: 300px;
+  background-color: $bg-tertiary;
+  color: $text-primary;
+  border: 1px solid $border-color;
+  border-radius: $radius-sm;
+  padding: $spacing-md;
+  font-family: $font-mono;
+  font-size: 13px;
+  resize: none;
+  margin-bottom: $spacing-lg;
+
+  &:focus {
+    border-color: $accent-primary;
+    outline: none;
+  }
+}
+
+.copyButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-sm;
+}

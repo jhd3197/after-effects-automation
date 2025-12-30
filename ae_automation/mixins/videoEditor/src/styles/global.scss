@@ -1,0 +1,81 @@
+@use './variables.scss' as *;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: $font-family;
+  background-color: $bg-primary;
+  color: $text-primary;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  width: 100vw;
+  height: 100vh;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: $bg-secondary;
+}
+
+::-webkit-scrollbar-thumb {
+  background: $border-color;
+  border-radius: $radius-sm;
+
+  &:hover {
+    background: $border-highlight;
+  }
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+  transition: all $transition-fast;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+input, textarea, select {
+  font-family: inherit;
+  background-color: $bg-tertiary;
+  color: $text-primary;
+  border: 1px solid $border-color;
+  border-radius: $radius-sm;
+  padding: $spacing-sm;
+  transition: all $transition-fast;
+
+  &:focus {
+    outline: none;
+    border-color: $accent-primary;
+  }
+
+  &::placeholder {
+    color: $text-tertiary;
+  }
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}

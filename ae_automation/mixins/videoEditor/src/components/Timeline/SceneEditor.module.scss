@@ -1,0 +1,252 @@
+@use '../../styles/variables.scss' as *;
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: $z-modal;
+  backdrop-filter: blur(4px);
+}
+
+.modal {
+  background-color: $bg-secondary;
+  border-radius: $radius-lg;
+  width: 90%;
+  max-width: 700px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-lg $spacing-xl;
+  border-bottom: 1px solid $border-color;
+
+  h2 {
+    font-size: 18px;
+  }
+
+  .closeButton {
+    padding: $spacing-sm;
+    color: $text-secondary;
+    font-size: 18px;
+    transition: all $transition-fast;
+
+    &:hover {
+      color: $text-primary;
+    }
+  }
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: $spacing-xl;
+}
+
+.section {
+  margin-bottom: $spacing-xxl;
+
+  h3 {
+    font-size: 14px;
+    margin-bottom: $spacing-md;
+    color: $text-secondary;
+  }
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-md;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+
+  label {
+    font-size: 12px;
+    color: $text-secondary;
+    font-weight: 500;
+  }
+
+  input {
+    width: 100%;
+  }
+
+  &:has(.checkboxLabel) {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .checkboxLabel {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    cursor: pointer;
+
+    input[type="checkbox"] {
+      width: auto;
+      cursor: pointer;
+    }
+
+    span {
+      font-size: 13px;
+      color: $text-primary;
+    }
+  }
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.addButton {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: $spacing-sm $spacing-md;
+  background-color: $accent-primary;
+  color: white;
+  border-radius: $radius-sm;
+  font-size: 12px;
+  font-weight: 600;
+
+  &:hover {
+    background-color: $accent-hover;
+  }
+}
+
+.actionForm {
+  background-color: $bg-tertiary;
+  padding: $spacing-md;
+  border-radius: $radius-sm;
+  margin-bottom: $spacing-md;
+  overflow: hidden;
+
+  .formGrid {
+    margin-bottom: $spacing-md;
+
+    input {
+      font-size: 12px;
+    }
+  }
+}
+
+.saveActionButton {
+  width: 100%;
+  padding: $spacing-sm;
+  background-color: $accent-primary;
+  color: white;
+  border-radius: $radius-sm;
+  font-size: 12px;
+  font-weight: 600;
+
+  &:hover {
+    background-color: $accent-hover;
+  }
+}
+
+.actionsList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.actionItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md;
+  background-color: $bg-tertiary;
+  border-radius: $radius-sm;
+}
+
+.actionDetails {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+
+  strong {
+    font-size: 13px;
+    color: $text-primary;
+  }
+
+  span {
+    font-size: 12px;
+    color: $text-secondary;
+  }
+}
+
+.removeButton {
+  padding: $spacing-sm;
+  color: $accent-danger;
+  font-size: 14px;
+
+  &:hover {
+    background-color: rgba($accent-danger, 0.1);
+    border-radius: $radius-sm;
+  }
+}
+
+.effectsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+}
+
+.effectItem {
+  padding: $spacing-sm $spacing-md;
+  background-color: $bg-tertiary;
+  border-radius: $radius-sm;
+  font-size: 12px;
+  color: $text-primary;
+}
+
+.footer {
+  display: flex;
+  gap: $spacing-md;
+  padding: $spacing-lg $spacing-xl;
+  border-top: 1px solid $border-color;
+
+  button {
+    flex: 1;
+    padding: $spacing-md;
+    border-radius: $radius-sm;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .cancelButton {
+    background-color: $bg-hover;
+    color: $text-primary;
+
+    &:hover {
+      background-color: #3d3d3d;
+    }
+  }
+
+  .saveButton {
+    background-color: $accent-primary;
+    color: white;
+
+    &:hover {
+      background-color: $accent-hover;
+    }
+  }
+}
