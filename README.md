@@ -201,7 +201,10 @@ python run.py
 ```
 
 ### 2. Understand the Code
-Read `examples/basic_composition/run.py` to see how it works.
+Read `examples/
+
+
+un.py` to see how it works.
 
 ### 3. Modify It
 Change text, timing, or compositions to match your needs.

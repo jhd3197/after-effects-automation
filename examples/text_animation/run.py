@@ -13,11 +13,19 @@ This shows:
 
 import os
 import sys
+import time
 from ae_automation import Client
+import template
 
 
 def run_automation():
     """Run the text animation automation"""
+    
+    # Ensure usage of local paths by switching to the script's directory
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
+    start_total_time = time.time()
+    template_time = 0
 
     print("\n" + "="*70)
     print("Running Text Animation Automation")
@@ -27,15 +35,18 @@ def run_automation():
     template_path = os.path.join(os.path.dirname(__file__), "text_animation_template.aep")
 
     if not os.path.exists(template_path):
-        print("❌ Template not found!")
-        print(f"   Expected: {template_path}")
-        print()
-        print("Please create the template first:")
-        print("  python template.py")
-        print()
-        sys.exit(1)
-
-    print(f"✓ Template found: {template_path}")
+        print("⚠ Template not found. Creating it now...")
+        start_template_time = time.time()
+        try:
+            # Pass path to create_template (create_template works with absolute paths)
+            template.create_template() # Modified to not take arguments based on template.py signature
+            template_time = time.time() - start_template_time
+            print(f"✓ Template created in {template_time:.2f} seconds")
+        except Exception as e:
+            print(f"❌ Failed to create template: {e}")
+            sys.exit(1)
+    else:
+        print(f"✓ Template found: {template_path}")
     print()
 
     # Initialize client
@@ -63,9 +74,9 @@ def run_automation():
             "comp_end_time": 15,
             "output_file": "text_animation_output.mp4",
             "output_dir": ".\\output",
-            "renderComp": False,  # Set to True to render
+            "renderComp": True,  # Set to True to render
             "debug": True,
-            "resources": []
+        "resources": []
         },
         "timeline": [
             {
@@ -195,8 +206,13 @@ def run_automation():
         print(f"Config saved to: {config_path}")
         print()
 
+        start_automation_time = time.time()
+
         # Start the automation (pass file path, not dict)
         client.startBot(config_path)
+
+        end_automation_time = time.time()
+        automation_time = end_automation_time - start_automation_time
 
         print("\n" + "="*70)
         print("✓ Automation Complete!")
@@ -204,6 +220,15 @@ def run_automation():
 
         if config['project']['renderComp']:
             print(f"Output video: {os.path.join(config['project']['output_dir'], config['project']['output_file'])}")
+            
+        print("\n" + "="*70)
+        print("Performance Report")
+        print("="*70)
+        if template_time > 0:
+            print(f"Template Creation: {template_time:.2f}s")
+        print(f"Automation Run:    {automation_time:.2f}s")
+        print(f"Total Time:        {(end_automation_time - start_total_time):.2f}s")
+        print("="*70 + "\n")
 
     except KeyboardInterrupt:
         print("\n\n⚠ Automation cancelled by user")
