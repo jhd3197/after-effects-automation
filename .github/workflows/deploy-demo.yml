@@ -3,7 +3,7 @@ name: Deploy Demo to GitHub Pages
 on:
   push:
     branches:
-      - dev  # Deploys when changes are pushed to the dev branch
+      - main  # Deploys when changes are pushed to the main branch
 
 permissions:
   contents: write

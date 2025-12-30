@@ -79,8 +79,8 @@ const useEditorStore = create(
         })
 
         // Trigger initial zoom logic for demo
-        // Target zoom level 18 for 30s project (shows ~67s on 1200px screen)
-        const projectDuration = 30
+        // Target zoom level 18 for 40s project (shows ~67s on 1200px screen)
+        const projectDuration = 40
         const viewportWidth = 1200 // Typical screen width for timeline
         const displayDuration = projectDuration * 2.2 // Show 2.2x project duration
         const idealZoom = viewportWidth / displayDuration
