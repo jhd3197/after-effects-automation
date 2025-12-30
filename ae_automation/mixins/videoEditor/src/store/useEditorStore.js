@@ -79,9 +79,11 @@ const useEditorStore = create(
         })
 
         // Trigger initial zoom logic for demo
+        // Aim to show project duration + 20% padding in ~1000px viewport
         const projectDuration = 30
-        const idealZoom = 80 / projectDuration
-        const clampedZoom = Math.max(0.1, Math.min(10, idealZoom))
+        const viewportWidth = 1000
+        const idealZoom = viewportWidth / (projectDuration * 1.2)
+        const clampedZoom = Math.max(0.5, Math.min(10, idealZoom))
         set({ zoomLevel: clampedZoom, initialZoomSet: true })
 
         return
@@ -107,8 +109,10 @@ const useEditorStore = create(
           const projectDuration = projectData.project?.comp_end_time || projectData.project?.duration || projectData.duration || 60
 
           // Calculate zoom so project fits nicely (showing ~20% extra)
-          const idealZoom = 80 / projectDuration
-          const clampedZoom = Math.max(0.1, Math.min(10, idealZoom))
+          // Aim to show project duration + 20% padding in ~1000px viewport
+          const viewportWidth = 1000
+          const idealZoom = viewportWidth / (projectDuration * 1.2)
+          const clampedZoom = Math.max(0.5, Math.min(10, idealZoom))
 
           set({
             project: projectData,
