@@ -30,7 +30,7 @@ const useEditorStore = create(
     error: null,
     isRendering: false,
     initialZoomSet: false,
-    isDemoMode: import.meta.env.VITE_DEMO_MODE === 'true',
+    isDemoMode: import.meta.env.VITE_DEMO_MODE === true,
 
     // Actions
     loadProject: async () => {
