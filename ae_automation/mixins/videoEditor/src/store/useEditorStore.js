@@ -30,10 +30,63 @@ const useEditorStore = create(
     error: null,
     isRendering: false,
     initialZoomSet: false,
+    isDemoMode: import.meta.env.VITE_DEMO_MODE === 'true',
 
     // Actions
     loadProject: async () => {
       set({ isLoading: true, error: null })
+      const isDemo = get().isDemoMode
+
+      if (isDemo) {
+        // MOCK DATA FOR DEMO MODE
+        console.log("Loading Demo Project...")
+        const demoProject = {
+          project: {
+            duration: 30,
+            comp_end_time: 30,
+            resources: []
+          },
+          timeline: [
+            {
+              name: 'Intro Scene',
+              duration: 5,
+              startTime: 0,
+              template_comp: 'Intro_Template',
+              uiColor: SCENE_COLORS[0]
+            },
+            {
+              name: 'Main Content',
+              duration: 15,
+              startTime: 5,
+              template_comp: 'Content_Template',
+              uiColor: SCENE_COLORS[2]
+            },
+            {
+              name: 'Outro Scene',
+              duration: 5,
+              startTime: 20,
+              template_comp: 'Outro_Template',
+              uiColor: SCENE_COLORS[1]
+            }
+          ]
+        }
+
+        set({
+          project: demoProject,
+          filePath: 'Demo Project.aep',
+          isLoading: false,
+          initialZoomSet: false
+        })
+
+        // Trigger initial zoom logic for demo
+        const projectDuration = 30
+        const idealZoom = 80 / projectDuration
+        const clampedZoom = Math.max(0.1, Math.min(10, idealZoom))
+        set({ zoomLevel: clampedZoom, initialZoomSet: true })
+
+        return
+      }
+
       try {
         const response = await axios.get(`${API_BASE}/project`)
         const projectData = response.data.data
@@ -54,12 +107,6 @@ const useEditorStore = create(
           const projectDuration = projectData.project?.comp_end_time || projectData.project?.duration || projectData.duration || 60
 
           // Calculate zoom so project fits nicely (showing ~20% extra)
-          // Assuming viewport ~1000px wide, we want duration to take ~80% of it
-          // zoomLevel * 10 = pixels per second
-          // totalPixels = duration * (zoomLevel * 10)
-          // 800 = duration * zoomLevel * 10
-          // zoomLevel = 80 / duration
-
           const idealZoom = 80 / projectDuration
           const clampedZoom = Math.max(0.1, Math.min(10, idealZoom))
 

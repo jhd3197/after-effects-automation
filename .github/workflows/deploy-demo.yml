@@ -1,0 +1,37 @@
+name: Deploy Demo to GitHub Pages
+
+on:
+  push:
+    branches:
+      - dev  # Deploys when changes are pushed to the dev branch
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install and Build (Demo Mode)
+        working-directory: ae_automation/mixins/videoEditor
+        env:
+          VITE_DEMO_MODE: "true"
+        run: |
+          npm install
+          npm run build
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./ae_automation/mixins/videoEditor/dist
+          publish_branch: gh-pages  # The branch that GitHub Pages serves from
