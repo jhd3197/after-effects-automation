@@ -138,3 +138,8 @@ playground.py
 /.vscode
 
 test_report_*.json
+output/
+*.aep
+*.mp4
+cachefile_map.json
+automation_config.json

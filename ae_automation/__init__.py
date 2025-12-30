@@ -27,7 +27,8 @@ class Client(
         super().__init__(**kwargs)
         
         # Get environment variables with defaults
-        cache_folder = os.environ.get('CACHE_FOLDER', 'cache')
+        from ae_automation import settings
+        cache_folder = settings.CACHE_FOLDER
         
         # Create cache folder if it doesn't exist
         pathlib.Path(cache_folder).mkdir(parents=True, exist_ok=True) 
@@ -42,5 +43,10 @@ class Client(
         framework_js = self.file_get_contents(os.path.join(js_path, 'framework.js'))
         
         # Replace cache folder placeholder
-        framework_js = framework_js.replace('{CACHE_FOLDER}', cache_folder.replace('\\', '/'))
+        # Ensure path has trailing slash for JS string concatenation
+        cache_path = cache_folder.replace('\\', '/')
+        if not cache_path.endswith('/'):
+            cache_path += '/'
+            
+        framework_js = framework_js.replace('{CACHE_FOLDER}', cache_path)
         self.JS_FRAMEWORK += framework_js

@@ -28,7 +28,7 @@ class ToolsMixin:
     def file_get_contents(self,filename):
         #Convert filename to absolute path
         filename = os.path.abspath(filename)
-        with open(filename) as f:
+        with open(filename, encoding='utf-8') as f:
             return f.read()
 
     def slug(self,_str):

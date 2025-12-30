@@ -85,26 +85,6 @@ class ProcessManagerMixin:
         print(f"✗ Timeout waiting for After Effects window")
         return False
 
-    def close_home_screen(self):
-        """
-        Close the Home screen (Quick Start) if it's open
-        After Effects 2024/2025 opens with a Home screen by default
-
-        Returns:
-            True if successful
-        """
-        print("Checking for Home screen...")
-
-        try:
-            # Run script to close home screen and ensure we're on a project
-            self.runScript("close_home_screen.jsx")
-            time.sleep(2)
-            print("✓ Home screen handled")
-            return True
-        except Exception as e:
-            print(f"  Note: Could not close home screen: {e}")
-            return False
-
     def is_after_effects_responsive(self, max_retries=5):
         """
         Check if After Effects is responsive by running a simple script
@@ -119,9 +99,6 @@ class ProcessManagerMixin:
 
         for attempt in range(max_retries):
             try:
-                # First, try to close the home screen
-                if attempt == 0:
-                    self.close_home_screen()
 
                 # Run a very simple test script
                 test_script = "app.project ? 'ready' : 'no project';"
@@ -158,6 +135,26 @@ class ProcessManagerMixin:
         print("✗ After Effects is not responding")
         return False
 
+    def handle_crash_dialog(self):
+        """
+        Check for and handle "Crash Repair Options" / "Safe Mode" dialog
+        Presses Space to select the default option (usually Start Normally or Continue)
+        """
+        try:
+            # We blindly send Space/Enter if we suspect a dialog based on timing
+            # Ideally we would check for window title "Adobe After Effects" with specific size
+            # But just pressing Space is often safe enough during startup
+            print("Checking for Crash/Safe Mode dialog...")
+            import pyautogui
+            # Focus AE window if possible (optional, might need win32gui)
+            
+            # Send Space key to dismiss "Start Safe Mode" dialog or "Crash Repair"
+            pyautogui.press('space')
+            print("  Sent SPACE key to handle potential dialog")
+            time.sleep(1)
+        except Exception as e:
+            print(f"  Failed to handle crash dialog: {e}")
+
     def wait_for_after_effects_ready(self, timeout=120):
         """
         Comprehensive wait for After Effects to be fully loaded and ready
@@ -183,23 +180,27 @@ class ProcessManagerMixin:
         if remaining_time <= 0:
             print("✗ Timeout reached")
             return False
+            
+        # Attempt to handle crash dialog early
+        time.sleep(5)
+        self.handle_crash_dialog()
 
         # Step 2: Wait for main window
         if not self.wait_for_window("Adobe After Effects", timeout=int(remaining_time)):
-            return False
-
-        remaining_time = timeout - (time.time() - start_time)
-        if remaining_time <= 0:
-            print("✗ Timeout reached")
-            return False
-
+            # Try handling dialog again if window wait fails or takes too long
+            self.handle_crash_dialog()
+            # Retry wait? No, let's just proceed to plugin wait
+        
         # Step 3: Wait a bit more for plugins to load
         print("Waiting for plugins and UI to initialize...")
         time.sleep(5)
 
         # Step 4: Check if responsive
         if not self.is_after_effects_responsive(max_retries=3):
-            return False
+            # One last try to clear dialogs
+            self.handle_crash_dialog()
+            if not self.is_after_effects_responsive(max_retries=2):
+                return False
 
         elapsed = time.time() - start_time
         print("="*60)
@@ -246,12 +247,6 @@ class ProcessManagerMixin:
 
         # Wait for it to be ready
         ready = self.wait_for_after_effects_ready(timeout=timeout)
-
-        # Close home screen if requested
-        if ready and skip_home_screen:
-            print("Ensuring we're past the Home screen...")
-            self.close_home_screen()
-            time.sleep(2)
 
         return ready
 
@@ -305,5 +300,202 @@ class ProcessManagerMixin:
 
         # Wait for completion
         time.sleep(wait_time)
+
+        return True
+
+    def test_script_execution(self):
+        """
+        Test if After Effects can execute scripts
+        Shows an alert dialog in AE if scripts are working
+
+        Returns:
+            True if test was sent (check AE for alert dialog)
+        """
+        print("\n" + "="*60)
+        print("Testing Script Execution")
+        print("="*60)
+        print("Running test script...")
+        print("(You should see an alert dialog in After Effects)\n")
+
+        try:
+            self.runScript("test_script_execution.jsx")
+            time.sleep(3)
+
+            print("✓ Test script sent to After Effects")
+            print("\n⚠ IMPORTANT: Did you see an alert dialog in After Effects?")
+            print("  - If YES: Scripts are working! ✓")
+            print("  - If NO: Scripts are NOT executing - check preferences")
+            print("="*60 + "\n")
+            return True
+        except Exception as e:
+            print(f"✗ Failed to run test script: {e}")
+            print("="*60 + "\n")
+            return False
+
+    def check_scripting_settings(self):
+        """
+        Check After Effects scripting settings
+        Shows a detailed alert dialog in AE with current settings
+
+        Returns:
+            True if check was sent (read alert dialog in AE for details)
+        """
+        print("\n" + "="*60)
+        print("Checking Scripting Settings")
+        print("="*60)
+        print("Running settings check...")
+        print("(You should see a detailed alert in After Effects)\n")
+
+        try:
+            self.runScript("check_scripting_enabled.jsx")
+            time.sleep(3)
+
+            print("✓ Settings check sent to After Effects")
+            print("\nRead the alert dialog in After Effects for details")
+            print("="*60 + "\n")
+            return True
+        except Exception as e:
+            print(f"✗ Failed to check settings: {e}")
+            print("="*60 + "\n")
+            return False
+
+    def test_composition_creation(self):
+        """
+        Test composition creation with debug alerts
+        Shows multiple alert dialogs showing progress
+
+        Returns:
+            True if test was sent (check AE for alerts and composition)
+        """
+        print("\n" + "="*60)
+        print("Testing Composition Creation (Debug Mode)")
+        print("="*60)
+        print("Attempting to create a test composition...")
+        print("(You should see multiple alert dialogs showing progress)\n")
+
+        try:
+            replacements = {
+                "{compName}": "DEBUG_TEST_COMP",
+                "{compWidth}": "1920",
+                "{compHeight}": "1080",
+                "{pixelAspect}": "1",
+                "{duration}": "10",
+                "{frameRate}": "29.97",
+                "{folderName}": ""
+            }
+
+            self.runScript("debug_create_comp.jsx", replacements)
+            time.sleep(5)
+
+            print("✓ Debug comp creation script sent")
+            print("\nCheck After Effects:")
+            print("  - Did you see alert dialogs?")
+            print("  - Was a composition created?")
+            print("  - Check the Project panel for 'DEBUG_TEST_COMP'")
+            print("="*60 + "\n")
+            return True
+        except Exception as e:
+            print(f"✗ Failed to create debug comp: {e}")
+            print("="*60 + "\n")
+            return False
+
+    def run_full_diagnostic(self):
+        """
+        Run complete diagnostic suite
+        Tests process, window detection, script execution, and settings
+
+        Returns:
+            True if diagnostics completed
+        """
+        print("\n" + "="*60)
+        print("After Effects Automation - Full Diagnostic")
+        print("="*60 + "\n")
+
+        # Step 1: Check if AE is running
+        print("Step 1: Checking After Effects Process")
+        print("-" * 60)
+
+        ae_running = False
+        ae_pid = None
+
+        for proc in psutil.process_iter(['name', 'pid']):
+            try:
+                if proc.info['name'].lower() == 'afterfx.exe':
+                    ae_running = True
+                    ae_pid = proc.info['pid']
+                    print(f"✓ After Effects is running (PID: {ae_pid})")
+                    break
+            except (psutil.NoSuchProcess, psutil.AccessDenied):
+                pass
+
+        if not ae_running:
+            print("✗ After Effects is not running")
+            print("\nStarting After Effects...")
+
+            if not self.ensure_after_effects_running(timeout=120):
+                print("✗ Failed to start After Effects")
+                return False
+
+        # Step 2: Check window detection
+        print("\nStep 2: Checking Window Detection")
+        print("-" * 60)
+
+        try:
+            import pygetwindow as gw
+            ae_windows = [w for w in gw.getAllWindows() if 'after effects' in w.title.lower()]
+
+            if ae_windows:
+                print(f"✓ Found {len(ae_windows)} After Effects window(s):")
+                for i, window in enumerate(ae_windows, 1):
+                    print(f"  {i}. {window.title}")
+            else:
+                print("✗ No After Effects windows found")
+        except Exception as e:
+            print(f"⚠ Could not detect windows: {e}")
+
+        # Step 3: Test script execution
+        self.test_script_execution()
+
+        # Step 4: Check scripting settings
+        self.check_scripting_settings()
+
+        # Step 5: Test composition creation
+        self.test_composition_creation()
+
+        # Summary
+        print("\n" + "="*60)
+        print("Summary and Recommendations")
+        print("="*60 + "\n")
+
+        print("If you saw alert dialogs:")
+        print("  ✓ Scripts ARE executing - the system is working!")
+        print("  ✓ Check After Effects for the created items")
+        print("")
+        print("If you did NOT see alert dialogs:")
+        print("  ✗ Scripts are NOT executing properly")
+        print("")
+        print("  Common fixes:")
+        print("  1. Enable scripting in After Effects:")
+        print("     Edit > Preferences > Scripting & Expressions")
+        print("     ☑ Allow Scripts to Write Files and Access Network")
+        print("")
+        print("  2. Restart After Effects after enabling")
+        print("")
+        print("  3. Check that After Effects is not showing any error dialogs")
+        print("")
+        print("  4. Try running After Effects as Administrator")
+        print("")
+        print("  5. Check antivirus isn't blocking script execution")
+        print("")
+
+        print("="*60)
+        print("Next Steps")
+        print("="*60 + "\n")
+
+        print("1. Review the alert dialogs in After Effects")
+        print("2. If scripting is disabled, enable it and restart AE")
+        print("3. Run diagnostics again: ae-automation diagnose")
+        print("4. Once scripts work, try: ae-automation generate --template tutorial")
+        print("")
 
         return True
