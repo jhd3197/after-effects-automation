@@ -36,6 +36,7 @@ setup(
         "mutagen>=1.45.1",
         "moviepy>=1.0.3",
         "flask>=2.0.0",
+        "flask-cors>=3.0.0",
         "werkzeug>=2.0.0",
         "psutil>=5.8.0"
     ],
@@ -43,7 +44,9 @@ setup(
         "ae_automation": [
             "mixins/js/*.js",
             "mixins/js/*.jsx",
-            "mixins/videoEditor/*"
+            "mixins/videoEditor/dist/**/*",
+            "mixins/videoEditor/dist/*",
+            "mixins/videoEditor/script.js" 
         ]
     },
     include_package_data=True,

@@ -50,3 +50,7 @@ class Client(
             
         framework_js = framework_js.replace('{CACHE_FOLDER}', cache_path)
         self.JS_FRAMEWORK += framework_js
+
+# Export the Client class with multiple names for convenience
+AfterEffectsAutomation = Client
+__all__ = ['Client', 'AfterEffectsAutomation']

@@ -7,8 +7,18 @@ include .env.example
 recursive-include ae_automation/mixins/js *.js
 recursive-include ae_automation/mixins/js *.jsx
 
-# Include web editor files
-recursive-include ae_automation/mixins/videoEditor *
+# Include web editor files (Production Build Only)
+recursive-include ae_automation/mixins/videoEditor/dist *
+include ae_automation/mixins/videoEditor/script.js
+
+# Exclude web editor source files and node_modules
+prune ae_automation/mixins/videoEditor/src
+prune ae_automation/mixins/videoEditor/node_modules
+exclude ae_automation/mixins/videoEditor/*.scss
+exclude ae_automation/mixins/videoEditor/package.json
+exclude ae_automation/mixins/videoEditor/package-lock.json
+exclude ae_automation/mixins/videoEditor/vite.config.js
+exclude ae_automation/mixins/videoEditor/index.html
 
 # Exclude cache and development files
 global-exclude *.pyc

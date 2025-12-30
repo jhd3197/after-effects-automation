@@ -1,0 +1,50 @@
+@use '../../styles/variables.scss' as *;
+
+.timeline {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: $timeline-bg;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-lg $spacing-xl;
+  background-color: $bg-secondary;
+  border-bottom: 1px solid $border-color;
+
+  h2 {
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .info {
+    display: flex;
+    gap: $spacing-lg;
+    font-size: 13px;
+    color: $text-secondary;
+  }
+}
+
+.timelineContainer {
+  flex: 1;
+  overflow-x: auto;
+  overflow-y: hidden;
+  position: relative;
+}
+
+.timelineContent {
+  min-width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.tracks {
+  min-height: calc(100% - 40px);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}

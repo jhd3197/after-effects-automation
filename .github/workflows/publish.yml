@@ -90,6 +90,18 @@ jobs:
           python -m pip install --upgrade pip
           pip install setuptools wheel twine
 
+      ### Step 9.5: Build Frontend Assets ###
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Build Frontend
+        working-directory: ae_automation/mixins/videoEditor
+        run: |
+          npm install
+          npm run build
+
       ### Step 10: Build the Package ###
       - name: Build Package
         run: |

@@ -1,0 +1,155 @@
+@use '../../styles/variables.scss' as *;
+
+.effectsPanel {
+  width: 280px;
+  background-color: $bg-secondary;
+  border-left: 1px solid $border-color;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-lg;
+  background-color: $bg-tertiary;
+
+  svg {
+    color: $accent-primary;
+    font-size: 16px;
+  }
+
+  h2 {
+    font-size: 14px;
+    font-weight: 600;
+  }
+}
+
+.notice {
+  padding: $spacing-lg;
+  text-align: center;
+  color: $text-tertiary;
+  font-size: 12px;
+  background-color: $bg-tertiary;
+  margin: $spacing-md;
+  border-radius: $radius-sm;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: $spacing-lg;
+}
+
+.section {
+  margin-bottom: $spacing-lg;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md;
+  background-color: $bg-tertiary;
+  border-radius: $radius-sm;
+  cursor: pointer;
+  user-select: none;
+  transition: all $transition-fast;
+
+  &:hover {
+    background-color: #313131;
+  }
+
+  .title {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+
+    svg {
+      color: $text-tertiary;
+      font-size: 12px;
+      transition: transform $transition-fast;
+    }
+
+    h3 {
+      font-size: 13px;
+      font-weight: 600;
+    }
+  }
+
+  .count {
+    font-size: 11px;
+    color: $text-tertiary;
+    background-color: $bg-hover;
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+}
+
+.effectsList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  margin-top: $spacing-sm;
+}
+
+.effectItem {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  background-color: $bg-tertiary;
+  border-radius: $radius-sm;
+  transition: all $transition-fast;
+
+  &:hover {
+    background-color: #313131;
+  }
+}
+
+.effectInfo {
+  flex: 1;
+
+  h4 {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: $text-primary;
+  }
+
+  p {
+    font-size: 11px;
+    color: $text-secondary;
+    line-height: 1.4;
+  }
+}
+
+.addButton {
+  padding: 6px 10px;
+  background-color: $accent-primary;
+  color: white;
+  border-radius: $radius-sm;
+  font-size: 12px;
+  transition: all $transition-fast;
+  flex-shrink: 0;
+
+  svg {
+    font-size: 12px;
+  }
+
+  &:hover:not(:disabled) {
+    background-color: $accent-hover;
+  }
+
+  &:disabled {
+    background-color: $bg-hover;
+    color: $text-tertiary;
+  }
+}

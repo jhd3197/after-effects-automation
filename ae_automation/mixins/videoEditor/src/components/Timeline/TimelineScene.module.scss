@@ -1,0 +1,177 @@
+@use '../../styles/variables.scss' as *;
+
+.track {
+  position: relative;
+  height: 70px;
+  border-bottom: 1px solid $border-color;
+  transition: height $transition-normal;
+
+  &.expanded {
+    height: 200px;
+  }
+}
+
+.scene {
+  position: absolute;
+  top: 10px;
+  height: 50px;
+  border-radius: $radius-sm;
+  cursor: grab;
+  user-select: none;
+  transition: box-shadow $transition-fast, transform $transition-fast;
+  overflow: hidden;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+  }
+
+  &.selected {
+    box-shadow: 0 0 0 2px $accent-primary,
+      0 4px 16px rgba($accent-primary, 0.4);
+    z-index: 10;
+  }
+
+  &.dragging {
+    cursor: grabbing;
+    opacity: 0.8;
+    z-index: 100;
+  }
+}
+
+.sceneHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-sm $spacing-md;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.sceneInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  overflow: hidden;
+
+  .sceneName {
+    font-size: 13px;
+    font-weight: 600;
+    color: white;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .sceneDuration {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.7);
+  }
+}
+
+.sceneActions {
+  display: flex;
+  gap: $spacing-xs;
+  opacity: 0;
+  transition: opacity $transition-fast;
+
+  .scene:hover & {
+    opacity: 1;
+  }
+}
+
+.actionButton {
+  padding: 4px;
+  background-color: rgba(0, 0, 0, 0.3);
+  color: white;
+  border-radius: $radius-sm;
+  font-size: 11px;
+  transition: all $transition-fast;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  &.delete {
+    &:hover {
+      background-color: $accent-danger;
+    }
+  }
+}
+
+.sceneDetails {
+  position: absolute;
+  top: 60px;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: $spacing-md;
+  border-radius: $radius-sm;
+  backdrop-filter: blur(10px);
+}
+
+.detailItem {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: $spacing-xs;
+
+  strong {
+    color: white;
+    margin-right: $spacing-xs;
+  }
+}
+
+.resizeHandle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 10px;
+  cursor: ew-resize;
+  z-index: 10;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+
+  &.right {
+    right: 0;
+  }
+
+  &.left {
+    left: 0;
+  }
+}
+
+.sceneContainer {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-md;
+  width: 100%;
+  padding-right: $spacing-xl; // Add some padding on the right
+
+  &.odd {
+    background-color: rgba(255, 255, 255, 0.03);
+  }
+
+  &.even {
+    background-color: transparent;
+  }
+}
+
+.indexBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background-color: $bg-tertiary;
+  color: $text-secondary;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 600;
+  flex-shrink: 0;
+  margin-top: 18px; // Align with scene bar
+  border: 1px solid $border-color;
+  user-select: none;
+}

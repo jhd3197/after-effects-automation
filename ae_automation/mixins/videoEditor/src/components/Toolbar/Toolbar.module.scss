@@ -1,0 +1,101 @@
+@use '../../styles/variables.scss' as *;
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: $spacing-lg;
+  padding: $spacing-md $spacing-xl;
+  background-color: $bg-secondary;
+  border-bottom: 1px solid $border-color;
+  height: 50px;
+}
+
+.group {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.separator {
+  width: 1px;
+  height: 24px;
+  background-color: $border-color;
+}
+
+.toolButton {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-sm;
+  background-color: transparent;
+  color: $text-secondary;
+  font-size: 13px;
+  transition: all $transition-fast;
+
+  svg {
+    font-size: 14px;
+  }
+
+  &:hover:not(:disabled) {
+    background-color: $bg-hover;
+    color: $text-primary;
+  }
+
+  &:disabled {
+    opacity: 0.3;
+  }
+
+  &.primary {
+    background-color: $accent-primary;
+    color: white;
+
+    &:hover:not(:disabled) {
+      background-color: $accent-hover;
+    }
+  }
+}
+
+.zoomLevel {
+  color: $text-secondary;
+  font-size: 12px;
+  min-width: 40px;
+  text-align: center;
+}
+
+.zoomSlider {
+  width: 120px;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: $bg-hover;
+  border-radius: 2px;
+  outline: none;
+
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    background: $accent-primary;
+    border-radius: 50%;
+    cursor: pointer;
+
+    &:hover {
+      background: $accent-hover;
+    }
+  }
+
+  &::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    background: $accent-primary;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+
+    &:hover {
+      background: $accent-hover;
+    }
+  }
+}

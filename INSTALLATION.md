@@ -19,7 +19,7 @@ pip install after-effects-automation
 ### Method 2: From Source
 
 ```bash
-git clone https://github.com/yourusername/after-effects-automation.git
+git clone https://github.com/jhd3197/after-effects-automation.git
 cd after-effects-automation
 pip install -e .
 ```
@@ -205,5 +205,5 @@ rm -rf C:/temp/ae_cache
 
 ## Support
 
-- **Issues**: [GitHub Issues](https://github.com/yourusername/after-effects-automation/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/after-effects-automation/discussions)
+- **Issues**: [GitHub Issues](https://github.com/jhd3197/after-effects-automation/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/jhd3197/after-effects-automation/discussions)
