@@ -50,6 +50,22 @@ python install_ae_runner.py
 3. Check **Allow Scripts to Write Files and Access Network**
 4. Restart After Effects
 
+### 3. Turn Off the Welcome Screen (Recommended)
+
+The Welcome Screen can interfere with automation. Disable it:
+
+1. Open After Effects
+2. Go to **Edit > Preferences > General**
+3. **Uncheck** "Show Welcome Screen at Startup"
+4. Restart After Effects
+
+**Why this is important:**
+- Removes the visual welcome UI that can block automation
+- Allows AE to start in a clean state ready for scripting
+- Prevents dialogs from interfering with process detection
+
+**Note:** This removes the welcome screen but AE may still open with an empty project. This is normal and expected behavior.
+
 ## Environment Configuration
 
 ### Create .env File
