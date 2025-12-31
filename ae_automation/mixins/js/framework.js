@@ -173,20 +173,20 @@ function outputLogs(finalLog,debug){
 function decodeHTMLEntities(text) {
     var entities = [
         ['amp', '&'],
-        ['apos', '\''],
-        ['#x27', '\''],
+        ['apos', '\u2019'],  // Curly apostrophe instead of straight '
+        ['#x27', '\u2019'],  // Curly apostrophe
         ['#x2F', '/'],
-        ['#39', '\''],
+        ['#39', '\u2019'],   // Curly apostrophe
         ['#47', '/'],
         ['lt', '<'],
         ['gt', '>'],
         ['#44', ','],
         ['nbsp', ' '],
-        ['quot', '"'],
-        
+        ['quot', '\u201C'],  // Opening curly double quote
+
     ];
 
-    for (var i = 0, max = entities.length; i < max; ++i) 
+    for (var i = 0, max = entities.length; i < max; ++i)
         text = text.replace(new RegExp('&'+entities[i][0]+';', 'g'), entities[i][1]);
 
     return text;
@@ -214,10 +214,20 @@ function valueParser(propertyValue){
     else{
         // Decode html entities
         propertyValue = decodeHTMLEntities(propertyValue);
-    }
-    // check if value contains "<br>" and convert to "\n"s
-    if (propertyValue.indexOf("<br>") > -1) {
-        propertyValue = propertyValue.replace(/<br>/g, "\n");
+
+        // Replace HTML line breaks with newlines (case-insensitive, with or without slash)
+        propertyValue = propertyValue.replace(/<br\s*\/?>/gi, "\n");
+
+        // Replace straight quotes with curly quotes for After Effects compatibility
+        // Straight apostrophe/single quote to curly apostrophe
+        propertyValue = propertyValue.replace(/'/g, '\u2019');
+
+        // Straight double quotes to curly quotes (simple replacement - opening quote)
+        propertyValue = propertyValue.replace(/"/g, '\u201C');
+
+        // Replace backtick and acute accent with curly apostrophe
+        propertyValue = propertyValue.replace(/`/g, '\u2018');  // Opening single quote
+        propertyValue = propertyValue.replace(/´/g, '\u2019');  // Closing single quote
     }
     return propertyValue
 }
