@@ -11,6 +11,9 @@
 
 Perfect for batch video production, template-based workflows, and automated content creation.
 
+**📦 PyPI Package:** [pypi.org/project/after-effects-automation](https://pypi.org/project/after-effects-automation/)
+
+
 > [!TIP]
 > Starring this repo helps more developers discover after-effects-automation ✨
 >
@@ -34,7 +37,7 @@ Perfect for batch video production, template-based workflows, and automated cont
 ## ⚡ Quick Start
 
 ```bash
-# 1. Install
+# 1. Install from PyPI
 pip install after-effects-automation
 
 # 2. Setup After Effects integration
@@ -48,6 +51,7 @@ python run.py
 
 **That's it!** A 10-second video will be created automatically.
 
+**📦 PyPI:** [pypi.org/project/after-effects-automation](https://pypi.org/project/after-effects-automation/)
 **📖 Need more help?** See the [Quick Start Guide](QUICK_START.md)
 
 ---
@@ -223,15 +227,35 @@ Contributions welcome! Here's how:
 4. **Submit PRs** - Bug fixes and features
 
 ---
-
 ## 📄 License
 
-MIT License - See [LICENSE](LICENSE) file for details.
+This project is licensed under the **MIT License**.
+See the [LICENSE](LICENSE) file for full details.
+
+**Adobe After Effects** is a trademark of Adobe Inc. This project is **not affiliated with, endorsed by, or sponsored by Adobe Inc.**
+
+---
+
+### Disclaimer
+
+This project is an **automation and middleware tool** for Adobe After Effects.
+It requires a **valid Adobe Creative Cloud license** to use.
+
+The tool works by translating Python commands into **Adobe-supported ExtendScript (JavaScript)** instructions that After Effects already supports natively.
+
+* It does **not** modify, crack, patch, or bypass Adobe software
+* It does **not** distribute Adobe assets or binaries
+* It does **not** enable use of After Effects without a license
+
+We do **not** support or condone software piracy in any form.
+
+By using this project, you confirm that you have obtained Adobe After Effects through official channels at [https://www.adobe.com/products/aftereffects.html](https://www.adobe.com/products/aftereffects.html).
 
 ---
 
 ## 📞 Get Help
 
+* **📦 PyPI Package** - [pypi.org/project/after-effects-automation](https://pypi.org/project/after-effects-automation/)
 * **📖 Documentation** - Read the guides in `/docs` folder
 * **💡 Examples** - Working code in `examples/` folder
 * **🐛 Issues** - [GitHub Issues](https://github.com/jhd3197/after-effects-automation/issues)
