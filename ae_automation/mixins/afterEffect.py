@@ -28,7 +28,29 @@ class afterEffectMixin:
     #TODO - Create function to edit values from comp or create a template.json and add the values there then the script will read the values from there will modify the json
     #TODO - Add transitions layer
     afterEffectItems=[]
-    
+
+    def sanitize_text_for_ae(self, text):
+        """
+        Sanitize text before sending to After Effects.
+        Must be done in Python before JS to avoid string escaping issues.
+        """
+        if not isinstance(text, str):
+            return text
+
+        # Replace HTML line breaks with carriage return (AE uses \r for newlines)
+        text = text.replace('<br>', '\r')
+        text = text.replace('<br/>', '\r')
+        text = text.replace('<BR>', '\r')
+        text = text.replace('<BR/>', '\r')
+        text = text.replace('<br />', '\r')
+        text = text.replace('<BR />', '\r')
+
+        # DON'T convert quotes - keep them as-is to avoid UTF-8 encoding issues
+        # After Effects handles straight quotes fine, and converting causes encoding problems
+        # The â€™ you're seeing is UTF-8 curly quote being misinterpreted as Latin-1
+
+        return text
+
     def startAfterEffect(self, data):
         """
         startAfterEffect
@@ -320,6 +342,10 @@ class afterEffectMixin:
         """
         editComp
         """
+        # Sanitize text values before sending to After Effects
+        if isinstance(value, str):
+            value = self.sanitize_text_for_ae(value)
+
         _replace={
             "{comp_name}":str(comp_name),
             "{layer_name}":str(layer_name),
@@ -353,6 +379,10 @@ class afterEffectMixin:
         """
         editComp
         """
+        # Sanitize text values before sending to After Effects
+        if isinstance(value, str):
+            value = self.sanitize_text_for_ae(value)
+
         _replace={
             "{comp_name}":str(comp_name),
             "{layer_name}":str(layer_name),

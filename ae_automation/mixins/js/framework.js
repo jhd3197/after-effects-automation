@@ -173,16 +173,16 @@ function outputLogs(finalLog,debug){
 function decodeHTMLEntities(text) {
     var entities = [
         ['amp', '&'],
-        ['apos', '\u2019'],  // Curly apostrophe instead of straight '
-        ['#x27', '\u2019'],  // Curly apostrophe
+        ['apos', '\''],  // Keep straight apostrophe to avoid UTF-8 encoding issues
+        ['#x27', '\''],
         ['#x2F', '/'],
-        ['#39', '\u2019'],   // Curly apostrophe
+        ['#39', '\''],
         ['#47', '/'],
         ['lt', '<'],
         ['gt', '>'],
         ['#44', ','],
         ['nbsp', ' '],
-        ['quot', '\u201C'],  // Opening curly double quote
+        ['quot', '"'],  // Keep straight quote to avoid UTF-8 encoding issues
 
     ];
 
@@ -215,19 +215,8 @@ function valueParser(propertyValue){
         // Decode html entities
         propertyValue = decodeHTMLEntities(propertyValue);
 
-        // Replace HTML line breaks with newlines (case-insensitive, with or without slash)
-        propertyValue = propertyValue.replace(/<br\s*\/?>/gi, "\n");
-
-        // Replace straight quotes with curly quotes for After Effects compatibility
-        // Straight apostrophe/single quote to curly apostrophe
-        propertyValue = propertyValue.replace(/'/g, '\u2019');
-
-        // Straight double quotes to curly quotes (simple replacement - opening quote)
-        propertyValue = propertyValue.replace(/"/g, '\u201C');
-
-        // Replace backtick and acute accent with curly apostrophe
-        propertyValue = propertyValue.replace(/`/g, '\u2018');  // Opening single quote
-        propertyValue = propertyValue.replace(/´/g, '\u2019');  // Closing single quote
+        // Note: <br> replacement is now handled in Python to use \r (carriage return)
+        // which is the proper newline character for After Effects text layers
     }
     return propertyValue
 }
