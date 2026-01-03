@@ -106,49 +106,59 @@ function outputLogs(finalLog,debug){
     }
     _LOGS = _LOGS + "\n" + finalLog;
 
+    // Save logs to file so Python can read them
+    try {
+        var logFile = new File(CACHE_FODLER + "{LOGS_NAME}.log");
+        logFile.open("w");
+        logFile.write(_LOGS);
+        logFile.close();
+    } catch(e) {
+        // If we can't write logs, at least try to show the dialog
+    }
+
     /*
-    Code for Import https://scriptui.joonas.me — (Triple click to select): 
+    Code for Import https://scriptui.joonas.me — (Triple click to select):
     {"activeId":6,"items":{"item-0":{"id":0,"type":"Dialog","parentId":false,"style":{"enabled":true,"varName":null,"windowType":"Dialog","creationProps":{"su1PanelCoordinates":false,"maximizeButton":false,"minimizeButton":false,"independent":false,"closeButton":true,"borderless":false,"resizeable":false},"text":"Dialog","preferredSize":[0,0],"margins":16,"orientation":"column","spacing":10,"alignChildren":["center","top"]}},"item-2":{"id":2,"type":"Panel","parentId":0,"style":{"enabled":true,"varName":null,"creationProps":{"borderStyle":"etched","su1PanelCoordinates":false},"text":"Log","preferredSize":[0,0],"margins":10,"orientation":"column","spacing":10,"alignChildren":["left","top"],"alignment":null}},"item-4":{"id":4,"type":"EditText","parentId":2,"style":{"enabled":true,"varName":null,"creationProps":{"noecho":false,"readonly":true,"multiline":true,"scrollable":true,"borderless":false,"enterKeySignalsOnChange":false},"softWrap":false,"text":"EditText\nsdsds","justify":"left","preferredSize":[700,200],"alignment":"right","helpTip":null}},"item-5":{"id":5,"type":"Button","parentId":0,"style":{"enabled":true,"varName":null,"text":"Close","justify":"center","preferredSize":[0,0],"alignment":"right","helpTip":null}},"item-6":{"id":6,"type":"StaticText","parentId":0,"style":{"enabled":true,"varName":null,"creationProps":{"truncate":"none","multiline":false,"scrolling":false},"softWrap":false,"text":"File : {FILE_NAME}","justify":"left","preferredSize":[0,0],"alignment":"left","helpTip":null}}},"order":[0,6,2,4,5],"settings":{"importJSON":true,"indentSize":false,"cepExport":false,"includeCSSJS":true,"showDialog":true,"functionWrapper":false,"afterEffectsDockable":false,"itemReferenceList":"None"}}
-    */ 
+    */
 
     // DIALOG
     // ======
-    var dialog = new Window("dialog"); 
-    dialog.text = "AE Automation - Debug"; 
-    dialog.orientation = "column"; 
-    dialog.alignChildren = ["center","top"]; 
-    dialog.spacing = 10; 
-    dialog.margins = 16; 
+    var dialog = new Window("dialog");
+    dialog.text = "AE Automation - Debug";
+    dialog.orientation = "column";
+    dialog.alignChildren = ["center","top"];
+    dialog.spacing = 10;
+    dialog.margins = 16;
 
-    var statictext1 = dialog.add("statictext", undefined, undefined, {name: "statictext1"}); 
-        statictext1.text = "File : {FILE_NAME}"; 
-        statictext1.alignment = ["left","top"]; 
+    var statictext1 = dialog.add("statictext", undefined, undefined, {name: "statictext1"});
+        statictext1.text = "File : {FILE_NAME}";
+        statictext1.alignment = ["left","top"];
 
     // PANEL1
     // ======
-    var panel1 = dialog.add("panel", undefined, undefined, {name: "panel1"}); 
-        panel1.text = "Log"; 
-        panel1.orientation = "column"; 
-        panel1.alignChildren = ["left","top"]; 
-        panel1.spacing = 10; 
-        panel1.margins = 10; 
+    var panel1 = dialog.add("panel", undefined, undefined, {name: "panel1"});
+        panel1.text = "Log";
+        panel1.orientation = "column";
+        panel1.alignChildren = ["left","top"];
+        panel1.spacing = 10;
+        panel1.margins =10;
 
-    var edittext1 = panel1.add('edittext {size: [700,400], properties: {name: "edittext1", readonly: true, multiline: true, scrollable: true}}'); 
-        edittext1.text =_LOGS; 
+    var edittext1 = panel1.add('edittext {size: [700,400], properties: {name: "edittext1", readonly: true, multiline: true, scrollable: true}}');
+        edittext1.text =_LOGS;
 
     // DIALOG
     // ======
-    var button1 = dialog.add("button", undefined, undefined, {name: "button1"}); 
-        button1.text = "Close"; 
-        button1.preferredSize.width = 700; 
-        button1.alignment = ["center","top"]; 
-        
+    var button1 = dialog.add("button", undefined, undefined, {name: "button1"});
+        button1.text = "Close";
+        button1.preferredSize.width = 700;
+        button1.alignment = ["center","top"];
+
         button1.onClick = function() { //user cancelled action
             dialog.close();
             return false;
         };
-        
-    debug=true;    
+
+    debug=true;
     //convert debug str to boolean
     if(debug == undefined){
         debug = false;
