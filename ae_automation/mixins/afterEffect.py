@@ -28,7 +28,29 @@ class afterEffectMixin:
     #TODO - Create function to edit values from comp or create a template.json and add the values there then the script will read the values from there will modify the json
     #TODO - Add transitions layer
     afterEffectItems=[]
-    
+
+    def sanitize_text_for_ae(self, text):
+        """
+        Sanitize text before sending to After Effects.
+        Must be done in Python before JS to avoid string escaping issues.
+        """
+        if not isinstance(text, str):
+            return text
+
+        # Replace HTML line breaks with carriage return (AE uses \r for newlines)
+        text = text.replace('<br>', '\r')
+        text = text.replace('<br/>', '\r')
+        text = text.replace('<BR>', '\r')
+        text = text.replace('<BR/>', '\r')
+        text = text.replace('<br />', '\r')
+        text = text.replace('<BR />', '\r')
+
+        # DON'T convert quotes - keep them as-is to avoid UTF-8 encoding issues
+        # After Effects handles straight quotes fine, and converting causes encoding problems
+        # The â€™ you're seeing is UTF-8 curly quote being misinterpreted as Latin-1
+
+        return text
+
     def startAfterEffect(self, data):
         """
         startAfterEffect
@@ -94,7 +116,6 @@ class afterEffectMixin:
 
         self.createFolder(settings.AFTER_EFFECT_PROJECT_FOLDER+"-cache",settings.AFTER_EFFECT_PROJECT_FOLDER)
         #Import Resources
-        self.start_batch()
         for resource in data["project"]["resources"]:
             self.importFile(resource["path"],resource["name"],settings.AFTER_EFFECT_PROJECT_FOLDER+"-cache")
             resource["duration"]=0
@@ -104,7 +125,6 @@ class afterEffectMixin:
                 audio = MP3(resource["path"])
                 mp3_duration=audio.info.length
                 resource["duration"]=mp3_duration
-        self.end_batch()
 
         self.afterEffectResource=data["project"]["resources"]
 
@@ -119,13 +139,11 @@ class afterEffectMixin:
             if not self.checkIfItemExists(scene_folder):
                 self.deleteFolder(scene_folder)
 
-            self.start_batch()
             self.createFolder(scene_folder,settings.AFTER_EFFECT_PROJECT_FOLDER)
             self.addCompToTimeline(data["project"]["comp_name"],itemTimeline["template_comp"],scene_folder,itemTimeline["startTime"],itemTimeline["duration"])
 
             for custom_edit in itemTimeline["custom_actions"]:
                 self.parseCustomActions(custom_edit,scene_folder,itemTimeline,data)
-            self.end_batch()
                 
         if data["project"]["debug"] == False:
             pyautogui.hotkey('ctrl', 's')
@@ -168,25 +186,13 @@ class afterEffectMixin:
             self.updateLayerProperties(self.slug(scene_folder+" "+custom_edit["comp_name"]),custom_edit["layerIndex"],custom_edit["startTime"],custom_edit["duration"],moveToEnd=str(custom_edit["moveToEnd"]).lower())
 
         if custom_edit["change_type"] == "swap_items_by_index":
-            # Unsafe for batching due to PyAutoGUI and file I/O dependency
-            if hasattr(self, 'batch_mode') and self.batch_mode:
-                self.end_batch()
-                self.swapItem(self.slug(scene_folder+" "+custom_edit["comp_name"]),custom_edit["layer_index"],custom_edit["layer_name"])
-                if custom_edit["fit_to_screen"]:
-                    pyautogui.hotkey('ctrl', 'alt', 'f')
-                if custom_edit["fit_to_screen_width"]:
-                    pyautogui.hotkey('ctrl', 'alt', 'shift', 'h')
-                if custom_edit["fit_to_screen_height"]:
-                    pyautogui.hotkey('ctrl', 'alt', 'shift', 'g')
-                self.start_batch()
-            else:
-                self.swapItem(self.slug(scene_folder+" "+custom_edit["comp_name"]),custom_edit["layer_index"],custom_edit["layer_name"])
-                if custom_edit["fit_to_screen"]:
-                    pyautogui.hotkey('ctrl', 'alt', 'f')
-                if custom_edit["fit_to_screen_width"]:
-                    pyautogui.hotkey('ctrl', 'alt', 'shift', 'h')
-                if custom_edit["fit_to_screen_height"]:
-                    pyautogui.hotkey('ctrl', 'alt', 'shift', 'g')
+            self.swapItem(self.slug(scene_folder+" "+custom_edit["comp_name"]),custom_edit["layer_index"],custom_edit["layer_name"])
+            if custom_edit["fit_to_screen"]:
+                pyautogui.hotkey('ctrl', 'alt', 'f')
+            if custom_edit["fit_to_screen_width"]:
+                pyautogui.hotkey('ctrl', 'alt', 'shift', 'h')
+            if custom_edit["fit_to_screen_height"]:
+                pyautogui.hotkey('ctrl', 'alt', 'shift', 'g')
  
         if custom_edit["change_type"] == "add_marker":
             self.addMarker(self.slug(scene_folder+" "+custom_edit["comp_name"]),self.slug(scene_folder+" "+custom_edit["layer_name"]),custom_edit["marker_name"],custom_edit["marker_time"])
@@ -225,12 +231,6 @@ class afterEffectMixin:
         """
         getProjectMap
         """
-        # Ensure we are not in batch mode for this operation
-        # This requires immediate execution to read the resulting file
-        if hasattr(self, 'batch_mode') and self.batch_mode:
-            print("Forcing batch execution before getProjectMap")
-            self.end_batch()
-
         print("Get Project Map")
         
         self.runScript("file_map.jsx")
@@ -320,6 +320,10 @@ class afterEffectMixin:
         """
         editComp
         """
+        # Sanitize text values before sending to After Effects
+        if isinstance(value, str):
+            value = self.sanitize_text_for_ae(value)
+
         _replace={
             "{comp_name}":str(comp_name),
             "{layer_name}":str(layer_name),
@@ -353,6 +357,10 @@ class afterEffectMixin:
         """
         editComp
         """
+        # Sanitize text values before sending to After Effects
+        if isinstance(value, str):
+            value = self.sanitize_text_for_ae(value)
+
         _replace={
             "{comp_name}":str(comp_name),
             "{layer_name}":str(layer_name),
@@ -512,78 +520,10 @@ class afterEffectMixin:
         }
         self.runScript("run_command.jsx",_replace)
 
-    def start_batch(self):
-        """Start recording script commands for batch execution"""
-        self.batch_mode = True
-        self.batch_commands = []
-        print("Started batch execution mode")
-
-    def end_batch(self):
-        """Execute all buffered commands as a single script"""
-        if not hasattr(self, 'batch_mode') or not self.batch_mode:
-            return
-
-        if not self.batch_commands:
-            self.batch_mode = False
-            return
-
-        print(f"Executing batch of {len(self.batch_commands)} commands")
-        
-        # Combine all commands into one script
-        # We wrap each command in a try-catch to ensure one failure doesn't stop the rest if desired,
-        # but for now let's just concatenate them.
-        
-        full_script_content = "\n// --- Batch Start ---\n"
-        for cmd_name, cmd_content in self.batch_commands:
-            full_script_content += f"\n// Command: {cmd_name}\n"
-            full_script_content += "(function(){\n" + cmd_content + "\n})();\n"
-        full_script_content += "\n// --- Batch End ---\n"
-        
-        # Execute the combined script
-        # Temporarily disable batch mode to execute
-        self.batch_mode = False
-        
-        # Manually construct and run the script without adding framework multiple times
-        # We reuse the logic from runScript but for the combined content
-        
-        fileName = "batch_execution.jsx"
-        print("Start Run Batch Script")
-        
-        fileContent = jsmin(self.JS_FRAMEWORK) + "\n var _error=''; try{" + full_script_content + "\n}catch(e){_error= e.lineNumber+' '+e.toString(); }outputLogs(_error);"
-
-        randomName=str(uuid.uuid4())
-        fileContent=fileContent.replace("{LOGS_NAME}",randomName)
-        fileContent=fileContent.replace("{FILE_NAME}",fileName)
-        
-        filePath=os.path.join(settings.CACHE_FOLDER, fileName)
-
-        with open(filePath, "w", encoding='utf-8') as text_file:
-            text_file.write(fileContent)
-
-        # Execute script in the already-running After Effects instance
-        self._execute_script_in_running_ae(filePath)
-
-        time.sleep(3) # Wait for batch to complete
-        print("Finish Run Batch Script")
-        
-        self.batch_commands = []
-
     def runScript(self, fileName, _remplacements=None,debug=False):
         """
         run Script
         """
-        # Check if we are in batch mode
-        if hasattr(self, 'batch_mode') and self.batch_mode:
-            print(f"Buffering script: {fileName}")
-            fileContent=self.file_get_contents(os.path.join(settings.JS_DIR, fileName))
-            
-            if _remplacements is not None:
-                for key, value in _remplacements.items():
-                    fileContent=fileContent.replace(key,value)
-            
-            self.batch_commands.append((fileName, fileContent))
-            return
-
         print("Start Run Script", fileName)
         fileContent=self.file_get_contents(os.path.join(settings.JS_DIR, fileName))
         filePath=os.path.join(settings.CACHE_FOLDER, fileName)
@@ -598,62 +538,15 @@ class afterEffectMixin:
         fileContent=fileContent.replace("{LOGS_NAME}",randomName)
         fileContent=fileContent.replace("{FILE_NAME}",fileName)
 
-        with open(filePath, "w", encoding='utf-8') as text_file:
+        with open(filePath, "w") as text_file:
             text_file.write(fileContent)
 
-        # Execute script in the already-running After Effects instance
-        self._execute_script_in_running_ae(filePath)
+        app = os.path.join(settings.AFTER_EFFECT_FOLDER, 'AfterFX.exe')
+
+        subprocess.Popen([app, '-s', f"var a = new File('{filePath}'); a.open(); eval(a.read()); app.exitAfterLaunchAndEval = false;"])
 
         time.sleep(3)
         print("Finish Run Script", fileName)
-
-    def _execute_script_in_running_ae(self, script_path):
-        """
-        Execute a script in an already-running After Effects instance
-        Uses file-based command queue system
-        """
-        import shutil
-
-        # Generate unique filename to avoid conflicts
-        queue_file = os.path.join(settings.QUEUE_FOLDER, f"cmd_{uuid.uuid4().hex[:8]}.jsx")
-
-        try:
-            # Copy the script to the queue folder
-            shutil.copy2(script_path, queue_file)
-
-            # Wait for the script to be processed (deleted by AE)
-            # The ae_command_runner.jsx script running in AE will pick it up
-            max_wait = 10  # seconds
-            wait_interval = 0.1  # seconds
-            elapsed = 0
-
-            while os.path.exists(queue_file) and elapsed < max_wait:
-                time.sleep(wait_interval)
-                elapsed += wait_interval
-
-            if os.path.exists(queue_file):
-                # File still exists - might not have been processed
-                # Check if it was renamed to .error
-                error_file = queue_file.replace('.jsx', '.error')
-                if os.path.exists(error_file):
-                    print(f"Warning: Script execution failed - check {error_file}")
-                    os.remove(error_file)
-                else:
-                    print(f"Warning: Script may not have been processed by After Effects")
-                    print("Make sure the ae_command_runner.jsx startup script is installed")
-                    # Clean up
-                    try:
-                        os.remove(queue_file)
-                    except:
-                        pass
-        except Exception as e:
-            print(f"Error queueing script: {e}")
-            # Clean up on error
-            try:
-                if os.path.exists(queue_file):
-                    os.remove(queue_file)
-            except:
-                pass
 
     def workAreaComp(self,compName,startTime,endTime):
         """
