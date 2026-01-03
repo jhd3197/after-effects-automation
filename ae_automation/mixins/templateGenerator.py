@@ -40,7 +40,17 @@ class TemplateGeneratorMixin:
             "{projectPath}": str(project_path)
         }
         self.runScript("save_project.jsx", _replace)
-        time.sleep(3)  # Wait for save operation to complete
+        time.sleep(2)  # Wait for save operation to complete
+
+        # Verify the file was actually created
+        original_path = project_path.replace('/', '\\')
+        for i in range(10):  # Try checking 10 times with delays
+            if os.path.exists(original_path):
+                print(f"✓ Project saved successfully!")
+                return
+            time.sleep(0.5)
+
+        raise Exception(f"Failed to save project to {original_path}. The file was not created.")
 
     def addTextLayer(self, comp_name, layer_name, text_content="Sample Text",
                      x_position=960, y_position=540, font_size=72):

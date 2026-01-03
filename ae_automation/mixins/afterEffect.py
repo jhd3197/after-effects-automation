@@ -193,7 +193,7 @@ class afterEffectMixin:
                 pyautogui.hotkey('ctrl', 'alt', 'shift', 'h')
             if custom_edit["fit_to_screen_height"]:
                 pyautogui.hotkey('ctrl', 'alt', 'shift', 'g')
- 
+
         if custom_edit["change_type"] == "add_marker":
             self.addMarker(self.slug(scene_folder+" "+custom_edit["comp_name"]),self.slug(scene_folder+" "+custom_edit["layer_name"]),custom_edit["marker_name"],custom_edit["marker_time"])
             
@@ -422,6 +422,11 @@ class afterEffectMixin:
         }
 
         self.runScript("duplicate_comp_2.jsx",_replace)
+        
+        data = json.load(open(settings.CACHE_FOLDER+"/comp_map.json", encoding='utf-8'))
+
+        for comp in data:
+            self.swapItem(comp["fromCompName"],comp["toLayerIndex"],comp["ItemName"])
 
     def addResourceToTimeline(self,ResourceName, CompName, startTime=0.0, compDuration=0.0, inPoint=0.0, stretch=100, moveToEnd=False):
         """
@@ -520,6 +525,55 @@ class afterEffectMixin:
         }
         self.runScript("run_command.jsx",_replace)
 
+    def _execute_script_in_running_ae(self, script_path):
+        """
+        Execute a script in an already-running After Effects instance
+        Uses file-based command queue system
+        """
+        # Generate unique filename to avoid conflicts
+        queue_file = os.path.join(settings.QUEUE_FOLDER, f"cmd_{uuid.uuid4().hex[:8]}.jsx")
+
+        try:
+            # Ensure queue folder exists
+            os.makedirs(settings.QUEUE_FOLDER, exist_ok=True)
+
+            # Copy the script to the queue folder
+            shutil.copy2(script_path, queue_file)
+
+            # Wait for the script to be processed (deleted by AE)
+            # The ae_command_runner.jsx script running in AE will pick it up
+            max_wait = 10  # seconds
+            wait_interval = 0.1  # seconds
+            elapsed = 0
+
+            while os.path.exists(queue_file) and elapsed < max_wait:
+                time.sleep(wait_interval)
+                elapsed += wait_interval
+
+            if os.path.exists(queue_file):
+                # File still exists - might not have been processed
+                # Check if it was renamed to .error
+                error_file = queue_file.replace('.jsx', '.error')
+                if os.path.exists(error_file):
+                    print(f"Warning: Script execution failed - check {error_file}")
+                    os.remove(error_file)
+                else:
+                    print(f"Warning: Script may not have been processed by After Effects")
+                    print("Make sure the ae_command_runner.jsx startup script is installed")
+                    # Clean up
+                    try:
+                        os.remove(queue_file)
+                    except:
+                        pass
+        except Exception as e:
+            print(f"Error queueing script: {e}")
+            # Clean up on error
+            try:
+                if os.path.exists(queue_file):
+                    os.remove(queue_file)
+            except:
+                pass
+
     def runScript(self, fileName, _remplacements=None,debug=False):
         """
         run Script
@@ -538,15 +592,15 @@ class afterEffectMixin:
         fileContent=fileContent.replace("{LOGS_NAME}",randomName)
         fileContent=fileContent.replace("{FILE_NAME}",fileName)
 
-        with open(filePath, "w") as text_file:
+        with open(filePath, "w", encoding='utf-8') as text_file:
             text_file.write(fileContent)
 
-        app = os.path.join(settings.AFTER_EFFECT_FOLDER, 'AfterFX.exe')
+        # Execute script in the already-running After Effects instance using queue system
+        self._execute_script_in_running_ae(filePath)
 
-        subprocess.Popen([app, '-s', f"var a = new File('{filePath}'); a.open(); eval(a.read()); app.exitAfterLaunchAndEval = false;"])
-
-        time.sleep(3)
+        time.sleep(1)  # Reduced sleep time since we wait in _execute_script_in_running_ae
         print("Finish Run Script", fileName)
+        return randomName
 
     def workAreaComp(self,compName,startTime,endTime):
         """
@@ -581,22 +635,15 @@ class afterEffectMixin:
         """
         Render an Adobe After Effects project file via terminal
         """
-        # Convert to absolute paths to avoid aerender path issues
-        projectPath = os.path.abspath(projectPath)
-        outputDir = os.path.abspath(outputDir)
-
         if not os.path.exists(outputDir):
             os.makedirs(outputDir)
-
-        if not os.path.exists(projectPath):
-            raise FileNotFoundError(f"Project file not found: {projectPath}")
-
+        
         outputPath = os.path.join(outputDir, f"{compName}.mp4")
-
+        
         render_command = f'"{settings.AERENDER_PATH}" -project "{projectPath}" -comp "{compName}" -output "{outputPath}" -mem_usage 20 40'
         print("Rendering project...")
         self.runCommand(render_command)
-
+        
         return outputPath
     
     def time_to_seconds(self, time_str):
