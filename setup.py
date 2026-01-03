@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="after-effects-automation",
-    version='0.1.4',
+    version='0.1.5',
     author="Juan Denis",
     author_email="juan@vene.co",
     description="A Python tool for automating Adobe After Effects workflows",
