@@ -1,11 +1,11 @@
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
-with open("README.md", "r", encoding="utf-8") as fh:
+with open("README.md", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
     name="after-effects-automation",
-    version='0.0.3',
+    version="0.0.3",
     author="Juan Denis",
     author_email="juan@vene.co",
     description="A unified video automation platform for Adobe After Effects",
@@ -39,7 +39,7 @@ setup(
         "flask>=2.0.0",
         "flask-cors>=3.0.0",
         "werkzeug>=2.0.0",
-        "psutil>=5.8.0"
+        "psutil>=5.8.0",
     ],
     extras_require={
         "window-detection": ["pygetwindow>=0.0.9"],
@@ -51,7 +51,7 @@ setup(
             "mixins/js/*.jsx",
             "mixins/videoEditor/dist/**/*",
             "mixins/videoEditor/dist/*",
-            "mixins/videoEditor/script.js"
+            "mixins/videoEditor/script.js",
         ]
     },
     include_package_data=True,
@@ -61,5 +61,5 @@ setup(
             # Legacy aliases for backward compatibility
             "ae-automate=cli:main",
         ],
-    }
+    },
 )

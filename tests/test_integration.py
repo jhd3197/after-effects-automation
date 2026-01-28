@@ -1,13 +1,14 @@
 """
 Mock-based integration tests that verify orchestration without After Effects
 """
-import unittest
+
 import json
-import tempfile
 import os
 import sys
+import tempfile
+import unittest
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
@@ -81,7 +82,7 @@ class TestStartBotFlow(unittest.TestCase):
     def setUp(self):
         self.client = Client()
 
-    @patch.object(Client, 'startAfterEffect')
+    @patch.object(Client, "startAfterEffect")
     def test_startbot_calls_start_after_effect(self, mock_start_ae):
         """startBot calls startAfterEffect with parsed config data"""
         config = {
@@ -90,11 +91,11 @@ class TestStartBotFlow(unittest.TestCase):
                 "comp_name": "TestComp",
                 "debug": True,
                 "output_dir": "/tmp/output",
-                "resources": []
+                "resources": [],
             },
-            "timeline": []
+            "timeline": [],
         }
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False, encoding='utf-8') as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False, encoding="utf-8") as f:
             json.dump(config, f)
             temp_path = f.name
 
@@ -106,7 +107,7 @@ class TestStartBotFlow(unittest.TestCase):
         finally:
             os.unlink(temp_path)
 
-    @patch.object(Client, 'startAfterEffect')
+    @patch.object(Client, "startAfterEffect")
     def test_startbot_resolves_relative_paths(self, mock_start_ae):
         """startBot resolves relative paths to absolute"""
         config = {
@@ -114,11 +115,11 @@ class TestStartBotFlow(unittest.TestCase):
                 "project_file": "relative/test.aep",
                 "output_dir": "relative/output",
                 "debug": True,
-                "resources": []
+                "resources": [],
             },
-            "timeline": []
+            "timeline": [],
         }
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False, encoding='utf-8') as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False, encoding="utf-8") as f:
             json.dump(config, f)
             temp_path = f.name
 
@@ -131,5 +132,5 @@ class TestStartBotFlow(unittest.TestCase):
             os.unlink(temp_path)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

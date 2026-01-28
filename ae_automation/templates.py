@@ -3,6 +3,7 @@ Built-in template registry for ae-automation generate/export commands.
 
 Each template is a dict compatible with TemplateGeneratorMixin.buildTemplate().
 """
+
 from __future__ import annotations
 
 from typing import Any

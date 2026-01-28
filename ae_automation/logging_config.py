@@ -8,6 +8,7 @@ Usage:
 Log level is controlled by the AE_LOG_LEVEL environment variable
 (default: INFO). The CLI --verbose flag sets it to DEBUG.
 """
+
 from __future__ import annotations
 
 import logging

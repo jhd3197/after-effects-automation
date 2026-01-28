@@ -9,6 +9,7 @@ Hierarchy:
     ├── RenderError            -- aerender failed
     └── ConfigValidationError  -- Invalid JSON config or settings
 """
+
 from __future__ import annotations
 
 
@@ -69,7 +70,13 @@ class RenderError(AEAutomationError):
     comp_name: str | None
     detail: str | None
 
-    def __init__(self, project_path: str | None = None, comp_name: str | None = None, detail: str | None = None, message: str | None = None) -> None:
+    def __init__(
+        self,
+        project_path: str | None = None,
+        comp_name: str | None = None,
+        detail: str | None = None,
+        message: str | None = None,
+    ) -> None:
         if message is None:
             message = "Render failed"
             if comp_name:

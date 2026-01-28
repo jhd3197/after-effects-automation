@@ -2,14 +2,16 @@
 Process Manager for After Effects
 Handles process detection, window waiting, and readiness checks
 """
+
 from __future__ import annotations
 
-import time
-import subprocess
-import psutil
 import os
+import subprocess
+import time
+
+import psutil
+
 from ae_automation.logging_config import get_logger
-from ae_automation.exceptions import AENotFoundError
 
 logger = get_logger(__name__)
 
@@ -44,10 +46,10 @@ class ProcessManagerMixin:
         start_time = time.time()
 
         while time.time() - start_time < timeout:
-            for proc in psutil.process_iter(['name', 'pid']):
+            for proc in psutil.process_iter(["name", "pid"]):
                 try:
-                    if proc.info['name'].lower() == process_name.lower():
-                        logger.info("Process found: %s (PID: %s)", process_name, proc.info['pid'])
+                    if proc.info["name"].lower() == process_name.lower():
+                        logger.info("Process found: %s (PID: %s)", process_name, proc.info["pid"])
                         return proc
                 except (psutil.NoSuchProcess, psutil.AccessDenied):
                     pass
@@ -82,11 +84,12 @@ class ProcessManagerMixin:
                     # Give it a moment to fully initialize
                     time.sleep(3)
                     return True
-            except Exception as e:
+            except Exception:
                 # Try alternate detection method
                 try:
                     import pygetwindow as gw
-                    ae_windows = [w for w in gw.getAllWindows() if 'after effects' in w.title.lower()]
+
+                    ae_windows = [w for w in gw.getAllWindows() if "after effects" in w.title.lower()]
                     if ae_windows:
                         logger.info("After Effects window is ready (found via alternate method)")
                         time.sleep(3)
@@ -113,23 +116,23 @@ class ProcessManagerMixin:
 
         for attempt in range(max_retries):
             try:
-
                 # Run a very simple test script
                 test_script = "app.project ? 'ready' : 'no project';"
 
                 from ae_automation import settings
+
                 test_file = os.path.join(settings.CACHE_FOLDER, "_ae_ready_test.jsx")
 
-                with open(test_file, 'w') as f:
+                with open(test_file, "w") as f:
                     f.write(test_script)
 
-                ae_path = os.path.join(settings.AFTER_EFFECT_FOLDER, 'AfterFX.exe')
+                ae_path = os.path.join(settings.AFTER_EFFECT_FOLDER, "AfterFX.exe")
 
                 # Run the test script
-                result = subprocess.run(
-                    [ae_path, '-s', f"var f = new File('{test_file}'); f.open(); eval(f.read());"],
+                subprocess.run(
+                    [ae_path, "-s", f"var f = new File('{test_file}'); f.open(); eval(f.read());"],
                     capture_output=True,
-                    timeout=10
+                    timeout=10,
                 )
 
                 # Clean up test file
@@ -163,7 +166,7 @@ class ProcessManagerMixin:
             # Focus AE window if possible (optional, might need win32gui)
 
             # Send Space key to dismiss "Start Safe Mode" dialog or "Crash Repair"
-            pyautogui.press('space')
+            pyautogui.press("space")
             logger.debug("Sent SPACE key to handle potential dialog")
             time.sleep(1)
         except Exception as e:
@@ -192,7 +195,7 @@ class ProcessManagerMixin:
         if remaining_time <= 0:
             logger.warning("Timeout reached")
             return False
-            
+
         # Attempt to handle crash dialog early
         time.sleep(5)
         self.handle_crash_dialog()
@@ -202,7 +205,7 @@ class ProcessManagerMixin:
             # Try handling dialog again if window wait fails or takes too long
             self.handle_crash_dialog()
             # Retry wait? No, let's just proceed to plugin wait
-        
+
         # Step 3: Wait a bit more for plugins to load
         logger.info("Waiting for plugins and UI to initialize...")
         time.sleep(5)
@@ -219,7 +222,9 @@ class ProcessManagerMixin:
 
         return True
 
-    def ensure_after_effects_running(self, project_file: str | None = None, timeout: int = 120, skip_home_screen: bool = True) -> bool:
+    def ensure_after_effects_running(
+        self, project_file: str | None = None, timeout: int = 120, skip_home_screen: bool = True
+    ) -> bool:
         """
         Ensure After Effects is running and ready, start if needed
 
@@ -232,12 +237,13 @@ class ProcessManagerMixin:
             True if running and ready, False otherwise
         """
         from ae_automation import settings
+
         settings.validate_settings()
         # Check if already running
         ae_running = False
-        for proc in psutil.process_iter(['name']):
+        for proc in psutil.process_iter(["name"]):
             try:
-                if proc.info['name'].lower() == 'afterfx.exe':
+                if proc.info["name"].lower() == "afterfx.exe":
                     ae_running = True
                     logger.info("After Effects is already running")
                     break
@@ -247,7 +253,8 @@ class ProcessManagerMixin:
         if not ae_running:
             # Start After Effects
             from ae_automation import settings
-            ae_path = os.path.join(settings.AFTER_EFFECT_FOLDER, 'AfterFX.exe')
+
+            ae_path = os.path.join(settings.AFTER_EFFECT_FOLDER, "AfterFX.exe")
 
             if project_file and os.path.exists(project_file):
                 logger.info("Starting After Effects with project: %s", project_file)
@@ -277,6 +284,7 @@ class ProcessManagerMixin:
         """
         # Check for the existence of a completion marker file
         from ae_automation import settings
+
         marker_file = os.path.join(settings.CACHE_FOLDER, "_script_complete.txt")
 
         start_time = time.time()
@@ -293,7 +301,9 @@ class ProcessManagerMixin:
 
         return False
 
-    def safe_script_execution(self, script_name: str, replacements: dict[str, str] | None = None, wait_time: int = 3) -> bool:
+    def safe_script_execution(
+        self, script_name: str, replacements: dict[str, str] | None = None, wait_time: int = 3
+    ) -> bool:
         """
         Execute a script with automatic waiting for completion
 
@@ -323,9 +333,9 @@ class ProcessManagerMixin:
         Returns:
             True if test was sent (check AE for alert dialog)
         """
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("Testing Script Execution")
-        print("="*60)
+        print("=" * 60)
         print("Running test script...")
         print("(You should see an alert dialog in After Effects)\n")
 
@@ -337,11 +347,11 @@ class ProcessManagerMixin:
             print("\nIMPORTANT: Did you see an alert dialog in After Effects?")
             print("  - If YES: Scripts are working!")
             print("  - If NO: Scripts are NOT executing - check preferences")
-            print("="*60 + "\n")
+            print("=" * 60 + "\n")
             return True
         except Exception as e:
             logger.error("Failed to run test script: %s", e)
-            print("="*60 + "\n")
+            print("=" * 60 + "\n")
             return False
 
     def check_scripting_settings(self) -> bool:
@@ -352,9 +362,9 @@ class ProcessManagerMixin:
         Returns:
             True if check was sent (read alert dialog in AE for details)
         """
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("Checking Scripting Settings")
-        print("="*60)
+        print("=" * 60)
         print("Running settings check...")
         print("(You should see a detailed alert in After Effects)\n")
 
@@ -364,11 +374,11 @@ class ProcessManagerMixin:
 
             print("Settings check sent to After Effects")
             print("\nRead the alert dialog in After Effects for details")
-            print("="*60 + "\n")
+            print("=" * 60 + "\n")
             return True
         except Exception as e:
             logger.error("Failed to check settings: %s", e)
-            print("="*60 + "\n")
+            print("=" * 60 + "\n")
             return False
 
     def test_composition_creation(self) -> bool:
@@ -379,9 +389,9 @@ class ProcessManagerMixin:
         Returns:
             True if test was sent (check AE for alerts and composition)
         """
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("Testing Composition Creation (Debug Mode)")
-        print("="*60)
+        print("=" * 60)
         print("Attempting to create a test composition...")
         print("(You should see multiple alert dialogs showing progress)\n")
 
@@ -393,7 +403,7 @@ class ProcessManagerMixin:
                 "{pixelAspect}": "1",
                 "{duration}": "10",
                 "{frameRate}": "29.97",
-                "{folderName}": ""
+                "{folderName}": "",
             }
 
             self.runScript("debug_create_comp.jsx", replacements)
@@ -404,11 +414,11 @@ class ProcessManagerMixin:
             print("  - Did you see alert dialogs?")
             print("  - Was a composition created?")
             print("  - Check the Project panel for 'DEBUG_TEST_COMP'")
-            print("="*60 + "\n")
+            print("=" * 60 + "\n")
             return True
         except Exception as e:
             logger.error("Failed to create debug comp: %s", e)
-            print("="*60 + "\n")
+            print("=" * 60 + "\n")
             return False
 
     def run_full_diagnostic(self) -> bool:
@@ -419,9 +429,9 @@ class ProcessManagerMixin:
         Returns:
             True if diagnostics completed
         """
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("After Effects Automation - Full Diagnostic")
-        print("="*60 + "\n")
+        print("=" * 60 + "\n")
 
         # Step 1: Check if AE is running
         print("Step 1: Checking After Effects Process")
@@ -430,11 +440,11 @@ class ProcessManagerMixin:
         ae_running = False
         ae_pid = None
 
-        for proc in psutil.process_iter(['name', 'pid']):
+        for proc in psutil.process_iter(["name", "pid"]):
             try:
-                if proc.info['name'].lower() == 'afterfx.exe':
+                if proc.info["name"].lower() == "afterfx.exe":
                     ae_running = True
-                    ae_pid = proc.info['pid']
+                    ae_pid = proc.info["pid"]
                     print(f"After Effects is running (PID: {ae_pid})")
                     break
             except (psutil.NoSuchProcess, psutil.AccessDenied):
@@ -454,7 +464,8 @@ class ProcessManagerMixin:
 
         try:
             import pygetwindow as gw
-            ae_windows = [w for w in gw.getAllWindows() if 'after effects' in w.title.lower()]
+
+            ae_windows = [w for w in gw.getAllWindows() if "after effects" in w.title.lower()]
 
             if ae_windows:
                 print(f"Found {len(ae_windows)} After Effects window(s):")
@@ -475,9 +486,9 @@ class ProcessManagerMixin:
         self.test_composition_creation()
 
         # Summary
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("Summary and Recommendations")
-        print("="*60 + "\n")
+        print("=" * 60 + "\n")
 
         print("If you saw alert dialogs:")
         print("  ✓ Scripts ARE executing - the system is working!")
@@ -500,9 +511,9 @@ class ProcessManagerMixin:
         print("  5. Check antivirus isn't blocking script execution")
         print("")
 
-        print("="*60)
+        print("=" * 60)
         print("Next Steps")
-        print("="*60 + "\n")
+        print("=" * 60 + "\n")
 
         print("1. Review the alert dialogs in After Effects")
         print("2. If scripting is disabled, enable it and restart AE")

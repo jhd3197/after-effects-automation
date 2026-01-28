@@ -3,17 +3,18 @@
 After Effects Automation CLI
 Unified command-line interface for all automation tasks
 """
+
 from __future__ import annotations
 
+import argparse
 import os
 import sys
-import argparse
 
 
 def cmd_run(args: argparse.Namespace) -> None:
     """Run automation with a configuration file"""
+
     from ae_automation import Client
-    import json
 
     if not os.path.exists(args.config):
         print(f"Error: Configuration file not found: {args.config}")
@@ -27,27 +28,20 @@ def cmd_run(args: argparse.Namespace) -> None:
 
 def cmd_editor(args: argparse.Namespace) -> None:
     """Open the web-based configuration editor"""
-    from ae_automation.mixins.VideoEditorApp import VideoEditorAppMixin
     import json
+
+    from ae_automation.mixins.VideoEditorApp import VideoEditorAppMixin
 
     config_file = args.config
 
     # Create default config if it doesn't exist
     if not os.path.exists(config_file):
         default_config = {
-            "project": {
-                "project_file": "",
-                "composition": "",
-                "output_file": "",
-                "comp_name": ""
-            },
-            "settings": {
-                "render_settings": "Best Settings",
-                "output_module": "Lossless"
-            },
-            "timeline": []
+            "project": {"project_file": "", "composition": "", "output_file": "", "comp_name": ""},
+            "settings": {"render_settings": "Best Settings", "output_module": "Lossless"},
+            "timeline": [],
         }
-        with open(config_file, 'w') as f:
+        with open(config_file, "w") as f:
             json.dump(default_config, f, indent=4)
         print(f"Created default config file: {config_file}")
 
@@ -65,20 +59,17 @@ def cmd_editor(args: argparse.Namespace) -> None:
         sys.exit(1)
 
 
-
-
-
 def cmd_test(args: argparse.Namespace) -> None:
     """Run compatibility tests"""
     import subprocess
 
-    test_args = ['python', 'test.py']
+    test_args = ["python", "test.py"]
 
     if args.verbose:
-        test_args.append('--verbose')
+        test_args.append("--verbose")
 
     if args.version:
-        test_args.extend(['--version', args.version])
+        test_args.extend(["--version", args.version])
 
     try:
         result = subprocess.run(test_args, check=False)
@@ -186,6 +177,7 @@ def cmd_diagnose(args: argparse.Namespace) -> None:
     except Exception as e:
         print(f"\n\nUnexpected error: {e}")
         import traceback
+
         traceback.print_exc()
 
     if not args.no_wait:
@@ -199,17 +191,17 @@ def main() -> None:
 
     # Detect if called via legacy command
     prog_name = os.path.basename(sys.argv[0])
-    is_legacy = prog_name.startswith('ae-automate')
+    is_legacy = prog_name.startswith("ae-automate")
 
     # If legacy command and has arguments, treat first arg as config file
-    if is_legacy and len(sys.argv) > 1 and not sys.argv[1].startswith('-'):
+    if is_legacy and len(sys.argv) > 1 and not sys.argv[1].startswith("-"):
         # Legacy mode: ae-automate config.json
         # Convert to: ae-automation run config.json
-        sys.argv.insert(1, 'run')
+        sys.argv.insert(1, "run")
 
     parser = argparse.ArgumentParser(
-        prog='ae-automation',
-        description='After Effects Automation - Automate video production workflows',
+        prog="ae-automation",
+        description="After Effects Automation - Automate video production workflows",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Global options:
@@ -245,155 +237,96 @@ Examples:
   ae-automation diagnose --no-wait
 
 For more information, visit: https://github.com/jhd3197/after-effects-automation
-        """
+        """,
     )
 
     # Global verbose flag
-    parser.add_argument(
-        '--verbose',
-        action='store_true',
-        default=False,
-        help='Enable debug logging output'
-    )
+    parser.add_argument("--verbose", action="store_true", default=False, help="Enable debug logging output")
 
     # Create subparsers
     subparsers = parser.add_subparsers(
-        title='commands',
-        description='Available commands',
-        dest='command',
-        help='Command to execute'
+        title="commands", description="Available commands", dest="command", help="Command to execute"
     )
 
     # ============================================================
     # RUN command
     # ============================================================
     parser_run = subparsers.add_parser(
-        'run',
-        help='Run automation with a configuration file',
-        description='Execute After Effects automation using a JSON configuration file'
+        "run",
+        help="Run automation with a configuration file",
+        description="Execute After Effects automation using a JSON configuration file",
     )
-    parser_run.add_argument(
-        'config',
-        help='Path to the JSON configuration file'
-    )
+    parser_run.add_argument("config", help="Path to the JSON configuration file")
     parser_run.set_defaults(func=cmd_run)
 
     # ============================================================
     # EDITOR command
     # ============================================================
     parser_editor = subparsers.add_parser(
-        'editor',
-        help='Open web-based configuration editor',
-        description='Launch a web interface to edit configuration files'
+        "editor",
+        help="Open web-based configuration editor",
+        description="Launch a web interface to edit configuration files",
     )
     parser_editor.add_argument(
-        'config',
-        nargs='?',
-        default='config.json',
-        help='Path to the JSON configuration file (default: config.json)'
+        "config", nargs="?", default="config.json", help="Path to the JSON configuration file (default: config.json)"
     )
-    parser_editor.add_argument(
-        '--host',
-        default='127.0.0.1',
-        help='Host to run the web server on (default: 127.0.0.1)'
-    )
-    parser_editor.add_argument(
-        '--port',
-        type=int,
-        default=5000,
-        help='Port to run the web server on (default: 5000)'
-    )
+    parser_editor.add_argument("--host", default="127.0.0.1", help="Host to run the web server on (default: 127.0.0.1)")
+    parser_editor.add_argument("--port", type=int, default=5000, help="Port to run the web server on (default: 5000)")
     parser_editor.set_defaults(func=cmd_editor)
 
     # ============================================================
     # GENERATE command
     # ============================================================
     parser_generate = subparsers.add_parser(
-        'generate',
-        help='Generate a template .aep project',
-        description='Create After Effects project files from built-in templates'
+        "generate",
+        help="Generate a template .aep project",
+        description="Create After Effects project files from built-in templates",
     )
+    parser_generate.add_argument("--template", "-t", help="Name of the built-in template to generate")
+    parser_generate.add_argument("--all", action="store_true", help="Generate all built-in templates")
     parser_generate.add_argument(
-        '--template', '-t',
-        help='Name of the built-in template to generate'
+        "--output", "-o", help="Custom output path for the .aep file (only with single --template)"
     )
-    parser_generate.add_argument(
-        '--all',
-        action='store_true',
-        help='Generate all built-in templates'
-    )
-    parser_generate.add_argument(
-        '--output', '-o',
-        help='Custom output path for the .aep file (only with single --template)'
-    )
-    parser_generate.add_argument(
-        '--list', '-l',
-        action='store_true',
-        help='List available built-in templates'
-    )
+    parser_generate.add_argument("--list", "-l", action="store_true", help="List available built-in templates")
     parser_generate.set_defaults(func=cmd_generate)
 
     # ============================================================
     # EXPORT command
     # ============================================================
     parser_export = subparsers.add_parser(
-        'export',
-        help='Generate a template and render to video',
-        description='Create an After Effects project from a template and render it to video'
+        "export",
+        help="Generate a template and render to video",
+        description="Create an After Effects project from a template and render it to video",
+    )
+    parser_export.add_argument("--template", "-t", required=True, help="Name of the built-in template to export")
+    parser_export.add_argument(
+        "--output-dir", "-o", default=".", help="Directory for rendered output (default: current directory)"
     )
     parser_export.add_argument(
-        '--template', '-t',
-        required=True,
-        help='Name of the built-in template to export'
+        "--comp", "-c", help="Composition name to render (default: first composition in template)"
     )
-    parser_export.add_argument(
-        '--output-dir', '-o',
-        default='.',
-        help='Directory for rendered output (default: current directory)'
-    )
-    parser_export.add_argument(
-        '--comp', '-c',
-        help='Composition name to render (default: first composition in template)'
-    )
-    parser_export.add_argument(
-        '--force', '-f',
-        action='store_true',
-        help='Overwrite existing files'
-    )
+    parser_export.add_argument("--force", "-f", action="store_true", help="Overwrite existing files")
     parser_export.set_defaults(func=cmd_export)
 
     # ============================================================
     # TEST command
     # ============================================================
     parser_test = subparsers.add_parser(
-        'test',
-        help='Run compatibility tests',
-        description='Test package compatibility with your After Effects installation'
+        "test",
+        help="Run compatibility tests",
+        description="Test package compatibility with your After Effects installation",
     )
-    parser_test.add_argument(
-        '--verbose', '-v',
-        action='store_true',
-        help='Show detailed test output'
-    )
-    parser_test.add_argument(
-        '--version',
-        help='Specify After Effects version for testing'
-    )
+    parser_test.add_argument("--verbose", "-v", action="store_true", help="Show detailed test output")
+    parser_test.add_argument("--version", help="Specify After Effects version for testing")
     parser_test.set_defaults(func=cmd_test)
 
     # ============================================================
     # DIAGNOSE command
     # ============================================================
     parser_diagnose = subparsers.add_parser(
-        'diagnose',
-        help='Run diagnostic checks',
-        description='Diagnose After Effects scripting and automation issues'
+        "diagnose", help="Run diagnostic checks", description="Diagnose After Effects scripting and automation issues"
     )
-    parser_diagnose.add_argument(
-        '--no-wait',
-        action='store_true',
-        help='Do not wait for user input at the end'
-    )
+    parser_diagnose.add_argument("--no-wait", action="store_true", help="Do not wait for user input at the end")
     parser_diagnose.set_defaults(func=cmd_diagnose)
 
     # Parse arguments
@@ -402,11 +335,13 @@ For more information, visit: https://github.com/jhd3197/after-effects-automation
     # Configure logging level from --verbose flag
     if args.verbose:
         import logging
+
         from ae_automation.logging_config import setup_logging
+
         setup_logging(level=logging.DEBUG)
 
     # Show help if no command specified
-    if not hasattr(args, 'func'):
+    if not hasattr(args, "func"):
         parser.print_help()
         sys.exit(1)
 
@@ -414,5 +349,5 @@ For more information, visit: https://github.com/jhd3197/after-effects-automation
     args.func(args)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

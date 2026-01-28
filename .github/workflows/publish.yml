@@ -6,36 +6,75 @@ on:
       - main
 
 permissions:
-  contents: write  # Required to push commits and tags
+  contents: write
 
 jobs:
-  bump-version-and-publish:
+  # Run tests before publishing to ensure quality
+  test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+          cache-dependency-path: requirements-test.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-test.txt
+
+      - name: Run tests
+        run: python -m unittest discover tests -v
+
+  # Run linting before publishing
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install ruff
+        run: pip install ruff
+
+      - name: Run ruff check
+        run: ruff check .
+
+  # Build, stage on TestPyPI, then publish to PyPI
+  bump-version-and-publish:
+    needs: [test, lint]
+    runs-on: ubuntu-latest
+    # Prevent infinite loop from bot commits
+    if: github.actor != 'github-actions[bot]'
 
     steps:
       ### Step 1: Checkout Repository ###
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Fetch all history for tagging
-
-      ### Step 1.1: Prevent Infinite Loop ###
-      - name: Check Committer
-        if: github.actor == 'github-actions[bot]'
-        run: |
-          echo "Commit made by GitHub Actions. Exiting workflow."
-          exit 0
+          fetch-depth: 0
 
       ### Step 2: Bump Version and Push Tag ###
       - name: Bump Version and Push Tag
         id: bump_version
-        uses: mathieudutour/github-tag-action@v6.0
+        uses: mathieudutour/github-tag-action@v6.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           release_branches: main
-          default_bump: patch    # Options: patch, minor, major
-          tag_prefix: 'v'         # Prefix for tags (e.g., 'v1.0.0')
-          skip_ci: true           # Prevent triggering workflows on tag push
+          default_bump: patch
+          tag_prefix: "v"
 
       ### Step 3: Update VERSION File ###
       - name: Update VERSION File
@@ -44,57 +83,45 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add VERSION
-          git commit -m "📦 Version to v${{ steps.bump_version.outputs.new_version }} [skip ci]"
-          git push origin main
+          git commit -m "chore: bump version to v${{ steps.bump_version.outputs.new_version }} [skip ci]"
 
       ### Step 4: Update setup.py with the New Version ###
       - name: Update setup.py Version
         run: |
           NEW_VERSION=${{ steps.bump_version.outputs.new_version }}
-          # Update the version in setup.py
           sed -i "s/version=['\"][^'\"]*['\"],/version='${NEW_VERSION}',/" setup.py
           git add setup.py
-          git commit -m "Update setup.py to version ${NEW_VERSION} [skip ci]" || echo "No changes to commit"
+          git commit -m "chore: update setup.py to v${NEW_VERSION} [skip ci]" || echo "No changes to commit"
           git push origin main
 
-      ### Step 6: Create GitHub Release ###
+      ### Step 5: Create GitHub Release ###
       - name: Create GitHub Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.bump_version.outputs.new_version }}
-          release_name: Release v${{ steps.bump_version.outputs.new_version }}
-          body: "Release version v${{ steps.bump_version.outputs.new_version }}"
+          name: Release v${{ steps.bump_version.outputs.new_version }}
+          body: ${{ steps.bump_version.outputs.changelog }}
           draft: false
           prerelease: false
 
-      ### Step 7: Set Up Python ###
+      ### Step 6: Set Up Python ###
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.x'  # Specify your Python version
+          python-version: "3.12"
+          cache: "pip"
 
-      ### Step 8: Cache pip ###
-      - name: Cache pip
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
-      ### Step 9: Install Build Dependencies ###
+      ### Step 7: Install Build Dependencies ###
       - name: Install Build Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install setuptools wheel twine
+          pip install build twine
 
-      ### Step 9.5: Build Frontend Assets ###
+      ### Step 8: Build Frontend Assets ###
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: "20"
 
       - name: Build Frontend
         working-directory: ae_automation/mixins/videoEditor
@@ -102,12 +129,27 @@ jobs:
           npm install
           npm run build
 
-      ### Step 10: Build the Package ###
+      ### Step 9: Build the Package ###
       - name: Build Package
-        run: |
-          python setup.py sdist bdist_wheel
+        run: python -m build
 
-      ### Step 11: Publish to PyPI ###
+      ### Step 10: Publish to TestPyPI (staging) ###
+      - name: Publish to TestPyPI
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.TEST_PYPI_TOKEN }}
+        run: |
+          twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+        continue-on-error: true
+
+      ### Step 11: Verify TestPyPI package ###
+      - name: Verify TestPyPI package
+        run: |
+          sleep 15
+          pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ after-effects-automation==${{ steps.bump_version.outputs.new_version }} || echo "TestPyPI verification skipped"
+        continue-on-error: true
+
+      ### Step 12: Publish to PyPI ###
       - name: Publish to PyPI
         env:
           TWINE_USERNAME: __token__

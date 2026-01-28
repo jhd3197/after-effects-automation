@@ -1,10 +1,11 @@
 """
 Unit tests for custom exception classes and logging configuration.
 """
-import unittest
+
 import logging
 import os
 import sys
+import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -13,26 +14,24 @@ from ae_automation.exceptions import (
     AEAutomationError,
     AENotFoundError,
     AENotResponsiveError,
-    ScriptExecutionError,
-    RenderError,
     ConfigValidationError,
+    RenderError,
+    ScriptExecutionError,
 )
-from ae_automation.logging_config import setup_logging, get_logger
+from ae_automation.logging_config import get_logger, setup_logging
 
 
 class TestExceptionHierarchy(unittest.TestCase):
     """All custom exceptions inherit from AEAutomationError."""
 
     def test_base_class(self):
-        for cls in (AENotFoundError, AENotResponsiveError,
-                    ScriptExecutionError, RenderError, ConfigValidationError):
+        for cls in (AENotFoundError, AENotResponsiveError, ScriptExecutionError, RenderError, ConfigValidationError):
             with self.subTest(cls=cls.__name__):
                 self.assertTrue(issubclass(cls, AEAutomationError))
                 self.assertTrue(issubclass(cls, Exception))
 
 
 class TestAENotFoundError(unittest.TestCase):
-
     def test_default_message(self):
         err = AENotFoundError()
         self.assertIn("not found", str(err))
@@ -48,7 +47,6 @@ class TestAENotFoundError(unittest.TestCase):
 
 
 class TestAENotResponsiveError(unittest.TestCase):
-
     def test_default_message(self):
         err = AENotResponsiveError()
         self.assertIn("not responding", str(err))
@@ -60,7 +58,6 @@ class TestAENotResponsiveError(unittest.TestCase):
 
 
 class TestScriptExecutionError(unittest.TestCase):
-
     def test_default_message(self):
         err = ScriptExecutionError()
         self.assertIn("Script execution failed", str(err))
@@ -77,7 +74,6 @@ class TestScriptExecutionError(unittest.TestCase):
 
 
 class TestRenderError(unittest.TestCase):
-
     def test_default_message(self):
         err = RenderError()
         self.assertIn("Render failed", str(err))
@@ -92,7 +88,6 @@ class TestRenderError(unittest.TestCase):
 
 
 class TestConfigValidationError(unittest.TestCase):
-
     def test_default_message(self):
         err = ConfigValidationError()
         self.assertIn("validation failed", str(err))
@@ -108,15 +103,13 @@ class TestExceptionsAreCatchable(unittest.TestCase):
     """Verify that catching AEAutomationError catches all subtypes."""
 
     def test_catch_base(self):
-        for cls in (AENotFoundError, AENotResponsiveError,
-                    ScriptExecutionError, RenderError, ConfigValidationError):
+        for cls in (AENotFoundError, AENotResponsiveError, ScriptExecutionError, RenderError, ConfigValidationError):
             with self.subTest(cls=cls.__name__):
                 with self.assertRaises(AEAutomationError):
                     raise cls()
 
 
 class TestLoggingSetup(unittest.TestCase):
-
     def test_get_logger_returns_logger(self):
         lg = get_logger("ae_automation.test")
         self.assertIsInstance(lg, logging.Logger)
@@ -157,6 +150,7 @@ class TestSettingsUsesCustomExceptions(unittest.TestCase):
 
     def test_validate_settings_raises_ae_not_found(self):
         from ae_automation import settings
+
         original = settings.AFTER_EFFECT_FOLDER
         settings.AFTER_EFFECT_FOLDER = "/nonexistent/path/to/ae"
         try:
@@ -166,5 +160,5 @@ class TestSettingsUsesCustomExceptions(unittest.TestCase):
             settings.AFTER_EFFECT_FOLDER = original
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

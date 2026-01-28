@@ -1,9 +1,10 @@
 """
 Unit tests for JavaScript/JSX integration
 """
-import unittest
-import sys
+
 import os
+import sys
+import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -31,21 +32,19 @@ class TestJSXScripts(unittest.TestCase):
             "selectItemByName.jsx",
             "selectLayerByIndex.jsx",
             "renderComp.jsx",
-            "workAreaComp.jsx"
+            "workAreaComp.jsx",
         ]
 
     def test_jsx_directory_exists(self):
         """Test that JSX directory exists"""
-        self.assertTrue(os.path.exists(settings.JS_DIR),
-                       f"JSX directory not found: {settings.JS_DIR}")
+        self.assertTrue(os.path.exists(settings.JS_DIR), f"JSX directory not found: {settings.JS_DIR}")
 
     def test_all_required_jsx_scripts_exist(self):
         """Test that all required JSX scripts exist"""
         for script_name in self.required_scripts:
             with self.subTest(script=script_name):
                 script_path = os.path.join(settings.JS_DIR, script_name)
-                self.assertTrue(os.path.exists(script_path),
-                              f"Required JSX script not found: {script_name}")
+                self.assertTrue(os.path.exists(script_path), f"Required JSX script not found: {script_name}")
 
     def test_jsx_scripts_are_readable(self):
         """Test that JSX scripts can be read"""
@@ -56,8 +55,7 @@ class TestJSXScripts(unittest.TestCase):
                     try:
                         content = self.client.file_get_contents(script_path)
                         self.assertIsInstance(content, str)
-                        self.assertGreater(len(content), 0,
-                                         f"JSX script is empty: {script_name}")
+                        self.assertGreater(len(content), 0, f"JSX script is empty: {script_name}")
                     except Exception as e:
                         self.fail(f"Failed to read {script_name}: {e}")
 
@@ -77,8 +75,7 @@ class TestJSXScripts(unittest.TestCase):
                 if os.path.exists(script_path):
                     content = self.client.file_get_contents(script_path)
                     for keyword in expected_keywords:
-                        self.assertIn(keyword, content,
-                                    f"{script_name} missing expected keyword: {keyword}")
+                        self.assertIn(keyword, content, f"{script_name} missing expected keyword: {keyword}")
 
 
 class TestJavaScriptFramework(unittest.TestCase):
@@ -104,8 +101,7 @@ class TestJavaScriptFramework(unittest.TestCase):
         """Test that framework includes custom utility functions"""
         # The framework.js should be included
         # We can't easily test the minified content, but we can check it's not empty
-        self.assertGreater(len(self.client.JS_FRAMEWORK), 100,
-                          "Framework seems too small")
+        self.assertGreater(len(self.client.JS_FRAMEWORK), 100, "Framework seems too small")
 
 
 class TestScriptGeneration(unittest.TestCase):
@@ -119,10 +115,7 @@ class TestScriptGeneration(unittest.TestCase):
         """Test that parameters are replaced in scripts"""
         # This tests the logic that would be used in runScript
         template = "var compName = '{compName}'; var width = {width};"
-        replacements = {
-            "{compName}": "TestComp",
-            "{width}": "1920"
-        }
+        replacements = {"{compName}": "TestComp", "{width}": "1920"}
 
         result = template
         for key, value in replacements.items():
@@ -132,5 +125,5 @@ class TestScriptGeneration(unittest.TestCase):
         self.assertEqual(result, expected)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
