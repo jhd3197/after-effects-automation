@@ -7,7 +7,7 @@
 
 ## Overview
 
-Learn how to manipulate text layers in After Effects using automation. This example shows you how to:
+Learn how to manipulate text layers in After Effects using configuration-driven automation. Define your text content in Python, and the platform handles template creation, layer updates, and rendering automatically. This example shows you how to:
 - Update text content dynamically
 - Work with multiple text layers
 - Create multi-line text with line breaks
@@ -241,6 +241,6 @@ Try these other examples:
 
 ## Related Documentation
 
-- [Text Property Reference](../../docs/text_properties.md)
-- [Custom Actions Guide](../../docs/custom_actions.md)
 - [Main README](../../README.md)
+- [Examples Guide](../README.md)
+- [CLI Guide](../../CLI_GUIDE.md)

@@ -8,7 +8,7 @@ setup(
     version='0.0.3',
     author="Juan Denis",
     author_email="juan@vene.co",
-    description="A Python tool for automating Adobe After Effects workflows",
+    description="A unified video automation platform for Adobe After Effects",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/jhd3197/after-effects-automation",

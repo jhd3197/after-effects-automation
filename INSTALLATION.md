@@ -1,11 +1,11 @@
 # Installation Guide
 
-Complete installation instructions for After Effects Automation.
+Complete installation instructions for After Effects Automation. This covers the Python package (including the CLI and built-in Web Editor), the AE bridge script that connects Python to After Effects, and environment configuration.
 
 ## Requirements
 
 - **Python 3.7+**
-- **Adobe After Effects** (2024, 2025, or 2025 Beta recommended)
+- **Adobe After Effects** (2024, 2025, or 2026 recommended)
 - **Windows, macOS, or Linux**
 
 ## Installation Methods
@@ -15,6 +15,8 @@ Complete installation instructions for After Effects Automation.
 ```bash
 pip install after-effects-automation
 ```
+
+This installs the Python automation library, the `ae-automation` CLI, and the built-in Web Editor for visual config editing.
 
 ### Method 2: From Source
 
@@ -28,7 +30,7 @@ pip install -e .
 
 ### 1. Install the Startup Script
 
-This allows Python to communicate with After Effects while it's running:
+This installs the bridge between Python and After Effects — a startup script that monitors a file-based command queue so Python can send ExtendScript commands to AE asynchronously:
 
 ```bash
 python install_ae_runner.py

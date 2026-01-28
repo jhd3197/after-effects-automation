@@ -1,6 +1,6 @@
 # Render Only Example
 
-Simple example for rendering After Effects project files without automation.
+Use the platform's rendering pipeline to render existing After Effects project files directly, without running the full composition-building automation.
 
 ## Use Case
 

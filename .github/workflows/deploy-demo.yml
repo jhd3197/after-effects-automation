@@ -3,16 +3,20 @@ name: Deploy Demo to GitHub Pages
 on:
   push:
     branches:
-      - main  # Deploys when changes are pushed to the main branch
+      - main
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
 
     steps:
       - name: Checkout Repository
@@ -33,32 +37,22 @@ jobs:
         working-directory: ae_automation/mixins/videoEditor
         run: npm run build:demo
 
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: demo-build
           path: ae_automation/mixins/videoEditor/dist
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: demo-build
-          path: dist
-
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
-          publish_branch: gh-pages
-          force_orphan: true
+        id: deployment
+        uses: actions/deploy-pages@v4

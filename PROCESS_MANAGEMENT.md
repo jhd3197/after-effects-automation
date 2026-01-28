@@ -4,6 +4,8 @@ Understanding how After Effects Automation manages the After Effects process lif
 
 ## Overview
 
+Intelligent process management is one of the key things that separates a unified automation platform from a collection of standalone scripts. Rather than assuming After Effects is already running and correctly configured, the platform handles the full process lifecycle automatically.
+
 The automation system includes sophisticated process management to handle:
 - **Process Detection** - Find and monitor After Effects
 - **Window Waiting** - Wait for UI to be ready
@@ -15,7 +17,7 @@ The automation system includes sophisticated process management to handle:
 
 ### ProcessManagerMixin
 
-The core process management is implemented in `ae_automation/mixins/processManager.py`:
+The core process management is implemented in `ae_automation/mixins/processManager.py` and composed into the unified `Client` class alongside the other mixins (afterEffect, bot, templateGenerator, etc.):
 
 ```python
 from ae_automation import Client

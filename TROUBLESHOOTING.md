@@ -1,6 +1,6 @@
 # Troubleshooting Guide
 
-Common issues and solutions for After Effects Automation.
+Common issues and solutions for the After Effects Automation platform.
 
 ## Quick Fixes
 
