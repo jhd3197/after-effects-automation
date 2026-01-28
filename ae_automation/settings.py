@@ -1,27 +1,29 @@
+from __future__ import annotations
+
 import os
 from pathlib import Path
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
-env_path = Path('.env')
+env_path: Path = Path('.env')
 load_dotenv(dotenv_path=env_path)
 
 # Cross-platform fallback for APPDATA
-_appdata = os.getenv('APPDATA')
+_appdata: str | None = os.getenv('APPDATA')
 if _appdata is None:
     _appdata = os.path.join(os.path.expanduser('~'), '.local', 'share')
 
 # Get environment variables with defaults
 # Use APPDATA for cache folder to ensure consistent location regardless of where scripts run from
-CACHE_FOLDER = os.getenv('CACHE_FOLDER', os.path.join(_appdata, 'ae_automation', 'cache'))
-AFTER_EFFECT_FOLDER = os.getenv('AFTER_EFFECT_FOLDER', 'C:/Program Files/Adobe/Adobe After Effects 2025/Support Files')
-AFTER_EFFECT_PROJECT_FOLDER = os.getenv('AFTER_EFFECT_PROJECT_FOLDER', 'au-automate')
+CACHE_FOLDER: str = os.getenv('CACHE_FOLDER', os.path.join(_appdata, 'ae_automation', 'cache'))
+AFTER_EFFECT_FOLDER: str = os.getenv('AFTER_EFFECT_FOLDER', 'C:/Program Files/Adobe/Adobe After Effects 2025/Support Files')
+AFTER_EFFECT_PROJECT_FOLDER: str = os.getenv('AFTER_EFFECT_PROJECT_FOLDER', 'au-automate')
 
 # Queue folder for file-based communication with After Effects
-QUEUE_FOLDER = os.path.join(_appdata, 'ae_automation', 'queue')
+QUEUE_FOLDER: str = os.path.join(_appdata, 'ae_automation', 'queue')
 
 # Derive AERENDER_PATH from AFTER_EFFECT_FOLDER
-AERENDER_PATH = os.getenv('AERENDER_PATH', os.path.join(AFTER_EFFECT_FOLDER, 'aerender.exe'))
+AERENDER_PATH: str = os.getenv('AERENDER_PATH', os.path.join(AFTER_EFFECT_FOLDER, 'aerender.exe'))
 
 # Ensure cache directory exists
 os.makedirs(CACHE_FOLDER, exist_ok=True)
@@ -30,10 +32,10 @@ os.makedirs(CACHE_FOLDER, exist_ok=True)
 os.makedirs(QUEUE_FOLDER, exist_ok=True)
 
 # Package resources path
-PACKAGE_DIR = os.path.dirname(os.path.abspath(__file__))
-JS_DIR = os.path.join(PACKAGE_DIR, 'mixins', 'js')
+PACKAGE_DIR: str = os.path.dirname(os.path.abspath(__file__))
+JS_DIR: str = os.path.join(PACKAGE_DIR, 'mixins', 'js')
 
-def validate_settings():
+def validate_settings() -> None:
     """Validate required settings and paths."""
     from ae_automation.exceptions import AENotFoundError, ConfigValidationError
 

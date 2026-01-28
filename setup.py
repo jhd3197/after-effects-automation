@@ -46,11 +46,12 @@ setup(
     },
     package_data={
         "ae_automation": [
+            "py.typed",
             "mixins/js/*.js",
             "mixins/js/*.jsx",
             "mixins/videoEditor/dist/**/*",
             "mixins/videoEditor/dist/*",
-            "mixins/videoEditor/script.js" 
+            "mixins/videoEditor/script.js"
         ]
     },
     include_package_data=True,

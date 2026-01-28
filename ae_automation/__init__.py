@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 import pathlib
 import gc
 import os
+from typing import Any
 from dotenv import load_dotenv
 
 from ae_automation.mixins.afterEffect import afterEffectMixin
@@ -21,9 +24,9 @@ class Client(
     TemplateGeneratorMixin,
     ProcessManagerMixin,
 ):
-    JS_FRAMEWORK=""
-  
-    def __init__(self, **kwargs):
+    JS_FRAMEWORK: str = ""
+
+    def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
         
         # Get environment variables with defaults

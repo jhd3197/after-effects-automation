@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 from ae_automation.logging_config import get_logger
 from ae_automation.exceptions import ConfigValidationError
@@ -10,7 +12,7 @@ class botMixin:
     Bot Mixin
     """
 
-    def startBot(self,file_name):
+    def startBot(self, file_name: str) -> None:
         """
         startBot
         """

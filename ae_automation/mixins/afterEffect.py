@@ -1,9 +1,12 @@
+from __future__ import annotations
+
 import subprocess
 import time
 import os
 import json
 import uuid
 import shutil
+from typing import Any
 from ae_automation import settings
 from ae_automation.logging_config import get_logger
 from ae_automation.exceptions import (
@@ -43,7 +46,11 @@ class afterEffectMixin:
     #TODO - Create function to edit values from comp or create a template.json and add the values there then the script will read the values from there will modify the json
     #TODO - Add transitions layer
 
-    def sanitize_text_for_ae(self, text):
+    afterEffectItems: list[dict[str, Any]]
+    afterEffectResource: list[dict[str, Any]]
+    JS_FRAMEWORK: str
+
+    def sanitize_text_for_ae(self, text: Any) -> Any:
         """
         Sanitize text before sending to After Effects.
         Must be done in Python before JS to avoid string escaping issues.
@@ -65,7 +72,7 @@ class afterEffectMixin:
 
         return text
 
-    def startAfterEffect(self, data):
+    def startAfterEffect(self, data: dict[str, Any]) -> None:
         """
         startAfterEffect
         """
@@ -166,7 +173,7 @@ class afterEffectMixin:
             time.sleep(10)
             output_file=self.renderFile(filePath,data["project"]["comp_name"],data["project"]["output_dir"])
 
-    def getResourceDuration(self,resource_name):
+    def getResourceDuration(self, resource_name: str) -> float:
         """
         getResourceDuration
         """
@@ -175,7 +182,7 @@ class afterEffectMixin:
                 return float(resource["duration"])
         return 0        
 
-    def parseCustomActions(self,custom_edit,scene_folder,itemTimeline,data):
+    def parseCustomActions(self, custom_edit: dict[str, Any], scene_folder: str, itemTimeline: dict[str, Any], data: dict[str, Any]) -> None:
         if "property_type" in custom_edit:
             if custom_edit["property_type"] == "color":
                 custom_edit["value"]=self.hexToRGBA(custom_edit["value"])
@@ -223,7 +230,7 @@ class afterEffectMixin:
         if custom_edit["change_type"] == "add_comp":
             self.addCompToTimeline(self.slug(scene_folder+" "+itemTimeline["template_comp"]),custom_edit["comp_name"],scene_folder,custom_edit["startTime"],custom_edit["duration"])
 
-    def checkIfItemExists(self, itemName):
+    def checkIfItemExists(self, itemName: str) -> bool:
         """
         check If Item Exists
         """
@@ -232,7 +239,7 @@ class afterEffectMixin:
                 return False
         return True
 
-    def focusOnProjectPanel(self):
+    def focusOnProjectPanel(self) -> None:
         """
         focusOnProjectPanel
         """
@@ -241,7 +248,7 @@ class afterEffectMixin:
         pyautogui.hotkey('ctrl', '0')
         time.sleep(2)
 
-    def getProjectMap(self):
+    def getProjectMap(self) -> dict[str, Any]:
         """
         getProjectMap
         """
@@ -255,7 +262,7 @@ class afterEffectMixin:
         logger.debug("Finished getting project map")
         return data
 
-    def createFolder(self, folderName, parentFolder=""):
+    def createFolder(self, folderName: str, parentFolder: str = "") -> None:
         """
         createFolder
         """
@@ -267,7 +274,7 @@ class afterEffectMixin:
         self.runScript("create_folder.jsx",_replace)
         logger.debug("Finished creating folder: %s", folderName)
         
-    def deleteFolder(self, folderName):
+    def deleteFolder(self, folderName: str) -> None:
         """
         Delete Folder
         """
@@ -279,7 +286,7 @@ class afterEffectMixin:
         time.sleep(2)
         pyautogui.hotkey('ctrl', 's')
 
-    def createComp(self, compName,compWidth=1980,compHeight=1080,pixelAspect=1,duration=120,frameRate=30,folderName=""):
+    def createComp(self, compName: str, compWidth: int = 1980, compHeight: int = 1080, pixelAspect: int = 1, duration: float = 120, frameRate: float = 30, folderName: str = "") -> None:
         """
         Create Comp
         """
@@ -296,14 +303,14 @@ class afterEffectMixin:
         self.runScript("addComp.jsx",_replace)
         logger.debug("Finished creating comp: %s", compName)
 
-    def goToItem(self,itemName):
+    def goToItem(self, itemName: str) -> None:
         self.deselectAll()
         for item in self.afterEffectItems:
             if item["name"] == itemName:
                 self.selectItem(item["id"])
                 break
             
-    def selectItem(self,index):
+    def selectItem(self, index: int | str) -> None:
         """
         selectItem
         """
@@ -312,7 +319,7 @@ class afterEffectMixin:
         }
         self.runScript("selectItem.jsx",_replace)
 
-    def selectItemByName(self,name):
+    def selectItemByName(self, name: str) -> None:
         """
         Select Item By Name
         """
@@ -321,7 +328,7 @@ class afterEffectMixin:
         }
         self.runScript("selectItemByName.jsx",_replace)
 
-    def openItemByName(self,name):
+    def openItemByName(self, name: str) -> None:
         """
         Select Item By Name
         """
@@ -330,7 +337,7 @@ class afterEffectMixin:
         }
         self.runScript("openItemName.jsx",_replace)
         
-    def editComp(self, comp_name, layer_name, property_name, value):
+    def editComp(self, comp_name: str, layer_name: str, property_name: str, value: Any) -> None:
         """
         editComp
         """
@@ -347,7 +354,7 @@ class afterEffectMixin:
         logger.debug("editComp replacements: %s", _replace)
         self.runScript("update_properties.jsx",_replace)
         
-    def selectLayerByName(self, comp_name, layer_name):
+    def selectLayerByName(self, comp_name: str, layer_name: str) -> None:
         """
         editComp
         """
@@ -357,7 +364,7 @@ class afterEffectMixin:
         }
         self.runScript("selectLayerByLayer.jsx",_replace)
 
-    def selectLayerByIndex(self, comp_name, layer_index):
+    def selectLayerByIndex(self, comp_name: str, layer_index: int | str) -> None:
         """
         editComp
         """
@@ -367,7 +374,7 @@ class afterEffectMixin:
         }
         self.runScript("selectLayerByIndex.jsx",_replace)
 
-    def editLayerAtKey(self, comp_name, layer_name, property_name, value,frame):
+    def editLayerAtKey(self, comp_name: str, layer_name: str, property_name: str, value: Any, frame: int | float | str) -> None:
         """
         editComp
         """
@@ -384,7 +391,7 @@ class afterEffectMixin:
         }
         self.runScript("update_properties_frame.jsx",_replace)
 
-    def editComp1(self, comp_name, layer_name, property_name, value):
+    def editComp1(self, comp_name: str, layer_name: str, property_name: str, value: Any) -> None:
         """
         editComp
         """
@@ -396,14 +403,14 @@ class afterEffectMixin:
         }
         self.runScript("duplicate_comp_1.jsx",_replace)
             
-    def swapItem(self, fromCompName, toLayerIndex, ItemName):
+    def swapItem(self, fromCompName: str, toLayerIndex: int | str, ItemName: str) -> None:
         self.openItemByName(fromCompName)
         self.selectItemByName(ItemName)
         time.sleep(2)
         self.selectLayerByIndex(fromCompName, toLayerIndex)
         pyautogui.hotkey('ctrl', 'alt', '/')
 
-    def addMarker(self, comp_name, layer_name, marker_name, marker_time):
+    def addMarker(self, comp_name: str, layer_name: str, marker_name: str, marker_time: float | str) -> None:
         """
         add marker
         """
@@ -415,13 +422,13 @@ class afterEffectMixin:
         }
         self.runScript("add_marker.jsx",_replace)
 
-    def addCompToTimeline(self,CompTemplateName, CopyCompName, FolderName, startTime=0.0, compDuration=0.0, inPoint=0.0, stretch=100, outputName=""):
+    def addCompToTimeline(self, CompTemplateName: str, CopyCompName: str, FolderName: str, startTime: float = 0.0, compDuration: float = 0.0, inPoint: float = 0.0, stretch: int = 100, outputName: str = "") -> None:
         """
         add Comp To Timeline
         """
         self.addCompToTimelineB1(CompTemplateName, CopyCompName, FolderName, startTime, compDuration, inPoint, stretch)
 
-    def addCompToTimelineB1(self,CompTemplateName, CopyCompName, FolderName, startTime=0.0, compDuration=0.0, inPoint=0.0, stretch=100):
+    def addCompToTimelineB1(self, CompTemplateName: str, CopyCompName: str, FolderName: str, startTime: float = 0.0, compDuration: float = 0.0, inPoint: float = 0.0, stretch: int = 100) -> None:
         """
         add Comp To Timeline
         """
@@ -442,7 +449,7 @@ class afterEffectMixin:
         for comp in data:
             self.swapItem(comp["fromCompName"],comp["toLayerIndex"],comp["ItemName"])
 
-    def addResourceToTimeline(self,ResourceName, CompName, startTime=0.0, compDuration=0.0, inPoint=0.0, stretch=100, moveToEnd=False):
+    def addResourceToTimeline(self, ResourceName: str, CompName: str, startTime: float = 0.0, compDuration: float = 0.0, inPoint: float = 0.0, stretch: int = 100, moveToEnd: bool | str = False) -> None:
         """
         add Comp To Timeline
         """
@@ -457,7 +464,7 @@ class afterEffectMixin:
         }
         self.runScript("add_resource.jsx",_replace)
 
-    def updateLayerProperties(self, CompName, layerIndex=0, startTime=0.0, compDuration=0.0, inPoint=0.0, stretch=100, moveToEnd=False):
+    def updateLayerProperties(self, CompName: str, layerIndex: int = 0, startTime: float = 0.0, compDuration: float = 0.0, inPoint: float = 0.0, stretch: int = 100, moveToEnd: bool | str = False) -> None:
         """
         add Comp To Timeline
         """
@@ -472,7 +479,7 @@ class afterEffectMixin:
         }
         self.runScript("update_resource.jsx",_replace,debug=True)
 
-    def addCompToTimelineA1(self,CompTemplateID, compName, compStartTime=0, compDuration=0, compInPoint=0, compStretch=100):
+    def addCompToTimelineA1(self, CompTemplateID: int | str, compName: str, compStartTime: float = 0, compDuration: float = 0, compInPoint: float = 0, compStretch: int = 100) -> None:
         """
         add Comp To Timeline
         """
@@ -486,7 +493,7 @@ class afterEffectMixin:
         }
         self.runScript("add_comp_to_templates.jsx",_replace)
     
-    def renameItem(self,itemID,itemName):
+    def renameItem(self, itemID: int | str, itemName: str) -> None:
         """
         renameItem
         """
@@ -502,7 +509,7 @@ class afterEffectMixin:
                 break
         self.afterEffectItems=_file_map
 
-    def importFile(self,filePath,fileName,cacheFolder):
+    def importFile(self, filePath: str, fileName: str, cacheFolder: str) -> None:
         """
         Import File
         """
@@ -513,7 +520,7 @@ class afterEffectMixin:
         }
         self.runScript("importFile.jsx",_replace)
 
-    def renderComp(self,compName,outputPath):
+    def renderComp(self, compName: str, outputPath: str) -> str:
         _replace={
             "{outputPath}":str(outputPath),
             "{compName}":str(compName)
@@ -521,7 +528,7 @@ class afterEffectMixin:
         self.runScript("renderComp.jsx",_replace) 
         return outputPath+"/"+compName+".mp4"
 
-    def deselectAll(self):
+    def deselectAll(self) -> None:
         """
         deselectAll
         """
@@ -530,7 +537,7 @@ class afterEffectMixin:
         pyautogui.hotkey('ctrl', 'shift', 'a')
         time.sleep(2)
 
-    def executeCommand(self, cmdId):
+    def executeCommand(self, cmdId: int | str) -> None:
         """
         run Command
         """
@@ -539,7 +546,7 @@ class afterEffectMixin:
         }
         self.runScript("run_command.jsx",_replace)
 
-    def _execute_script_in_running_ae(self, script_path):
+    def _execute_script_in_running_ae(self, script_path: str) -> None:
         """
         Execute a script in an already-running After Effects instance
         Uses file-based command queue system
@@ -588,7 +595,7 @@ class afterEffectMixin:
             except OSError:
                 pass
 
-    def runScript(self, fileName, _remplacements=None,debug=False):
+    def runScript(self, fileName: str, _remplacements: dict[str, str] | None = None, debug: bool = False) -> str:
         """
         run Script
         """
@@ -616,7 +623,7 @@ class afterEffectMixin:
         logger.debug("Finished script: %s", fileName)
         return randomName
 
-    def workAreaComp(self,compName,startTime,endTime):
+    def workAreaComp(self, compName: str, startTime: float, endTime: float) -> None:
         """
         workAreaComp
         """
@@ -628,7 +635,7 @@ class afterEffectMixin:
         }
         self.runScript("workAreaComp.jsx",_replace)
 
-    def runCommand(self, command):
+    def runCommand(self, command: str) -> str:
         process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         
         while True:
@@ -645,7 +652,7 @@ class afterEffectMixin:
         
         return "Command executed successfully."
 
-    def renderFile(self, projectPath, compName, outputDir):
+    def renderFile(self, projectPath: str, compName: str, outputDir: str) -> str:
         """
         Render an Adobe After Effects project file via terminal
         """
@@ -661,11 +668,11 @@ class afterEffectMixin:
         
         return outputPath
     
-    def time_to_seconds(self, time_str):
+    def time_to_seconds(self, time_str: str) -> float:
         h, m, s = map(float, time_str.split(':'))
         return h * 3600 + m * 60 + s
 
-    def convertMovToMp4(self, inputPath, outputPath):
+    def convertMovToMp4(self, inputPath: str, outputPath: str) -> None:
         """
         Convert MOV to MP4 using moviepy
         """

@@ -1,15 +1,25 @@
+from __future__ import annotations
+
 from flask import Flask, send_from_directory, request, jsonify, send_file
 from flask_cors import CORS
 import json
 import os
 import subprocess
+from typing import Any
 from werkzeug.serving import run_simple
 import webbrowser
 from threading import Timer
 from pathlib import Path
 
 class VideoEditorAppMixin:
-    def __init__(self):
+    dist_dir: str
+    app: Flask
+    data: dict[str, Any]
+    file_path: str
+    history: list[str]
+    history_index: int
+
+    def __init__(self) -> None:
         # Get absolute path to the videoEditor directory
         base_dir = os.path.dirname(os.path.abspath(__file__))
         self.dist_dir = os.path.join(base_dir, 'videoEditor', 'dist')
@@ -289,7 +299,7 @@ class VideoEditorAppMixin:
                 return send_from_directory(self.dist_dir, path)
             return send_from_directory(self.dist_dir, 'index.html')
 
-    def runVideoEditor(self, file_path, host='127.0.0.1', port=5000, dev_mode=False):
+    def runVideoEditor(self, file_path: str, host: str = '127.0.0.1', port: int = 5000, dev_mode: bool = False) -> None:
         """
         Run the video editor application
 
@@ -321,5 +331,5 @@ class VideoEditorAppMixin:
 
         run_simple(host, port, self.app, use_reloader=False, use_debugger=True)
 
-    def open_browser(self, host, port):
+    def open_browser(self, host: str, port: int) -> None:
         webbrowser.open_new(f'http://{host}:{port}/')

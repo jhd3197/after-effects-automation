@@ -2,8 +2,11 @@
 Template Generator Mixin
 Provides functionality to create After Effects project templates (.aep files)
 """
+from __future__ import annotations
+
 import time
 import os
+from typing import Any
 from ae_automation.logging_config import get_logger
 from ae_automation.exceptions import AENotResponsiveError, ScriptExecutionError
 
@@ -15,7 +18,7 @@ class TemplateGeneratorMixin:
     Mixin for generating After Effects project templates
     """
 
-    def createNewProject(self):
+    def createNewProject(self) -> None:
         """
         Create a new After Effects project
         """
@@ -23,7 +26,7 @@ class TemplateGeneratorMixin:
         self.runScript("create_new_project.jsx")
         time.sleep(1)  # Brief wait for script execution
 
-    def saveProject(self, project_path):
+    def saveProject(self, project_path: str) -> None:
         """
         Save the current project to a file
 
@@ -56,8 +59,8 @@ class TemplateGeneratorMixin:
 
         raise ScriptExecutionError(script_name="save_project.jsx", detail=f"File was not created at {original_path}")
 
-    def addTextLayer(self, comp_name, layer_name, text_content="Sample Text",
-                     x_position=960, y_position=540, font_size=72):
+    def addTextLayer(self, comp_name: str, layer_name: str, text_content: str = "Sample Text",
+                     x_position: int = 960, y_position: int = 540, font_size: int = 72) -> None:
         """
         Add a text layer to a composition
 
@@ -81,8 +84,8 @@ class TemplateGeneratorMixin:
         self.runScript("add_text_layer.jsx", _replace)
         time.sleep(1)
 
-    def addSolidLayer(self, comp_name, layer_name, color_r=1, color_g=1, color_b=1,
-                     width=1920, height=1080):
+    def addSolidLayer(self, comp_name: str, layer_name: str, color_r: float = 1, color_g: float = 1, color_b: float = 1,
+                     width: int = 1920, height: int = 1080) -> None:
         """
         Add a solid layer to a composition
 
@@ -108,7 +111,7 @@ class TemplateGeneratorMixin:
         self.runScript("add_solid_layer.jsx", _replace)
         time.sleep(1)
 
-    def addNullLayer(self, comp_name, layer_name):
+    def addNullLayer(self, comp_name: str, layer_name: str) -> None:
         """
         Add a null object layer to a composition
 
@@ -124,8 +127,8 @@ class TemplateGeneratorMixin:
         self.runScript("add_null_layer.jsx", _replace)
         time.sleep(1)
 
-    def addShapeLayer(self, comp_name, layer_name, width=500, height=500,
-                     color_r=0.5, color_g=0.5, color_b=0.5):
+    def addShapeLayer(self, comp_name: str, layer_name: str, width: int = 500, height: int = 500,
+                     color_r: float = 0.5, color_g: float = 0.5, color_b: float = 0.5) -> None:
         """
         Add a shape layer with a rectangle to a composition
 
@@ -151,7 +154,7 @@ class TemplateGeneratorMixin:
         self.runScript("add_shape_layer.jsx", _replace)
         time.sleep(1)
 
-    def buildTemplate(self, template_config, output_path):
+    def buildTemplate(self, template_config: dict[str, Any], output_path: str) -> None:
         """
         Build a complete template project from a configuration
 

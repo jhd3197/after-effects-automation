@@ -8,16 +8,18 @@ Usage:
 Log level is controlled by the AE_LOG_LEVEL environment variable
 (default: INFO). The CLI --verbose flag sets it to DEBUG.
 """
+from __future__ import annotations
+
 import logging
 import os
 
-_LOG_FORMAT = "%(levelname)s: %(message)s"
-_DEBUG_FORMAT = "%(asctime)s %(levelname)s [%(name)s] %(message)s"
+_LOG_FORMAT: str = "%(levelname)s: %(message)s"
+_DEBUG_FORMAT: str = "%(asctime)s %(levelname)s [%(name)s] %(message)s"
 
-_configured = False
+_configured: bool = False
 
 
-def setup_logging(level=None):
+def setup_logging(level: int | None = None) -> None:
     """
     Configure the root ae_automation logger.
 
@@ -47,7 +49,7 @@ def setup_logging(level=None):
     _configured = True
 
 
-def get_logger(name):
+def get_logger(name: str) -> logging.Logger:
     """
     Return a logger under the ae_automation namespace.
 

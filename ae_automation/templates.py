@@ -3,8 +3,11 @@ Built-in template registry for ae-automation generate/export commands.
 
 Each template is a dict compatible with TemplateGeneratorMixin.buildTemplate().
 """
+from __future__ import annotations
 
-BUILTIN_TEMPLATES = {
+from typing import Any
+
+BUILTIN_TEMPLATES: dict[str, Any] = {
     "tutorial": {
         "name": "Tutorial Template",
         "width": 1920,
@@ -430,11 +433,11 @@ BUILTIN_TEMPLATES = {
 }
 
 
-def get_template(name):
+def get_template(name: str) -> dict[str, Any] | None:
     """Get a built-in template by name. Returns None if not found."""
     return BUILTIN_TEMPLATES.get(name)
 
 
-def list_templates():
+def list_templates() -> list[tuple[str, str]]:
     """Return a list of (name, description) tuples for all built-in templates."""
     return [(name, cfg["name"]) for name, cfg in BUILTIN_TEMPLATES.items()]

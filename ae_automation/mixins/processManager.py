@@ -2,6 +2,8 @@
 Process Manager for After Effects
 Handles process detection, window waiting, and readiness checks
 """
+from __future__ import annotations
+
 import time
 import subprocess
 import psutil
@@ -27,7 +29,7 @@ class ProcessManagerMixin:
     Mixin for managing After Effects process lifecycle
     """
 
-    def wait_for_process(self, process_name="AfterFX.exe", timeout=30):
+    def wait_for_process(self, process_name: str = "AfterFX.exe", timeout: int = 30) -> psutil.Process | None:
         """
         Wait for a process to start
 
@@ -54,7 +56,7 @@ class ProcessManagerMixin:
         logger.warning("Timeout waiting for %s", process_name)
         return None
 
-    def wait_for_window(self, window_title_pattern="After Effects", timeout=60):
+    def wait_for_window(self, window_title_pattern: str = "After Effects", timeout: int = 60) -> bool:
         """
         Wait for After Effects main window to appear
 
@@ -97,7 +99,7 @@ class ProcessManagerMixin:
         logger.warning("Timeout waiting for After Effects window")
         return False
 
-    def is_after_effects_responsive(self, max_retries=5):
+    def is_after_effects_responsive(self, max_retries: int = 5) -> bool:
         """
         Check if After Effects is responsive by running a simple script
 
@@ -147,7 +149,7 @@ class ProcessManagerMixin:
         logger.warning("After Effects is not responding")
         return False
 
-    def handle_crash_dialog(self):
+    def handle_crash_dialog(self) -> None:
         """
         Check for and handle "Crash Repair Options" / "Safe Mode" dialog
         Presses Space to select the default option (usually Start Normally or Continue)
@@ -167,7 +169,7 @@ class ProcessManagerMixin:
         except Exception as e:
             logger.debug("Failed to handle crash dialog: %s", e)
 
-    def wait_for_after_effects_ready(self, timeout=120):
+    def wait_for_after_effects_ready(self, timeout: int = 120) -> bool:
         """
         Comprehensive wait for After Effects to be fully loaded and ready
 
@@ -217,7 +219,7 @@ class ProcessManagerMixin:
 
         return True
 
-    def ensure_after_effects_running(self, project_file=None, timeout=120, skip_home_screen=True):
+    def ensure_after_effects_running(self, project_file: str | None = None, timeout: int = 120, skip_home_screen: bool = True) -> bool:
         """
         Ensure After Effects is running and ready, start if needed
 
@@ -260,7 +262,7 @@ class ProcessManagerMixin:
 
         return ready
 
-    def wait_for_script_completion(self, timeout=30):
+    def wait_for_script_completion(self, timeout: int = 30) -> bool:
         """
         Wait for a script to complete execution
 
@@ -291,7 +293,7 @@ class ProcessManagerMixin:
 
         return False
 
-    def safe_script_execution(self, script_name, replacements=None, wait_time=3):
+    def safe_script_execution(self, script_name: str, replacements: dict[str, str] | None = None, wait_time: int = 3) -> bool:
         """
         Execute a script with automatic waiting for completion
 
@@ -313,7 +315,7 @@ class ProcessManagerMixin:
 
         return True
 
-    def test_script_execution(self):
+    def test_script_execution(self) -> bool:
         """
         Test if After Effects can execute scripts
         Shows an alert dialog in AE if scripts are working
@@ -342,7 +344,7 @@ class ProcessManagerMixin:
             print("="*60 + "\n")
             return False
 
-    def check_scripting_settings(self):
+    def check_scripting_settings(self) -> bool:
         """
         Check After Effects scripting settings
         Shows a detailed alert dialog in AE with current settings
@@ -369,7 +371,7 @@ class ProcessManagerMixin:
             print("="*60 + "\n")
             return False
 
-    def test_composition_creation(self):
+    def test_composition_creation(self) -> bool:
         """
         Test composition creation with debug alerts
         Shows multiple alert dialogs showing progress
@@ -409,7 +411,7 @@ class ProcessManagerMixin:
             print("="*60 + "\n")
             return False
 
-    def run_full_diagnostic(self):
+    def run_full_diagnostic(self) -> bool:
         """
         Run complete diagnostic suite
         Tests process, window detection, script execution, and settings

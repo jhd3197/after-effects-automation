@@ -9,6 +9,7 @@ Hierarchy:
     ├── RenderError            -- aerender failed
     └── ConfigValidationError  -- Invalid JSON config or settings
 """
+from __future__ import annotations
 
 
 class AEAutomationError(Exception):
@@ -18,7 +19,9 @@ class AEAutomationError(Exception):
 class AENotFoundError(AEAutomationError):
     """After Effects installation or executable not found."""
 
-    def __init__(self, path=None, message=None):
+    path: str | None
+
+    def __init__(self, path: str | None = None, message: str | None = None) -> None:
         if message is None:
             message = "After Effects installation not found"
             if path:
@@ -30,7 +33,9 @@ class AENotFoundError(AEAutomationError):
 class AENotResponsiveError(AEAutomationError):
     """After Effects launched but is not responding to commands."""
 
-    def __init__(self, timeout=None, message=None):
+    timeout: float | None
+
+    def __init__(self, timeout: float | None = None, message: str | None = None) -> None:
         if message is None:
             message = "After Effects is not responding"
             if timeout is not None:
@@ -42,7 +47,10 @@ class AENotResponsiveError(AEAutomationError):
 class ScriptExecutionError(AEAutomationError):
     """A JSX script failed to execute in After Effects."""
 
-    def __init__(self, script_name=None, detail=None, message=None):
+    script_name: str | None
+    detail: str | None
+
+    def __init__(self, script_name: str | None = None, detail: str | None = None, message: str | None = None) -> None:
         if message is None:
             message = "Script execution failed"
             if script_name:
@@ -57,7 +65,11 @@ class ScriptExecutionError(AEAutomationError):
 class RenderError(AEAutomationError):
     """aerender failed or produced no output."""
 
-    def __init__(self, project_path=None, comp_name=None, detail=None, message=None):
+    project_path: str | None
+    comp_name: str | None
+    detail: str | None
+
+    def __init__(self, project_path: str | None = None, comp_name: str | None = None, detail: str | None = None, message: str | None = None) -> None:
         if message is None:
             message = "Render failed"
             if comp_name:
@@ -75,7 +87,10 @@ class RenderError(AEAutomationError):
 class ConfigValidationError(AEAutomationError):
     """Invalid JSON configuration or missing settings."""
 
-    def __init__(self, field=None, detail=None, message=None):
+    field: str | None
+    detail: str | None
+
+    def __init__(self, field: str | None = None, detail: str | None = None, message: str | None = None) -> None:
         if message is None:
             message = "Configuration validation failed"
             if field:

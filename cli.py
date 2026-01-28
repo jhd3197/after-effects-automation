@@ -3,13 +3,14 @@
 After Effects Automation CLI
 Unified command-line interface for all automation tasks
 """
+from __future__ import annotations
 
 import os
 import sys
 import argparse
 
 
-def cmd_run(args):
+def cmd_run(args: argparse.Namespace) -> None:
     """Run automation with a configuration file"""
     from ae_automation import Client
     import json
@@ -24,7 +25,7 @@ def cmd_run(args):
     client.startBot(args.config)
 
 
-def cmd_editor(args):
+def cmd_editor(args: argparse.Namespace) -> None:
     """Open the web-based configuration editor"""
     from ae_automation.mixins.VideoEditorApp import VideoEditorAppMixin
     import json
@@ -67,7 +68,7 @@ def cmd_editor(args):
 
 
 
-def cmd_test(args):
+def cmd_test(args: argparse.Namespace) -> None:
     """Run compatibility tests"""
     import subprocess
 
@@ -87,7 +88,7 @@ def cmd_test(args):
         sys.exit(1)
 
 
-def cmd_generate(args):
+def cmd_generate(args: argparse.Namespace) -> None:
     """Generate a template .aep project from a built-in template"""
     from ae_automation import Client
     from ae_automation.templates import BUILTIN_TEMPLATES, list_templates
@@ -128,7 +129,7 @@ def cmd_generate(args):
     print(f"\nGenerated {len(templates_to_build)} template(s).")
 
 
-def cmd_export(args):
+def cmd_export(args: argparse.Namespace) -> None:
     """Generate a template and render it to video"""
     from ae_automation import Client
     from ae_automation.templates import BUILTIN_TEMPLATES
@@ -172,7 +173,7 @@ def cmd_export(args):
     print(f"\nExport complete: {output_file}")
 
 
-def cmd_diagnose(args):
+def cmd_diagnose(args: argparse.Namespace) -> None:
     """Run diagnostic checks"""
     from ae_automation import Client
 
@@ -193,7 +194,7 @@ def cmd_diagnose(args):
     sys.exit(0)
 
 
-def main():
+def main() -> None:
     """Main CLI entry point"""
 
     # Detect if called via legacy command
