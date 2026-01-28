@@ -4,6 +4,10 @@ Provides functionality to create After Effects project templates (.aep files)
 """
 import time
 import os
+from ae_automation.logging_config import get_logger
+from ae_automation.exceptions import AENotResponsiveError, ScriptExecutionError
+
+logger = get_logger(__name__)
 
 
 class TemplateGeneratorMixin:
@@ -15,7 +19,7 @@ class TemplateGeneratorMixin:
         """
         Create a new After Effects project
         """
-        print("Creating new project...")
+        logger.info("Creating new project...")
         self.runScript("create_new_project.jsx")
         time.sleep(1)  # Brief wait for script execution
 
@@ -26,7 +30,7 @@ class TemplateGeneratorMixin:
         Args:
             project_path: Path where the project will be saved
         """
-        print(f"Saving project to: {project_path}")
+        logger.info("Saving project to: %s", project_path)
 
         # Ensure directory exists
         project_dir = os.path.dirname(project_path)
@@ -46,11 +50,11 @@ class TemplateGeneratorMixin:
         original_path = project_path.replace('/', '\\')
         for i in range(10):  # Try checking 10 times with delays
             if os.path.exists(original_path):
-                print(f"✓ Project saved successfully!")
+                logger.info("Project saved successfully")
                 return
             time.sleep(0.5)
 
-        raise Exception(f"Failed to save project to {original_path}. The file was not created.")
+        raise ScriptExecutionError(script_name="save_project.jsx", detail=f"File was not created at {original_path}")
 
     def addTextLayer(self, comp_name, layer_name, text_content="Sample Text",
                      x_position=960, y_position=540, font_size=72):
@@ -65,7 +69,7 @@ class TemplateGeneratorMixin:
             y_position: Y position in pixels
             font_size: Font size in points
         """
-        print(f"Adding text layer '{layer_name}' to {comp_name}")
+        logger.info("Adding text layer '%s' to %s", layer_name, comp_name)
         _replace = {
             "{comp_name}": str(comp_name),
             "{layer_name}": str(layer_name),
@@ -91,7 +95,7 @@ class TemplateGeneratorMixin:
             width: Width in pixels
             height: Height in pixels
         """
-        print(f"Adding solid layer '{layer_name}' to {comp_name}")
+        logger.info("Adding solid layer '%s' to %s", layer_name, comp_name)
         _replace = {
             "{comp_name}": str(comp_name),
             "{layer_name}": str(layer_name),
@@ -112,7 +116,7 @@ class TemplateGeneratorMixin:
             comp_name: Name of the composition
             layer_name: Name for the null layer
         """
-        print(f"Adding null layer '{layer_name}' to {comp_name}")
+        logger.info("Adding null layer '%s' to %s", layer_name, comp_name)
         _replace = {
             "{comp_name}": str(comp_name),
             "{layer_name}": str(layer_name)
@@ -134,7 +138,7 @@ class TemplateGeneratorMixin:
             color_g: Green value (0-1)
             color_b: Blue value (0-1)
         """
-        print(f"Adding shape layer '{layer_name}' to {comp_name}")
+        logger.info("Adding shape layer '%s' to %s", layer_name, comp_name)
         _replace = {
             "{comp_name}": str(comp_name),
             "{layer_name}": str(layer_name),
@@ -190,13 +194,11 @@ class TemplateGeneratorMixin:
             ]
         }
         """
-        print(f"\n{'='*60}")
-        print(f"Building template: {template_config.get('name', 'Unnamed Template')}")
-        print(f"{'='*60}\n")
+        logger.info("Building template: %s", template_config.get('name', 'Unnamed Template'))
 
         # Ensure After Effects is running and ready
         if not self.ensure_after_effects_running(timeout=120):
-            raise Exception("Failed to start After Effects or wait for it to be ready")
+            raise AENotResponsiveError(timeout=120)
 
         # Create new project
         self.createNewProject()
@@ -213,7 +215,7 @@ class TemplateGeneratorMixin:
             comp_duration = comp_config.get('duration', template_config.get('duration', 120))
             comp_fps = comp_config.get('fps', template_config.get('fps', 29.97))
 
-            print(f"\nCreating composition: {comp_name}")
+            logger.info("Creating composition: %s", comp_name)
             self.createComp(
                 comp_name,
                 compWidth=comp_width,
@@ -265,7 +267,4 @@ class TemplateGeneratorMixin:
         # Save the project
         self.saveProject(output_path)
 
-        print(f"\n{'='*60}")
-        print(f"Template created successfully!")
-        print(f"Saved to: {output_path}")
-        print(f"{'='*60}\n")
+        logger.info("Template created successfully! Saved to: %s", output_path)

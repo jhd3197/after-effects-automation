@@ -5,9 +5,17 @@ import json
 import uuid
 import shutil
 from ae_automation import settings
+from ae_automation.logging_config import get_logger
+from ae_automation.exceptions import (
+    AENotResponsiveError,
+    ScriptExecutionError,
+    RenderError,
+)
 from jsmin import jsmin
 from mutagen.mp3 import MP3
 from moviepy import VideoFileClip
+
+logger = get_logger(__name__)
 
 try:
     import pyautogui
@@ -63,10 +71,9 @@ class afterEffectMixin:
         """
         settings.validate_settings()
         filePath = data["project"]["project_file"]
-        print("Start After Effect")
-        print(data["project"]["debug"])
-        print("filePath")
-        print(filePath)
+        logger.info("Start After Effect")
+        logger.debug("debug=%s", data["project"]["debug"])
+        logger.debug("filePath=%s", filePath)
         
         # Define the new file path
         new_file_path = os.path.join(data["project"]["output_dir"], "ae_automation.aep")
@@ -80,13 +87,13 @@ class afterEffectMixin:
         
         # Update filePath variable
         filePath = new_file_path
-        print(f"File copied to {filePath}")
+        logger.info("File copied to %s", filePath)
         
         if not data["project"]["debug"]:
             os.startfile(filePath)
             # Wait for After Effects to be fully loaded and ready
             if not self.wait_for_after_effects_ready(timeout=120):
-                raise Exception("After Effects failed to start or become ready")
+                raise AENotResponsiveError(timeout=120)
 
         self.deselectAll()
 
@@ -96,19 +103,19 @@ class afterEffectMixin:
         # Extract file name from path
         fileName=os.path.basename(filePath)
 
-        print("Project Is Open and Ready") 
+        logger.info("Project is open and ready")
 
-        print("Check if the project folder is created") 
+        logger.info("Checking if project folder exists") 
        
         if self.checkIfItemExists(settings.AFTER_EFFECT_PROJECT_FOLDER):
             self.createFolder(settings.AFTER_EFFECT_PROJECT_FOLDER)
         
-        print("Project Folder is already created")
+        logger.info("Project folder ready")
 
-        print("Check if the comp is created")
+        logger.info("Checking if comp exists")
         
         if self.checkIfItemExists(data["project"]["comp_name"]):
-            print("Create Comp")
+            logger.info("Creating comp")
             if type(data["project"]["comp_end_time"]) is str:
                 if ":" in data["project"]["comp_end_time"]:
                     # convert 00:12:00 to 7200
@@ -119,7 +126,7 @@ class afterEffectMixin:
 
             self.createComp(data["project"]["comp_name"],folderName=settings.AFTER_EFFECT_PROJECT_FOLDER,compWidth=data["project"]["comp_width"],compHeight=data["project"]["comp_height"],duration=comp_end_time,frameRate=data["project"]["comp_fps"])
 
-        print("Comp is already created")
+        logger.info("Comp ready")
 
         self.createFolder(settings.AFTER_EFFECT_PROJECT_FOLDER+"-cache",settings.AFTER_EFFECT_PROJECT_FOLDER)
         #Import Resources
@@ -137,11 +144,11 @@ class afterEffectMixin:
 
         Project_Map=self.getProjectMap()
 
-        print("Setting up the project")
+        logger.info("Setting up the project")
         for i, itemTimeline in enumerate(data["timeline"]):
             scene_folder=self.slug("Scene "+str(i+1))
 
-            print("Setting up",scene_folder)
+            logger.info("Setting up %s", scene_folder)
 
             if not self.checkIfItemExists(scene_folder):
                 self.deleteFolder(scene_folder)
@@ -238,14 +245,14 @@ class afterEffectMixin:
         """
         getProjectMap
         """
-        print("Get Project Map")
+        logger.info("Getting project map")
         
         self.runScript("file_map.jsx")
         time.sleep(2)
         data = json.load(open(settings.CACHE_FOLDER+"/file_map.json", encoding='utf-8'))
         
         self.afterEffectItems=data["files"]
-        print("Finish Get Project Map")
+        logger.debug("Finished getting project map")
         return data
 
     def createFolder(self, folderName, parentFolder=""):
@@ -256,15 +263,15 @@ class afterEffectMixin:
             "{folderName}":str(folderName),
             "{parentFolder}":str(parentFolder),
         }
-        print("Creating Folder",folderName)
+        logger.info("Creating folder: %s", folderName)
         self.runScript("create_folder.jsx",_replace)
-        print("Finish Creating Folder",folderName)
+        logger.debug("Finished creating folder: %s", folderName)
         
     def deleteFolder(self, folderName):
         """
         Delete Folder
         """
-        print("Delete Folder")
+        logger.info("Deleting folder: %s", folderName)
         self.goToItem(folderName)
         send_keys('{DEL}')
         time.sleep(1)
@@ -276,7 +283,7 @@ class afterEffectMixin:
         """
         Create Comp
         """
-        print("Creating Comp",compName)
+        logger.info("Creating comp: %s", compName)
         _replace={
             "{compName}":str(compName),
             "{compWidth}":str(compWidth),
@@ -287,7 +294,7 @@ class afterEffectMixin:
             "{folderName}":str(folderName)
         }
         self.runScript("addComp.jsx",_replace)
-        print("Finish Creating Comp",compName)
+        logger.debug("Finished creating comp: %s", compName)
 
     def goToItem(self,itemName):
         self.deselectAll()
@@ -337,7 +344,7 @@ class afterEffectMixin:
             "{property_name}":str(property_name),
             "{value}":str(value),
         }
-        print(_replace)
+        logger.debug("editComp replacements: %s", _replace)
         self.runScript("update_properties.jsx",_replace)
         
     def selectLayerByName(self, comp_name, layer_name):
@@ -562,30 +569,30 @@ class afterEffectMixin:
                 # Check if it was renamed to .error
                 error_file = queue_file.replace('.jsx', '.error')
                 if os.path.exists(error_file):
-                    print(f"Warning: Script execution failed - check {error_file}")
+                    logger.warning("Script execution failed - check %s", error_file)
                     os.remove(error_file)
                 else:
-                    print(f"Warning: Script may not have been processed by After Effects")
-                    print("Make sure the ae_command_runner.jsx startup script is installed")
+                    logger.warning("Script may not have been processed by After Effects")
+                    logger.warning("Make sure the ae_command_runner.jsx startup script is installed")
                     # Clean up
                     try:
                         os.remove(queue_file)
                     except Exception:
                         pass
-        except Exception as e:
-            print(f"Error queueing script: {e}")
+        except OSError as e:
+            logger.error("Error queueing script: %s", e)
             # Clean up on error
             try:
                 if os.path.exists(queue_file):
                     os.remove(queue_file)
-            except Exception:
+            except OSError:
                 pass
 
     def runScript(self, fileName, _remplacements=None,debug=False):
         """
         run Script
         """
-        print("Start Run Script", fileName)
+        logger.info("Running script: %s", fileName)
         fileContent=self.file_get_contents(os.path.join(settings.JS_DIR, fileName))
         filePath=os.path.join(settings.CACHE_FOLDER, fileName)
 
@@ -606,7 +613,7 @@ class afterEffectMixin:
         self._execute_script_in_running_ae(filePath)
 
         time.sleep(1)  # Reduced sleep time since we wait in _execute_script_in_running_ae
-        print("Finish Run Script", fileName)
+        logger.debug("Finished script: %s", fileName)
         return randomName
 
     def workAreaComp(self,compName,startTime,endTime):
@@ -629,12 +636,12 @@ class afterEffectMixin:
             if output == b"" and process.poll() is not None:
                 break
             if output:
-                print(output.decode('utf-8').strip())
+                logger.info(output.decode('utf-8').strip())
         
         stderr = process.communicate()[1]
         
         if process.returncode != 0:
-            raise Exception(f"Error: {stderr.decode('utf-8')}")
+            raise RenderError(detail=stderr.decode('utf-8'))
         
         return "Command executed successfully."
 
@@ -649,7 +656,7 @@ class afterEffectMixin:
         outputPath = os.path.join(outputDir, f"{compName}.mp4")
         
         render_command = f'"{settings.AERENDER_PATH}" -project "{projectPath}" -comp "{compName}" -output "{outputPath}" -mem_usage 20 40'
-        print("Rendering project...")
+        logger.info("Rendering project...")
         self.runCommand(render_command)
         
         return outputPath
@@ -662,7 +669,7 @@ class afterEffectMixin:
         """
         Convert MOV to MP4 using moviepy
         """
-        print("Converting MOV to MP4 using moviepy...")
+        logger.info("Converting MOV to MP4 using moviepy...")
         clip = VideoFileClip(inputPath)
         clip.write_videofile(outputPath, codec="libx264", audio_codec="aac", fps=29.97)
         clip.close()

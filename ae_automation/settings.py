@@ -35,11 +35,13 @@ JS_DIR = os.path.join(PACKAGE_DIR, 'mixins', 'js')
 
 def validate_settings():
     """Validate required settings and paths."""
+    from ae_automation.exceptions import AENotFoundError, ConfigValidationError
+
     if not os.path.exists(AFTER_EFFECT_FOLDER):
-        raise ValueError(f"After Effects folder not found: {AFTER_EFFECT_FOLDER}")
+        raise AENotFoundError(path=AFTER_EFFECT_FOLDER)
 
     if not os.path.exists(AERENDER_PATH):
-        raise ValueError(f"Aerender executable not found: {AERENDER_PATH}")
+        raise AENotFoundError(path=AERENDER_PATH)
 
     if not os.path.exists(JS_DIR):
-        raise ValueError(f"JavaScript files directory not found: {JS_DIR}")
+        raise ConfigValidationError(field="JS_DIR", detail=f"JavaScript files directory not found: {JS_DIR}")

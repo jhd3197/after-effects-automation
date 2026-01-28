@@ -87,6 +87,91 @@ def cmd_test(args):
         sys.exit(1)
 
 
+def cmd_generate(args):
+    """Generate a template .aep project from a built-in template"""
+    from ae_automation import Client
+    from ae_automation.templates import BUILTIN_TEMPLATES, list_templates
+
+    # List available templates
+    if args.list:
+        print("Available templates:")
+        for name, description in list_templates():
+            print(f"  {name:20s} {description}")
+        return
+
+    # Determine which templates to generate
+    if args.all:
+        templates_to_build = list(BUILTIN_TEMPLATES.keys())
+    elif args.template:
+        if args.template not in BUILTIN_TEMPLATES:
+            print(f"Error: Unknown template '{args.template}'")
+            print(f"Available templates: {', '.join(BUILTIN_TEMPLATES.keys())}")
+            sys.exit(1)
+        templates_to_build = [args.template]
+    else:
+        print("Error: Specify --template <name>, --all, or --list")
+        sys.exit(1)
+
+    client = Client()
+
+    for template_name in templates_to_build:
+        config = BUILTIN_TEMPLATES[template_name]
+
+        if args.output and len(templates_to_build) == 1:
+            output_path = args.output
+        else:
+            output_path = os.path.abspath(f"{template_name}.aep")
+
+        print(f"Generating template: {template_name} -> {output_path}")
+        client.buildTemplate(config, output_path)
+
+    print(f"\nGenerated {len(templates_to_build)} template(s).")
+
+
+def cmd_export(args):
+    """Generate a template and render it to video"""
+    from ae_automation import Client
+    from ae_automation.templates import BUILTIN_TEMPLATES
+
+    if args.template not in BUILTIN_TEMPLATES:
+        print(f"Error: Unknown template '{args.template}'")
+        print(f"Available templates: {', '.join(BUILTIN_TEMPLATES.keys())}")
+        sys.exit(1)
+
+    config = BUILTIN_TEMPLATES[args.template]
+    output_dir = os.path.abspath(args.output_dir)
+
+    # Determine output .aep path
+    aep_path = os.path.join(output_dir, f"{args.template}.aep")
+
+    if os.path.exists(aep_path) and not args.force:
+        print(f"Error: {aep_path} already exists. Use --force to overwrite.")
+        sys.exit(1)
+
+    os.makedirs(output_dir, exist_ok=True)
+
+    client = Client()
+
+    # Step 1: Generate the template
+    print(f"Generating template: {args.template}")
+    client.buildTemplate(config, aep_path)
+
+    # Step 2: Determine which comp to render
+    comp_name = args.comp
+    if not comp_name:
+        # Use the first composition defined in the template
+        comps = config.get("compositions", [])
+        if not comps:
+            print("Error: Template has no compositions to render.")
+            sys.exit(1)
+        comp_name = comps[0]["name"]
+
+    # Step 3: Render
+    print(f"Rendering composition: {comp_name}")
+    output_file = client.renderFile(aep_path, comp_name, output_dir)
+    print(f"\nExport complete: {output_file}")
+
+
 def cmd_diagnose(args):
     """Run diagnostic checks"""
     from ae_automation import Client
@@ -126,6 +211,9 @@ def main():
         description='After Effects Automation - Automate video production workflows',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
+Global options:
+  --verbose               Enable debug logging (or set AE_LOG_LEVEL=DEBUG)
+
 Examples:
   # Run automation
   ae-automation run config.json
@@ -157,6 +245,14 @@ Examples:
 
 For more information, visit: https://github.com/jhd3197/after-effects-automation
         """
+    )
+
+    # Global verbose flag
+    parser.add_argument(
+        '--verbose',
+        action='store_true',
+        default=False,
+        help='Enable debug logging output'
     )
 
     # Create subparsers
@@ -209,6 +305,63 @@ For more information, visit: https://github.com/jhd3197/after-effects-automation
     parser_editor.set_defaults(func=cmd_editor)
 
     # ============================================================
+    # GENERATE command
+    # ============================================================
+    parser_generate = subparsers.add_parser(
+        'generate',
+        help='Generate a template .aep project',
+        description='Create After Effects project files from built-in templates'
+    )
+    parser_generate.add_argument(
+        '--template', '-t',
+        help='Name of the built-in template to generate'
+    )
+    parser_generate.add_argument(
+        '--all',
+        action='store_true',
+        help='Generate all built-in templates'
+    )
+    parser_generate.add_argument(
+        '--output', '-o',
+        help='Custom output path for the .aep file (only with single --template)'
+    )
+    parser_generate.add_argument(
+        '--list', '-l',
+        action='store_true',
+        help='List available built-in templates'
+    )
+    parser_generate.set_defaults(func=cmd_generate)
+
+    # ============================================================
+    # EXPORT command
+    # ============================================================
+    parser_export = subparsers.add_parser(
+        'export',
+        help='Generate a template and render to video',
+        description='Create an After Effects project from a template and render it to video'
+    )
+    parser_export.add_argument(
+        '--template', '-t',
+        required=True,
+        help='Name of the built-in template to export'
+    )
+    parser_export.add_argument(
+        '--output-dir', '-o',
+        default='.',
+        help='Directory for rendered output (default: current directory)'
+    )
+    parser_export.add_argument(
+        '--comp', '-c',
+        help='Composition name to render (default: first composition in template)'
+    )
+    parser_export.add_argument(
+        '--force', '-f',
+        action='store_true',
+        help='Overwrite existing files'
+    )
+    parser_export.set_defaults(func=cmd_export)
+
+    # ============================================================
     # TEST command
     # ============================================================
     parser_test = subparsers.add_parser(
@@ -244,6 +397,12 @@ For more information, visit: https://github.com/jhd3197/after-effects-automation
 
     # Parse arguments
     args = parser.parse_args()
+
+    # Configure logging level from --verbose flag
+    if args.verbose:
+        import logging
+        from ae_automation.logging_config import setup_logging
+        setup_logging(level=logging.DEBUG)
 
     # Show help if no command specified
     if not hasattr(args, 'func'):

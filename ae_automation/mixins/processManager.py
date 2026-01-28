@@ -6,6 +6,10 @@ import time
 import subprocess
 import psutil
 import os
+from ae_automation.logging_config import get_logger
+from ae_automation.exceptions import AENotFoundError
+
+logger = get_logger(__name__)
 
 try:
     from pywinauto import Application
@@ -34,20 +38,20 @@ class ProcessManagerMixin:
         Returns:
             Process object if found, None if timeout
         """
-        print(f"Waiting for {process_name} to start...")
+        logger.info("Waiting for %s to start...", process_name)
         start_time = time.time()
 
         while time.time() - start_time < timeout:
             for proc in psutil.process_iter(['name', 'pid']):
                 try:
                     if proc.info['name'].lower() == process_name.lower():
-                        print(f"✓ Process found: {process_name} (PID: {proc.info['pid']})")
+                        logger.info("Process found: %s (PID: %s)", process_name, proc.info['pid'])
                         return proc
                 except (psutil.NoSuchProcess, psutil.AccessDenied):
                     pass
             time.sleep(0.5)
 
-        print(f"✗ Timeout waiting for {process_name}")
+        logger.warning("Timeout waiting for %s", process_name)
         return None
 
     def wait_for_window(self, window_title_pattern="After Effects", timeout=60):
@@ -61,7 +65,7 @@ class ProcessManagerMixin:
         Returns:
             True if window found, False if timeout
         """
-        print(f"Waiting for After Effects window...")
+        logger.info("Waiting for After Effects window...")
         start_time = time.time()
 
         while time.time() - start_time < timeout:
@@ -72,7 +76,7 @@ class ProcessManagerMixin:
                 windows = app.windows()
 
                 if len(windows) > 0:
-                    print(f"✓ After Effects window is ready ({len(windows)} window(s) found)")
+                    logger.info("After Effects window is ready (%d window(s) found)", len(windows))
                     # Give it a moment to fully initialize
                     time.sleep(3)
                     return True
@@ -82,7 +86,7 @@ class ProcessManagerMixin:
                     import pygetwindow as gw
                     ae_windows = [w for w in gw.getAllWindows() if 'after effects' in w.title.lower()]
                     if ae_windows:
-                        print(f"✓ After Effects window is ready (found via alternate method)")
+                        logger.info("After Effects window is ready (found via alternate method)")
                         time.sleep(3)
                         return True
                 except Exception:
@@ -90,7 +94,7 @@ class ProcessManagerMixin:
 
             time.sleep(1)
 
-        print(f"✗ Timeout waiting for After Effects window")
+        logger.warning("Timeout waiting for After Effects window")
         return False
 
     def is_after_effects_responsive(self, max_retries=5):
@@ -103,7 +107,7 @@ class ProcessManagerMixin:
         Returns:
             True if responsive, False otherwise
         """
-        print("Testing if After Effects is responsive...")
+        logger.info("Testing if After Effects is responsive...")
 
         for attempt in range(max_retries):
             try:
@@ -130,17 +134,17 @@ class ProcessManagerMixin:
                 if os.path.exists(test_file):
                     os.remove(test_file)
 
-                print(f"✓ After Effects is responsive (attempt {attempt + 1})")
+                logger.info("After Effects is responsive (attempt %d)", attempt + 1)
                 return True
 
             except subprocess.TimeoutExpired:
-                print(f"  Attempt {attempt + 1}/{max_retries}: Still loading...")
+                logger.debug("Attempt %d/%d: Still loading...", attempt + 1, max_retries)
                 time.sleep(3)
             except Exception as e:
-                print(f"  Attempt {attempt + 1}/{max_retries}: Waiting...")
+                logger.debug("Attempt %d/%d: Waiting... (%s)", attempt + 1, max_retries, e)
                 time.sleep(3)
 
-        print("✗ After Effects is not responding")
+        logger.warning("After Effects is not responding")
         return False
 
     def handle_crash_dialog(self):
@@ -152,16 +156,16 @@ class ProcessManagerMixin:
             # We blindly send Space/Enter if we suspect a dialog based on timing
             # Ideally we would check for window title "Adobe After Effects" with specific size
             # But just pressing Space is often safe enough during startup
-            print("Checking for Crash/Safe Mode dialog...")
+            logger.debug("Checking for Crash/Safe Mode dialog...")
             import pyautogui
             # Focus AE window if possible (optional, might need win32gui)
-            
+
             # Send Space key to dismiss "Start Safe Mode" dialog or "Crash Repair"
             pyautogui.press('space')
-            print("  Sent SPACE key to handle potential dialog")
+            logger.debug("Sent SPACE key to handle potential dialog")
             time.sleep(1)
         except Exception as e:
-            print(f"  Failed to handle crash dialog: {e}")
+            logger.debug("Failed to handle crash dialog: %s", e)
 
     def wait_for_after_effects_ready(self, timeout=120):
         """
@@ -173,9 +177,7 @@ class ProcessManagerMixin:
         Returns:
             True if ready, False if timeout
         """
-        print("\n" + "="*60)
-        print("Waiting for After Effects to be ready...")
-        print("="*60)
+        logger.info("Waiting for After Effects to be ready...")
 
         start_time = time.time()
 
@@ -186,7 +188,7 @@ class ProcessManagerMixin:
 
         remaining_time = timeout - (time.time() - start_time)
         if remaining_time <= 0:
-            print("✗ Timeout reached")
+            logger.warning("Timeout reached")
             return False
             
         # Attempt to handle crash dialog early
@@ -200,7 +202,7 @@ class ProcessManagerMixin:
             # Retry wait? No, let's just proceed to plugin wait
         
         # Step 3: Wait a bit more for plugins to load
-        print("Waiting for plugins and UI to initialize...")
+        logger.info("Waiting for plugins and UI to initialize...")
         time.sleep(5)
 
         # Step 4: Check if responsive
@@ -211,9 +213,7 @@ class ProcessManagerMixin:
                 return False
 
         elapsed = time.time() - start_time
-        print("="*60)
-        print(f"✓ After Effects is ready! (took {elapsed:.1f}s)")
-        print("="*60 + "\n")
+        logger.info("After Effects is ready (took %.1fs)", elapsed)
 
         return True
 
@@ -237,7 +237,7 @@ class ProcessManagerMixin:
             try:
                 if proc.info['name'].lower() == 'afterfx.exe':
                     ae_running = True
-                    print("After Effects is already running")
+                    logger.info("After Effects is already running")
                     break
             except (psutil.NoSuchProcess, psutil.AccessDenied):
                 pass
@@ -248,10 +248,10 @@ class ProcessManagerMixin:
             ae_path = os.path.join(settings.AFTER_EFFECT_FOLDER, 'AfterFX.exe')
 
             if project_file and os.path.exists(project_file):
-                print(f"Starting After Effects with project: {project_file}")
+                logger.info("Starting After Effects with project: %s", project_file)
                 subprocess.Popen([ae_path, project_file])
             else:
-                print("Starting After Effects...")
+                logger.info("Starting After Effects...")
                 # Start AE - it will open with Home screen
                 subprocess.Popen([ae_path])
 
@@ -303,7 +303,7 @@ class ProcessManagerMixin:
         Returns:
             True if successful
         """
-        print(f"Executing: {script_name}")
+        logger.info("Executing: %s", script_name)
 
         # Run the script
         self.runScript(script_name, replacements)
@@ -331,14 +331,14 @@ class ProcessManagerMixin:
             self.runScript("test_script_execution.jsx")
             time.sleep(3)
 
-            print("✓ Test script sent to After Effects")
-            print("\n⚠ IMPORTANT: Did you see an alert dialog in After Effects?")
-            print("  - If YES: Scripts are working! ✓")
+            print("Test script sent to After Effects")
+            print("\nIMPORTANT: Did you see an alert dialog in After Effects?")
+            print("  - If YES: Scripts are working!")
             print("  - If NO: Scripts are NOT executing - check preferences")
             print("="*60 + "\n")
             return True
         except Exception as e:
-            print(f"✗ Failed to run test script: {e}")
+            logger.error("Failed to run test script: %s", e)
             print("="*60 + "\n")
             return False
 
@@ -360,12 +360,12 @@ class ProcessManagerMixin:
             self.runScript("check_scripting_enabled.jsx")
             time.sleep(3)
 
-            print("✓ Settings check sent to After Effects")
+            print("Settings check sent to After Effects")
             print("\nRead the alert dialog in After Effects for details")
             print("="*60 + "\n")
             return True
         except Exception as e:
-            print(f"✗ Failed to check settings: {e}")
+            logger.error("Failed to check settings: %s", e)
             print("="*60 + "\n")
             return False
 
@@ -397,7 +397,7 @@ class ProcessManagerMixin:
             self.runScript("debug_create_comp.jsx", replacements)
             time.sleep(5)
 
-            print("✓ Debug comp creation script sent")
+            print("Debug comp creation script sent")
             print("\nCheck After Effects:")
             print("  - Did you see alert dialogs?")
             print("  - Was a composition created?")
@@ -405,7 +405,7 @@ class ProcessManagerMixin:
             print("="*60 + "\n")
             return True
         except Exception as e:
-            print(f"✗ Failed to create debug comp: {e}")
+            logger.error("Failed to create debug comp: %s", e)
             print("="*60 + "\n")
             return False
 
@@ -433,17 +433,17 @@ class ProcessManagerMixin:
                 if proc.info['name'].lower() == 'afterfx.exe':
                     ae_running = True
                     ae_pid = proc.info['pid']
-                    print(f"✓ After Effects is running (PID: {ae_pid})")
+                    print(f"After Effects is running (PID: {ae_pid})")
                     break
             except (psutil.NoSuchProcess, psutil.AccessDenied):
                 pass
 
         if not ae_running:
-            print("✗ After Effects is not running")
+            print("After Effects is not running")
             print("\nStarting After Effects...")
 
             if not self.ensure_after_effects_running(timeout=120):
-                print("✗ Failed to start After Effects")
+                print("Failed to start After Effects")
                 return False
 
         # Step 2: Check window detection
@@ -455,13 +455,13 @@ class ProcessManagerMixin:
             ae_windows = [w for w in gw.getAllWindows() if 'after effects' in w.title.lower()]
 
             if ae_windows:
-                print(f"✓ Found {len(ae_windows)} After Effects window(s):")
+                print(f"Found {len(ae_windows)} After Effects window(s):")
                 for i, window in enumerate(ae_windows, 1):
                     print(f"  {i}. {window.title}")
             else:
-                print("✗ No After Effects windows found")
+                print("No After Effects windows found")
         except Exception as e:
-            print(f"⚠ Could not detect windows: {e}")
+            print(f"Could not detect windows: {e}")
 
         # Step 3: Test script execution
         self.test_script_execution()
