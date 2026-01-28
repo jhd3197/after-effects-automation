@@ -6,14 +6,19 @@ from dotenv import load_dotenv
 env_path = Path('.env')
 load_dotenv(dotenv_path=env_path)
 
+# Cross-platform fallback for APPDATA
+_appdata = os.getenv('APPDATA')
+if _appdata is None:
+    _appdata = os.path.join(os.path.expanduser('~'), '.local', 'share')
+
 # Get environment variables with defaults
 # Use APPDATA for cache folder to ensure consistent location regardless of where scripts run from
-CACHE_FOLDER = os.getenv('CACHE_FOLDER', os.path.join(os.getenv('APPDATA'), 'ae_automation', 'cache'))
+CACHE_FOLDER = os.getenv('CACHE_FOLDER', os.path.join(_appdata, 'ae_automation', 'cache'))
 AFTER_EFFECT_FOLDER = os.getenv('AFTER_EFFECT_FOLDER', 'C:/Program Files/Adobe/Adobe After Effects 2025/Support Files')
 AFTER_EFFECT_PROJECT_FOLDER = os.getenv('AFTER_EFFECT_PROJECT_FOLDER', 'au-automate')
 
 # Queue folder for file-based communication with After Effects
-QUEUE_FOLDER = os.path.join(os.getenv('APPDATA'), 'ae_automation', 'queue')
+QUEUE_FOLDER = os.path.join(_appdata, 'ae_automation', 'queue')
 
 # Derive AERENDER_PATH from AFTER_EFFECT_FOLDER
 AERENDER_PATH = os.getenv('AERENDER_PATH', os.path.join(AFTER_EFFECT_FOLDER, 'aerender.exe'))
@@ -32,12 +37,9 @@ def validate_settings():
     """Validate required settings and paths."""
     if not os.path.exists(AFTER_EFFECT_FOLDER):
         raise ValueError(f"After Effects folder not found: {AFTER_EFFECT_FOLDER}")
-    
+
     if not os.path.exists(AERENDER_PATH):
         raise ValueError(f"Aerender executable not found: {AERENDER_PATH}")
-    
+
     if not os.path.exists(JS_DIR):
         raise ValueError(f"JavaScript files directory not found: {JS_DIR}")
-
-# Validate settings on import
-validate_settings()

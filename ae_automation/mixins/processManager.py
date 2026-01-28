@@ -6,8 +6,16 @@ import time
 import subprocess
 import psutil
 import os
-from pywinauto import Application
-from pywinauto.timings import wait_until
+
+try:
+    from pywinauto import Application
+except ImportError:
+    Application = None
+
+try:
+    from pywinauto.timings import wait_until
+except ImportError:
+    wait_until = None
 
 
 class ProcessManagerMixin:
@@ -221,6 +229,8 @@ class ProcessManagerMixin:
         Returns:
             True if running and ready, False otherwise
         """
+        from ae_automation import settings
+        settings.validate_settings()
         # Check if already running
         ae_running = False
         for proc in psutil.process_iter(['name']):

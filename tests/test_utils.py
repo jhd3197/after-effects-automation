@@ -75,6 +75,7 @@ class TestUtilityFunctions(unittest.TestCase):
             os.unlink(temp_file)
 
 
+@unittest.skipUnless(sys.platform == 'win32', "Requires Windows (uses TASKLIST command)")
 class TestProcessChecking(unittest.TestCase):
     """Test process checking utilities"""
 
@@ -96,6 +97,62 @@ class TestProcessChecking(unittest.TestCase):
         # This might be True or False depending on the system state
         self.assertIsInstance(result, bool,
                             "process_exists should return a boolean")
+
+
+class TestSanitizeText(unittest.TestCase):
+    """Test sanitize_text_for_ae method"""
+
+    def setUp(self):
+        self.client = Client()
+
+    def test_br_lowercase(self):
+        result = self.client.sanitize_text_for_ae("Hello<br>World")
+        self.assertEqual(result, "Hello\rWorld")
+
+    def test_br_uppercase(self):
+        result = self.client.sanitize_text_for_ae("Hello<BR>World")
+        self.assertEqual(result, "Hello\rWorld")
+
+    def test_br_self_closing(self):
+        result = self.client.sanitize_text_for_ae("Hello<br/>World")
+        self.assertEqual(result, "Hello\rWorld")
+
+    def test_br_self_closing_uppercase(self):
+        result = self.client.sanitize_text_for_ae("Hello<BR/>World")
+        self.assertEqual(result, "Hello\rWorld")
+
+    def test_br_self_closing_space(self):
+        result = self.client.sanitize_text_for_ae("Hello<br />World")
+        self.assertEqual(result, "Hello\rWorld")
+
+    def test_br_self_closing_space_uppercase(self):
+        result = self.client.sanitize_text_for_ae("Hello<BR />World")
+        self.assertEqual(result, "Hello\rWorld")
+
+    def test_multiple_br_tags(self):
+        result = self.client.sanitize_text_for_ae("Line1<br>Line2<BR/>Line3")
+        self.assertEqual(result, "Line1\rLine2\rLine3")
+
+    def test_non_string_int(self):
+        result = self.client.sanitize_text_for_ae(42)
+        self.assertEqual(result, 42)
+
+    def test_non_string_none(self):
+        result = self.client.sanitize_text_for_ae(None)
+        self.assertIsNone(result)
+
+    def test_non_string_list(self):
+        result = self.client.sanitize_text_for_ae([1, 2, 3])
+        self.assertEqual(result, [1, 2, 3])
+
+    def test_empty_string(self):
+        result = self.client.sanitize_text_for_ae("")
+        self.assertEqual(result, "")
+
+    def test_text_without_br_unchanged(self):
+        text = "Hello World, no line breaks here!"
+        result = self.client.sanitize_text_for_ae(text)
+        self.assertEqual(result, text)
 
 
 if __name__ == '__main__':

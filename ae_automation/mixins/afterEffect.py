@@ -1,14 +1,8 @@
 import subprocess
-from lib2to3.pgen2.pgen import DFAState
-import pyautogui
 import time
 import os
-import pandas as pd
-from pydantic import FilePath
-import pydirectinput
 import json
 import re
-from pywinauto.keyboard import send_keys
 import sys
 import uuid
 import shutil
@@ -16,6 +10,21 @@ from ae_automation import settings
 from jsmin import jsmin
 from mutagen.mp3 import MP3
 from moviepy import VideoFileClip
+
+try:
+    import pyautogui
+except ImportError:
+    pyautogui = None
+
+try:
+    import pydirectinput
+except ImportError:
+    pydirectinput = None
+
+try:
+    from pywinauto.keyboard import send_keys
+except ImportError:
+    send_keys = None
 
 class afterEffectMixin:
     """
@@ -55,6 +64,7 @@ class afterEffectMixin:
         """
         startAfterEffect
         """
+        settings.validate_settings()
         filePath = data["project"]["project_file"]
         print("Start After Effect")
         print(data["project"]["debug"])
@@ -635,6 +645,7 @@ class afterEffectMixin:
         """
         Render an Adobe After Effects project file via terminal
         """
+        settings.validate_settings()
         if not os.path.exists(outputDir):
             os.makedirs(outputDir)
         
