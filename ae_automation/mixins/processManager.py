@@ -85,7 +85,7 @@ class ProcessManagerMixin:
                         print(f"✓ After Effects window is ready (found via alternate method)")
                         time.sleep(3)
                         return True
-                except:
+                except Exception:
                     pass
 
             time.sleep(1)

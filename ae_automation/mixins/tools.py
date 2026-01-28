@@ -19,12 +19,6 @@ class ToolsMixin:
         # because Fail message could be translated
         return last_line.lower().startswith(process_name.lower())
     
-    def testFunction(self):
-        """
-        testFunction
-        """
-        print("testFunction")
-
     def file_get_contents(self,filename):
         #Convert filename to absolute path
         filename = os.path.abspath(filename)

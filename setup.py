@@ -18,20 +18,21 @@ setup(
         "Intended Audience :: Developers",
         "Topic :: Multimedia :: Video",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
         "License :: OSI Approved :: MIT License",
         "Operating System :: Microsoft :: Windows",
     ],
-    python_requires=">=3.7",
+    python_requires=">=3.9",
     install_requires=[
         "python-dotenv>=0.19.0",
         "pyautogui>=0.9.53",
         "pydirectinput>=1.0.4",
         "pywinauto>=0.6.8",
-        "pandas>=1.3.0",
-        "pydantic>=1.8.2",
+        "python-slugify>=5.0.0",
+        "Pillow>=8.0.0",
         "jsmin>=3.0.0",
         "mutagen>=1.45.1",
         "moviepy>=1.0.3",
@@ -40,6 +41,9 @@ setup(
         "werkzeug>=2.0.0",
         "psutil>=5.8.0"
     ],
+    extras_require={
+        "window-detection": ["pygetwindow>=0.0.9"],
+    },
     package_data={
         "ae_automation": [
             "mixins/js/*.js",

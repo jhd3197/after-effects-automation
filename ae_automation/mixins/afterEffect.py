@@ -2,8 +2,6 @@ import subprocess
 import time
 import os
 import json
-import re
-import sys
 import uuid
 import shutil
 from ae_automation import settings
@@ -28,7 +26,7 @@ except ImportError:
 
 class afterEffectMixin:
     """
-    ToolsMixin
+    afterEffectMixin
     """
     #TODO - Add search for items inside folder
     #FIXME - Create a function to duplicate comp and loop through layers to duplicate all the comps inside the comp
@@ -36,7 +34,6 @@ class afterEffectMixin:
 
     #TODO - Create function to edit values from comp or create a template.json and add the values there then the script will read the values from there will modify the json
     #TODO - Add transitions layer
-    afterEffectItems=[]
 
     def sanitize_text_for_ae(self, text):
         """
@@ -85,7 +82,7 @@ class afterEffectMixin:
         filePath = new_file_path
         print(f"File copied to {filePath}")
         
-        if data["project"]["debug"] == False:
+        if not data["project"]["debug"]:
             os.startfile(filePath)
             # Wait for After Effects to be fully loaded and ready
             if not self.wait_for_after_effects_ready(timeout=120):
@@ -155,7 +152,7 @@ class afterEffectMixin:
             for custom_edit in itemTimeline["custom_actions"]:
                 self.parseCustomActions(custom_edit,scene_folder,itemTimeline,data)
                 
-        if data["project"]["debug"] == False:
+        if not data["project"]["debug"]:
             pyautogui.hotkey('ctrl', 's')
             time.sleep(10)
             os.system('taskkill /F /FI "WINDOWTITLE eq Adobe After Effects*"')
@@ -573,7 +570,7 @@ class afterEffectMixin:
                     # Clean up
                     try:
                         os.remove(queue_file)
-                    except:
+                    except Exception:
                         pass
         except Exception as e:
             print(f"Error queueing script: {e}")
@@ -581,7 +578,7 @@ class afterEffectMixin:
             try:
                 if os.path.exists(queue_file):
                     os.remove(queue_file)
-            except:
+            except Exception:
                 pass
 
     def runScript(self, fileName, _remplacements=None,debug=False):
