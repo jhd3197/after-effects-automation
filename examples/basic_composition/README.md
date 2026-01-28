@@ -5,7 +5,7 @@
 
 ## Overview
 
-This example demonstrates the fundamental workflow of After Effects automation:
+This example demonstrates a full end-to-end automation pipeline — from template creation to rendered MP4 — using After Effects Automation:
 1. Create a template with basic compositions
 2. Run automation to customize and render
 

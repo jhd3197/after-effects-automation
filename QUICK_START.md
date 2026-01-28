@@ -1,13 +1,13 @@
 # Quick Start Guide
 
-Get After Effects Automation running in 5 minutes.
+Get After Effects Automation running and produce your first rendered video — from install to MP4 output — in a single walkthrough.
 
 ## Prerequisites
 
 Before you start, make sure you have:
 
 - ✅ **Python 3.7+** installed
-- ✅ **Adobe After Effects** (2024, 2025, or 2025 Beta)
+- ✅ **Adobe After Effects** (2024, 2025, or 2026)
 - ✅ **Administrator/sudo access** (for initial setup)
 
 ## Step 1: Install the Package
@@ -25,7 +25,8 @@ python install_ae_runner.py
 ```
 
 **What this does:**
-- Installs a startup script in After Effects
+- Installs a startup script (`ae_command_runner.jsx`) in After Effects' startup folder
+- This script monitors a file-based command queue, allowing Python to send ExtendScript commands to AE asynchronously
 - Enables real-time automation without manual intervention
 
 ## Step 3: Enable Scripting in After Effects
@@ -67,6 +68,8 @@ python run.py
 **That's it!**
 
 ## What Happens Next
+
+Here is the end-to-end pipeline that runs when you execute a single command. Every step is handled automatically:
 
 When you run `python run.py`, the automation will:
 
@@ -118,6 +121,7 @@ python render.py
 - **[Examples Guide](examples/README.md)** - See what you can build
 - **[Main README](README.md)** - Full feature overview
 - **[CLI Guide](CLI_GUIDE.md)** - Command-line tools
+- **Web Editor** - Run `ae-automation editor config.json` to edit configurations visually in your browser
 
 ## Common Issues
 

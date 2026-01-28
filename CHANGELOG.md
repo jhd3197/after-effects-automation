@@ -2,9 +2,9 @@
 
 All notable changes to After Effects Automation will be documented in this file.
 
-## [Unreleased] - 2025-01-XX
+## [Unreleased] - 2026-01-XX
 
-### Added - Intelligent Process Management ✅
+### Added - Intelligent Process Lifecycle Management ✅
 - **ProcessManagerMixin** - New intelligent wait system for After Effects
   - `wait_for_process()` - Detects when AE process starts
   - `wait_for_window()` - Waits for main window to appear
@@ -20,7 +20,7 @@ All notable changes to After Effects Automation will be documented in this file.
   - ✅ Configurable timeouts for different systems
 
 ### Added - Unified CLI System ✅
-- **Single Command Interface** - `ae-automation` with subcommands
+- **Single Command Interface** - `ae-automation` with subcommands (one of three interfaces alongside the Python API and Web Editor)
   - `ae-automation run <config>` - Run automation
   - `ae-automation editor <config>` - Open web editor
   - `ae-automation generate` - Generate templates

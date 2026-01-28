@@ -150,6 +150,7 @@ node_modules/
 
 # Build output
 dist/
+!ae_automation/mixins/videoEditor/dist/
 
 # Logs
 npm-debug.log*
@@ -174,3 +175,4 @@ lerna-debug.log*
 .env.development.local
 .env.test.local
 .env.production.local
+nul

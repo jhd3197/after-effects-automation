@@ -1,8 +1,8 @@
 # After Effects Automation - Examples
 
-Quick, practical examples showing what you can build with After Effects automation.
+Complete end-to-end workflow examples. Each example is a full automation pipeline — from JSON configuration through composition building to rendered MP4 output — not a standalone script.
 
-## 🚀 Quick Start
+## Quick Start
 
 ```bash
 # 1. Pick an example
@@ -18,11 +18,20 @@ python run.py
 - Build your composition
 - Render the final video
 
-Perfect for creating GIF demos! 🎬
+---
+
+## Use Case Categories
+
+| Category | Example | Description |
+|----------|---------|-------------|
+| **Content Creation** | basic_composition | Build multi-scene videos from template compositions |
+| **Dynamic Text** | text_animation | Update text layers with data-driven content from Python |
+| **Batch Rendering** | render_only | Render existing .aep files without modification |
+| **Template Workflows** | basic_composition | Programmatically generate .aep templates, then automate them |
 
 ---
 
-## 📊 Examples at a Glance
+## Examples at a Glance
 
 | Example | What It Does | Time | Command |
 |---------|-------------|------|---------|
@@ -32,10 +41,10 @@ Perfect for creating GIF demos! 🎬
 
 ---
 
-## 📚 Detailed Examples
+## Detailed Examples
 
 ### 1. Basic Composition
-**📁** `examples/basic_composition/` | **⭐ Beginner** | **⏱️ 2 minutes**
+`examples/basic_composition/` | **Beginner**
 
 **What You'll Learn:**
 - Automated template creation
@@ -58,12 +67,12 @@ python run.py
 4. Updates text in each scene
 5. Renders to `output/FinalComposition.mp4`
 
-[📖 Full Guide →](basic_composition/README.md)
+[Full Guide →](basic_composition/README.md)
 
 ---
 
 ### 2. Text Animation
-**📁** `examples/text_animation/` | **⭐ Beginner** | **⏱️ 2 minutes**
+`examples/text_animation/` | **Beginner**
 
 **What You'll Learn:**
 - Multiple text layers
@@ -81,12 +90,12 @@ python run.py
 
 **Output:** Video with multiple styled text layers
 
-[📖 Full Guide →](text_animation/README.md)
+[Full Guide →](text_animation/README.md)
 
 ---
 
 ### 3. Render Only
-**📁** `examples/render_only/` | **⭐ Beginner** | **⏱️ 10 seconds**
+`examples/render_only/` | **Beginner**
 
 **What You'll Learn:**
 - Rendering .aep files without automation
@@ -115,11 +124,11 @@ python render.py file.aep --comp "MyComp"
 - Outputs to current directory by default
 - Smart defaults: `ae_automation.aep` → FinalComposition, `basic_template.aep` → IntroTemplate
 
-[📖 Full Guide →](render_only/README.md)
+[Full Guide →](render_only/README.md)
 
 ---
 
-## 🎓 Learning Path
+## Learning Path
 
 ### Beginner (Start Here)
 1. **basic_composition** - Learn the automation workflow
@@ -133,7 +142,7 @@ python render.py file.aep --comp "MyComp"
 
 ---
 
-## 🛠️ How Examples Work
+## How Examples Work — End-to-End Pipeline
 
 ### Automation Examples (basic_composition, text_animation)
 
@@ -149,7 +158,7 @@ example_name/
     └── FinalComposition.mp4 # Rendered video
 ```
 
-**Workflow (Fully Automatic):**
+**Pipeline (Fully Automatic):**
 1. Run `python run.py`
 2. Script auto-creates template if missing
 3. Opens After Effects and loads template
@@ -181,7 +190,7 @@ render_only/
 
 ---
 
-## ⚙️ Configuration
+## Configuration
 
 Examples use Python dictionaries for configuration:
 
@@ -223,7 +232,7 @@ Examples use Python dictionaries for configuration:
 
 ---
 
-## 🚀 Common Customizations
+## Common Customizations
 
 ### Change Video Duration
 In `run.py`, modify:
@@ -256,9 +265,9 @@ In the timeline config:
 
 ---
 
-## 🔧 Prerequisites
+## Prerequisites
 
-1. **After Effects** (2024, 2025, or 2025 Beta)
+1. **After Effects** (2024, 2025, or 2026)
 2. **Python 3.7+**
 3. **Package installed:**
    ```bash
@@ -278,7 +287,7 @@ In the timeline config:
 
 ---
 
-## ❓ Troubleshooting
+## Troubleshooting
 
 ### "Template not found" then auto-creates it
 **This is normal!** First run creates the template automatically.
@@ -309,7 +318,9 @@ pip install --upgrade after-effects-automation
 
 ---
 
-## 📝 Creating Your Own Example
+## Creating Your Own Example
+
+Each example follows a configuration-driven approach: you define the project structure and timeline in a Python dictionary (or JSON file), and the platform handles the rest. Start from an existing example and modify the config to match your use case.
 
 ### Basic Structure
 
@@ -380,7 +391,7 @@ if __name__ == "__main__":
 
 ---
 
-## 🔗 Related Documentation
+## Related Documentation
 
 - [Main README](../README.md) - Package overview
 - [Installation Guide](../INSTALLATION.md) - Setup instructions
@@ -390,7 +401,7 @@ if __name__ == "__main__":
 
 ---
 
-## 🤝 Contributing Examples
+## Contributing Examples
 
 Have a useful example? Share it!
 
@@ -410,6 +421,6 @@ Have a useful example? Share it!
 
 ---
 
-## 📄 License
+## License
 
 Examples are part of the After Effects Automation package - MIT License

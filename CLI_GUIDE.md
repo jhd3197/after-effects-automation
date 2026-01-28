@@ -1,14 +1,12 @@
 # CLI Guide
 
-Command-line tools for After Effects Automation.
+The CLI is one of three interfaces provided by After Effects Automation, alongside the Python API and the built-in Web Editor. Use it to run automation pipelines, launch the visual config editor, test compatibility, and diagnose issues — all from the terminal.
 
-## Overview
-
-The package provides CLI commands for:
-- **Running automation** from config files
-- **Editing configurations** in a web interface
-- **Testing** your setup
-- **Diagnosing** issues
+| Interface | Best For | Entry Point |
+|-----------|----------|-------------|
+| **Python API** | Programmatic control, custom workflows | `from ae_automation import Client` |
+| **CLI** | Running configs, testing, diagnostics | `ae-automation run config.json` |
+| **Web Editor** | Visual config editing in the browser | `ae-automation editor config.json` |
 
 ## Installation
 
@@ -225,7 +223,8 @@ ae-automation run config.json
 
 ### Batch Processing
 
-Create a batch script for multiple videos:
+Because each `ae-automation run` invocation is a self-contained pipeline (launch AE, build, render, done), you can chain multiple runs to produce videos in sequence without manual intervention:
+
 
 **Windows (batch_render.bat):**
 ```batch
@@ -419,9 +418,9 @@ ae-automation diagnose --help
 
 ---
 
-## Python Script Alternative
+## Using the Python API Instead
 
-You can also use Python directly instead of CLI commands:
+You can also drive the same automation pipeline from Python directly, which gives you full programmatic control over config generation and execution:
 
 ```python
 from ae_automation import Client
