@@ -39,13 +39,6 @@ class afterEffectMixin:
     """
     afterEffectMixin
     """
-    #TODO - Add search for items inside folder
-    #FIXME - Create a function to duplicate comp and loop through layers to duplicate all the comps inside the comp
-    #TODO - Create a duplicate function for items inside folder
-
-    #TODO - Create function to edit values from comp or create a template.json and add the values there then the script will read the values from there will modify the json
-    #TODO - Add transitions layer
-
     afterEffectItems: list[dict[str, Any]]
     afterEffectResource: list[dict[str, Any]]
     JS_FRAMEWORK: str
@@ -230,6 +223,23 @@ class afterEffectMixin:
         if custom_edit["change_type"] == "add_comp":
             self.addCompToTimeline(self.slug(scene_folder+" "+itemTimeline["template_comp"]),custom_edit["comp_name"],scene_folder,custom_edit["startTime"],custom_edit["duration"])
 
+        if custom_edit["change_type"] == "apply_template_values":
+            target = self.slug(scene_folder + " " + custom_edit["comp_name"])
+            values_source = custom_edit.get("values_file") or custom_edit.get("values", [])
+            if isinstance(values_source, str):
+                self.applyTemplateValues(target, values_file=values_source)
+            else:
+                self.applyTemplateValues(target, values=values_source)
+
+        if custom_edit["change_type"] == "add_transition":
+            self.addTransition(
+                self.slug(scene_folder + " " + custom_edit["comp_name"]),
+                custom_edit["layer_name"],
+                custom_edit.get("transition_type", "fade_in"),
+                custom_edit.get("start_time", 0.0),
+                custom_edit.get("duration", 1.0)
+            )
+
     def checkIfItemExists(self, itemName: str) -> bool:
         """
         check If Item Exists
@@ -260,6 +270,19 @@ class afterEffectMixin:
         
         self.afterEffectItems=data["files"]
         logger.debug("Finished getting project map")
+        return data
+
+    def getFolderItems(self, folder_name: str) -> list[dict[str, Any]]:
+        """Return items from cached afterEffectItems whose parentFolder matches folder_name."""
+        return [item for item in self.afterEffectItems if item.get("parentFolder") == folder_name]
+
+    def searchFolderItems(self, folder_name: str) -> list[dict[str, Any]]:
+        """Execute JSX to get fresh folder contents from AE project, return as list of dicts."""
+        _replace = {
+            "{folderName}": str(folder_name),
+        }
+        self.runScript("search_folder_items.jsx", _replace)
+        data = json.load(open(settings.CACHE_FOLDER + "/search_folder_items.json", encoding='utf-8'))
         return data
 
     def createFolder(self, folderName: str, parentFolder: str = "") -> None:
@@ -449,6 +472,17 @@ class afterEffectMixin:
         for comp in data:
             self.swapItem(comp["fromCompName"],comp["toLayerIndex"],comp["ItemName"])
 
+    def duplicateFolderItems(self, source_folder: str, target_folder: str, parent_folder: str = "") -> list[dict[str, Any]]:
+        """Duplicate all items from source_folder into target_folder."""
+        _replace = {
+            "{sourceFolderName}": str(source_folder),
+            "{targetFolderName}": str(target_folder),
+            "{parentFolder}": str(parent_folder),
+        }
+        self.runScript("duplicate_folder_items.jsx", _replace)
+        data = json.load(open(settings.CACHE_FOLDER + "/duplicate_folder_items.json", encoding='utf-8'))
+        return data
+
     def addResourceToTimeline(self, ResourceName: str, CompName: str, startTime: float = 0.0, compDuration: float = 0.0, inPoint: float = 0.0, stretch: int = 100, moveToEnd: bool | str = False) -> None:
         """
         add Comp To Timeline
@@ -622,6 +656,48 @@ class afterEffectMixin:
         time.sleep(1)  # Reduced sleep time since we wait in _execute_script_in_running_ae
         logger.debug("Finished script: %s", fileName)
         return randomName
+
+    def applyTemplateValues(self, comp_name: str, values: list[dict[str, Any]] | None = None, values_file: str | None = None) -> None:
+        """Apply template values to a composition.
+
+        Args:
+            comp_name: Target composition name
+            values: List of value dicts with layer_name, property_name, value
+            values_file: Path to JSON file with template values (alternative to values param)
+        """
+        if values_file:
+            with open(values_file, encoding='utf-8') as f:
+                data = json.load(f)
+            comp_name = data.get("comp_name", comp_name)
+            values = data.get("values", [])
+
+        if values is None:
+            values = []
+
+        for val in values:
+            if val.get("property_type") == "color":
+                val["value"] = self.hexToRGBA(val["value"])
+            self.editComp(comp_name, val["layer_name"], val["property_name"], val["value"])
+
+    def addTransition(self, comp_name: str, layer_name: str, transition_type: str = "fade_in",
+                      start_time: float = 0.0, duration: float = 1.0) -> None:
+        """Add a transition effect to a layer.
+
+        Args:
+            comp_name: Target composition name
+            layer_name: Layer to apply transition to
+            transition_type: One of: fade_in, fade_out, cross_dissolve, slide_left, slide_right, wipe_left
+            start_time: When the transition starts (seconds)
+            duration: Transition duration (seconds)
+        """
+        _replace = {
+            "{comp_name}": str(comp_name),
+            "{layer_name}": str(layer_name),
+            "{transition_type}": str(transition_type),
+            "{start_time}": str(start_time),
+            "{duration}": str(duration),
+        }
+        self.runScript("add_transition.jsx", _replace)
 
     def workAreaComp(self, compName: str, startTime: float, endTime: float) -> None:
         """

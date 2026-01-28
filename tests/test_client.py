@@ -55,7 +55,12 @@ class TestClientInitialization(unittest.TestCase):
             'renderFile',
             'runScript',
             'slug',
-            'hexToRGBA'
+            'hexToRGBA',
+            'getFolderItems',
+            'searchFolderItems',
+            'duplicateFolderItems',
+            'applyTemplateValues',
+            'addTransition',
         ]
 
         for method_name in required_methods:
