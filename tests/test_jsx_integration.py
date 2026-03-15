@@ -64,8 +64,8 @@ class TestJSXScripts(unittest.TestCase):
         # Check a few key scripts for expected content
         test_cases = {
             "file_map.jsx": ["app.project", "items"],
-            "create_folder.jsx": ["FolderItem", "add"],
-            "addComp.jsx": ["CompItem", "add"],
+            "create_folder.jsx": ["addFolder", "parentFolder"],
+            "addComp.jsx": ["addComp", "parentFolder"],
             "update_properties.jsx": ["property", "setValue"],
         }
 

@@ -23,7 +23,7 @@ class TestUtilityFunctions(unittest.TestCase):
         test_cases = [
             ("Hello World", "hello-world"),
             ("Test Name 123", "test-name-123"),
-            ("Special@#$Characters", "specialcharacters"),
+            ("Special@#$Characters", "special-characters"),
             ("Multiple   Spaces", "multiple-spaces"),
             ("UPPERCASE", "uppercase"),
             ("Scene 1", "scene-1"),

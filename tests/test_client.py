@@ -75,22 +75,28 @@ class TestClientCacheFolder(unittest.TestCase):
 
     def test_cache_folder_creation(self):
         """Test that cache folder is created"""
+        import importlib
+
+        import ae_automation.settings as settings_mod
+
         with tempfile.TemporaryDirectory() as tmpdir:
-            # Set environment variable temporarily
-            original_cache = os.environ.get("CACHE_FOLDER")
             test_cache = os.path.join(tmpdir, "test_cache")
+            original_cache = os.environ.get("CACHE_FOLDER")
             os.environ["CACHE_FOLDER"] = test_cache
 
             try:
+                # Reload settings so it picks up the new env var
+                importlib.reload(settings_mod)
                 # Client should create cache folder on init
                 Client()
                 self.assertTrue(os.path.exists(test_cache), "Cache folder was not created")
             finally:
-                # Restore original environment
                 if original_cache:
                     os.environ["CACHE_FOLDER"] = original_cache
                 elif "CACHE_FOLDER" in os.environ:
                     del os.environ["CACHE_FOLDER"]
+                # Reload again to restore original settings
+                importlib.reload(settings_mod)
 
 
 if __name__ == "__main__":

@@ -32,7 +32,7 @@ setup(
         "pydirectinput>=1.0.4",
         "pywinauto>=0.6.8",
         "python-slugify>=5.0.0",
-        "Pillow>=8.0.0",
+        "Pillow>=12.1.1",
         "jsmin>=3.0.0",
         "mutagen>=1.45.1",
         "moviepy>=1.0.3",
