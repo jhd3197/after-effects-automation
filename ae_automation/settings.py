@@ -194,7 +194,7 @@ def validate_settings() -> None:
                 "\n  Set AFTER_EFFECT_FOLDER in .env to your AE Support Files path."
                 "\n  Example: AFTER_EFFECT_FOLDER=C:/Program Files/Adobe/Adobe After Effects 2025/Support Files"
             )
-        raise AENotFoundError(path=AFTER_EFFECT_FOLDER or "(not set)" + hint)
+        raise AENotFoundError(path=(AFTER_EFFECT_FOLDER or "(not set)") + hint)
 
     if not AERENDER_PATH or not os.path.exists(AERENDER_PATH):
         raise AENotFoundError(path=AERENDER_PATH or "(not set)")

@@ -14,7 +14,7 @@ English | [Español](docs/README.es.md) | [中文版](docs/README.zh-CN.md) | [P
 
 ![Windows](https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white)
 ![After Effects](https://img.shields.io/badge/After_Effects-9999FF?style=for-the-badge&logo=adobeaftereffects&logoColor=white)
-![Python](https://img.shields.io/badge/Python-3.7+-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.9+-3776AB?style=for-the-badge&logo=python&logoColor=white)
 
 [![PyPI](https://img.shields.io/pypi/v/after-effects-automation?style=flat-square&color=blue)](https://pypi.org/project/after-effects-automation/)
 [![Downloads](https://img.shields.io/pepy/dt/after-effects-automation?style=flat-square&color=green)](https://pepy.tech/project/after-effects-automation)
@@ -133,7 +133,7 @@ The `Client` class composes seven mixins:
 
 | Layer | Technology |
 |-------|------------|
-| Backend | Python 3.7+, Flask, Flask-CORS |
+| Backend | Python 3.9+, Flask, Flask-CORS |
 | AI | Prompture (any LLM provider) |
 | AE Bridge | ExtendScript (JSX), file-based command queue |
 | Web Editor | React 18, Vite, Zustand |
@@ -146,7 +146,7 @@ The `Client` class composes seven mixins:
 | Software | Versions |
 |----------|----------|
 | **After Effects** | 2020 – 2026+ (auto-detected) |
-| **Python** | 3.7+ |
+| **Python** | 3.9+ |
 | **OS** | Windows, macOS |
 
 ```python

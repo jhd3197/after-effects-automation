@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class ae_files(BaseModel):
@@ -9,4 +9,4 @@ class ae_files(BaseModel):
 
 class ae_bot(BaseModel):
     projectName: str
-    files: list[ae_files] = []
+    files: list[ae_files] = Field(default_factory=list)

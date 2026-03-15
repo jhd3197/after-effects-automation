@@ -2,29 +2,39 @@
     "project": {
         "project_file": "",
         "comp_name": "LowerThird",
-        "compWidth": 1920,
-        "compHeight": 1080,
-        "duration": 5,
-        "fps": 30,
+        "comp_width": 1920,
+        "comp_height": 1080,
+        "comp_fps": 30,
+        "comp_end_time": 5,
+        "comp_start_time": "00:00:00",
+        "output_file": "lower_third.mp4",
         "output_dir": "",
-        "renderComp": "LowerThird"
+        "renderComp": true,
+        "debug": true,
+        "resources": []
     },
     "timeline": [
         {
-            "scene": "LowerThird",
+            "name": "lower-third",
+            "duration": 5,
+            "startTime": 0,
+            "template_comp": "LowerThird",
+            "reverse": false,
             "custom_actions": [
                 {
-                    "action": "update_layer_property",
+                    "change_type": "update_layer_property",
                     "comp_name": "LowerThird",
                     "layer_name": "PersonName",
-                    "property": "Text.Source Text",
+                    "property_name": "Text.Source Text",
+                    "property_type": "string",
                     "value": "John Doe"
                 },
                 {
-                    "action": "update_layer_property",
+                    "change_type": "update_layer_property",
                     "comp_name": "LowerThird",
                     "layer_name": "PersonTitle",
-                    "property": "Text.Source Text",
+                    "property_name": "Text.Source Text",
+                    "property_type": "string",
                     "value": "Senior Producer"
                 }
             ]

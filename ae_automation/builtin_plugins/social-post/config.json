@@ -2,48 +2,64 @@
     "project": {
         "project_file": "",
         "comp_name": "SocialPost",
-        "compWidth": 1080,
-        "compHeight": 1920,
-        "duration": 15,
-        "fps": 30,
+        "comp_width": 1080,
+        "comp_height": 1920,
+        "comp_fps": 30,
+        "comp_end_time": 15,
+        "comp_start_time": "00:00:00",
+        "output_file": "social_post.mp4",
         "output_dir": "",
-        "renderComp": "SocialPost"
+        "renderComp": true,
+        "debug": true,
+        "resources": []
     },
     "timeline": [
         {
-            "scene": "Intro",
+            "name": "intro",
+            "duration": 5,
+            "startTime": 0,
+            "template_comp": "SocialPost",
+            "reverse": false,
             "custom_actions": [
                 {
-                    "action": "update_layer_property",
+                    "change_type": "update_layer_property",
                     "comp_name": "SocialPost",
                     "layer_name": "Headline",
-                    "property": "Text.Source Text",
+                    "property_name": "Text.Source Text",
+                    "property_type": "string",
                     "value": "Check This Out!"
                 },
                 {
-                    "action": "update_layer_property",
+                    "change_type": "update_layer_property",
                     "comp_name": "SocialPost",
                     "layer_name": "Handle",
-                    "property": "Text.Source Text",
+                    "property_name": "Text.Source Text",
+                    "property_type": "string",
                     "value": "@username"
                 }
             ]
         },
         {
-            "scene": "Content",
+            "name": "content",
+            "duration": 10,
+            "startTime": 5,
+            "template_comp": "SocialPost",
+            "reverse": false,
             "custom_actions": [
                 {
-                    "action": "update_layer_property",
+                    "change_type": "update_layer_property",
                     "comp_name": "SocialPost",
                     "layer_name": "BodyText",
-                    "property": "Text.Source Text",
+                    "property_name": "Text.Source Text",
+                    "property_type": "string",
                     "value": "Your content goes here. Edit this template to match your brand."
                 },
                 {
-                    "action": "update_layer_property",
+                    "change_type": "update_layer_property",
                     "comp_name": "SocialPost",
                     "layer_name": "CTA",
-                    "property": "Text.Source Text",
+                    "property_name": "Text.Source Text",
+                    "property_type": "string",
                     "value": "Follow for more!"
                 }
             ]
