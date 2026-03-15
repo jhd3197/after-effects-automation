@@ -11,7 +11,6 @@ import uuid
 from typing import Any
 
 from jsmin import jsmin
-from moviepy import VideoFileClip
 from mutagen.mp3 import MP3
 
 from ae_automation import settings
@@ -992,6 +991,11 @@ class afterEffectMixin:
         """
         Convert MOV to MP4 using moviepy
         """
+        try:
+            from moviepy import VideoFileClip
+        except ImportError:
+            from moviepy.video.io.VideoFileClip import VideoFileClip
+
         logger.info("Converting MOV to MP4 using moviepy...")
         clip = VideoFileClip(inputPath)
         clip.write_videofile(outputPath, codec="libx264", audio_codec="aac", fps=29.97)
