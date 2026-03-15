@@ -12,6 +12,8 @@ import time
 import psutil
 
 from ae_automation.logging_config import get_logger
+from ae_automation.platform import get_ae_executable, get_ae_process_name, press_key
+from ae_automation.settings import IS_WINDOWS
 
 logger = get_logger(__name__)
 
@@ -31,7 +33,7 @@ class ProcessManagerMixin:
     Mixin for managing After Effects process lifecycle
     """
 
-    def wait_for_process(self, process_name: str = "AfterFX.exe", timeout: int = 30) -> psutil.Process | None:
+    def wait_for_process(self, process_name: str | None = None, timeout: int = 30) -> psutil.Process | None:
         """
         Wait for a process to start
 
@@ -42,6 +44,8 @@ class ProcessManagerMixin:
         Returns:
             Process object if found, None if timeout
         """
+        if process_name is None:
+            process_name = get_ae_process_name()
         logger.info("Waiting for %s to start...", process_name)
         start_time = time.time()
 
@@ -74,16 +78,25 @@ class ProcessManagerMixin:
 
         while time.time() - start_time < timeout:
             try:
-                # Try to connect to any After Effects window
-                # This includes Home screen, project windows, etc.
-                app = Application(backend="uia").connect(title_re=f".*{window_title_pattern}.*", timeout=5)
-                windows = app.windows()
+                if IS_WINDOWS and Application is not None:
+                    # Try to connect to any After Effects window
+                    # This includes Home screen, project windows, etc.
+                    app = Application(backend="uia").connect(title_re=f".*{window_title_pattern}.*", timeout=5)
+                    windows = app.windows()
 
-                if len(windows) > 0:
-                    logger.info("After Effects window is ready (%d window(s) found)", len(windows))
-                    # Give it a moment to fully initialize
-                    time.sleep(3)
-                    return True
+                    if len(windows) > 0:
+                        logger.info("After Effects window is ready (%d window(s) found)", len(windows))
+                        # Give it a moment to fully initialize
+                        time.sleep(3)
+                        return True
+                else:
+                    # Non-Windows fallback: check via psutil for process existence
+                    from ae_automation.platform import process_is_running
+
+                    if process_is_running(get_ae_process_name()):
+                        logger.info("After Effects process detected (non-Windows fallback)")
+                        time.sleep(3)
+                        return True
             except Exception:
                 # Try alternate detection method
                 try:
@@ -126,7 +139,7 @@ class ProcessManagerMixin:
                 with open(test_file, "w") as f:
                     f.write(test_script)
 
-                ae_path = os.path.join(settings.AFTER_EFFECT_FOLDER, "AfterFX.exe")
+                ae_path = get_ae_executable(settings.AFTER_EFFECT_FOLDER)
 
                 # Run the test script
                 subprocess.run(
@@ -162,11 +175,9 @@ class ProcessManagerMixin:
             # Ideally we would check for window title "Adobe After Effects" with specific size
             # But just pressing Space is often safe enough during startup
             logger.debug("Checking for Crash/Safe Mode dialog...")
-            import pyautogui
-            # Focus AE window if possible (optional, might need win32gui)
 
             # Send Space key to dismiss "Start Safe Mode" dialog or "Crash Repair"
-            pyautogui.press("space")
+            press_key("space")
             logger.debug("Sent SPACE key to handle potential dialog")
             time.sleep(1)
         except Exception as e:
@@ -187,7 +198,7 @@ class ProcessManagerMixin:
         start_time = time.time()
 
         # Step 1: Wait for process to start
-        process = self.wait_for_process("AfterFX.exe", timeout=30)
+        process = self.wait_for_process(get_ae_process_name(), timeout=30)
         if not process:
             return False
 
@@ -243,7 +254,7 @@ class ProcessManagerMixin:
         ae_running = False
         for proc in psutil.process_iter(["name"]):
             try:
-                if proc.info["name"].lower() == "afterfx.exe":
+                if proc.info["name"].lower() == get_ae_process_name().lower():
                     ae_running = True
                     logger.info("After Effects is already running")
                     break
@@ -254,7 +265,7 @@ class ProcessManagerMixin:
             # Start After Effects
             from ae_automation import settings
 
-            ae_path = os.path.join(settings.AFTER_EFFECT_FOLDER, "AfterFX.exe")
+            ae_path = get_ae_executable(settings.AFTER_EFFECT_FOLDER)
 
             if project_file and os.path.exists(project_file):
                 logger.info("Starting After Effects with project: %s", project_file)
@@ -442,7 +453,7 @@ class ProcessManagerMixin:
 
         for proc in psutil.process_iter(["name", "pid"]):
             try:
-                if proc.info["name"].lower() == "afterfx.exe":
+                if proc.info["name"].lower() == get_ae_process_name().lower():
                     ae_running = True
                     ae_pid = proc.info["pid"]
                     print(f"After Effects is running (PID: {ae_pid})")

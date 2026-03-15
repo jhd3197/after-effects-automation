@@ -8,12 +8,14 @@ from typing import Any
 from dotenv import load_dotenv
 
 from ae_automation.mixins.afterEffect import afterEffectMixin
+from ae_automation.mixins.batchQueue import BatchQueueMixin
 from ae_automation.mixins.bot import botMixin
 from ae_automation.mixins.chatPanel import ChatPanelMixin
 from ae_automation.mixins.processManager import ProcessManagerMixin
 from ae_automation.mixins.templateGenerator import TemplateGeneratorMixin
 from ae_automation.mixins.tools import ToolsMixin
 from ae_automation.mixins.VideoEditorApp import VideoEditorAppMixin
+from ae_automation.plugins import PluginMixin
 
 # Load environment variables from .env file
 load_dotenv()
@@ -27,6 +29,8 @@ class Client(
     ChatPanelMixin,
     TemplateGeneratorMixin,
     ProcessManagerMixin,
+    BatchQueueMixin,
+    PluginMixin,
 ):
     JS_FRAMEWORK: str = ""
 

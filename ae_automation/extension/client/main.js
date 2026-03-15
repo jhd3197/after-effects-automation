@@ -185,7 +185,7 @@
 
     // ── Execute AE Actions ─────────────────────────────────────
     function executeAction(action, badgeEl) {
-        if (!csInterface) {
+        if (!csInterface || action.type === "render") {
             // Fallback: send to backend for execution via command queue
             fetch(settings.backendUrl + "/api/chat/execute", {
                 method: "POST",
@@ -196,6 +196,10 @@
                 .then(function (data) {
                     if (data.success) {
                         if (badgeEl) badgeEl.classList.add("executed");
+                        // Start polling render progress for render actions
+                        if (action.type === "render") {
+                            startRenderProgressPoll();
+                        }
                     } else {
                         if (badgeEl) badgeEl.classList.add("failed");
                         addMessage("system", "Action failed: " + (data.error || "Unknown"));
@@ -273,6 +277,10 @@
 
             case "list_comps":
                 return 'listCompositions()';
+
+            case "render":
+                // Rendering is handled by the backend; no ExtendScript needed
+                return null;
 
             default:
                 return null;
@@ -385,6 +393,57 @@
         } else {
             bar.classList.add("hidden");
         }
+    }
+
+    // ── Render Progress Polling ────────────────────────────────
+    var renderPollTimer = null;
+    var renderProgressEl = null;
+
+    function startRenderProgressPoll() {
+        // Create a progress bar message in the chat
+        renderProgressEl = addMessage("system", "");
+        var contentDiv = renderProgressEl.querySelector(".message-content");
+        contentDiv.innerHTML =
+            '<div class="progress-bar">' +
+            '  <div class="progress-fill" style="width: 0%"></div>' +
+            '  <span class="progress-text">Render starting...</span>' +
+            '</div>';
+
+        renderPollTimer = setInterval(pollRenderProgress, 2000);
+    }
+
+    function pollRenderProgress() {
+        fetch(settings.backendUrl + "/api/chat/render-progress", { method: "GET" })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                if (!data.success) return;
+
+                var pct = data.percent || 0;
+                var status = data.status || "idle";
+
+                if (renderProgressEl) {
+                    var fill = renderProgressEl.querySelector(".progress-fill");
+                    var text = renderProgressEl.querySelector(".progress-text");
+                    if (fill) fill.style.width = pct + "%";
+                    if (text) {
+                        if (status === "complete") {
+                            text.textContent = "Render complete!";
+                        } else if (status === "error") {
+                            text.textContent = "Render failed: " + (data.error || "Unknown error");
+                        } else {
+                            text.textContent = "Rendering: " + pct + "% (frame " + (data.frame || 0) + ")";
+                        }
+                    }
+                }
+
+                if (status === "complete" || status === "error" || status === "idle") {
+                    clearInterval(renderPollTimer);
+                    renderPollTimer = null;
+                }
+            })
+            .catch(function () {
+                // Silently ignore fetch errors during polling
+            });
     }
 
     // ── Start ──────────────────────────────────────────────────

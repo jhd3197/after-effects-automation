@@ -15,13 +15,9 @@ class ToolsMixin:
     """
 
     def process_exists(self, process_name: str) -> bool:
-        call = "TASKLIST", "/FI", f"imagename eq {process_name}"
-        # use buildin check_output right away
-        output = subprocess.check_output(call).decode()
-        # check in last line for process name
-        last_line = output.strip().split("\r\n")[-1]
-        # because Fail message could be translated
-        return last_line.lower().startswith(process_name.lower())
+        from ae_automation.platform import process_is_running
+
+        return process_is_running(process_name)
 
     def file_get_contents(self, filename: str) -> str:
         # Convert filename to absolute path

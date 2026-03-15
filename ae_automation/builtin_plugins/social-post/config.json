@@ -1,0 +1,52 @@
+{
+    "project": {
+        "project_file": "",
+        "comp_name": "SocialPost",
+        "compWidth": 1080,
+        "compHeight": 1920,
+        "duration": 15,
+        "fps": 30,
+        "output_dir": "",
+        "renderComp": "SocialPost"
+    },
+    "timeline": [
+        {
+            "scene": "Intro",
+            "custom_actions": [
+                {
+                    "action": "update_layer_property",
+                    "comp_name": "SocialPost",
+                    "layer_name": "Headline",
+                    "property": "Text.Source Text",
+                    "value": "Check This Out!"
+                },
+                {
+                    "action": "update_layer_property",
+                    "comp_name": "SocialPost",
+                    "layer_name": "Handle",
+                    "property": "Text.Source Text",
+                    "value": "@username"
+                }
+            ]
+        },
+        {
+            "scene": "Content",
+            "custom_actions": [
+                {
+                    "action": "update_layer_property",
+                    "comp_name": "SocialPost",
+                    "layer_name": "BodyText",
+                    "property": "Text.Source Text",
+                    "value": "Your content goes here. Edit this template to match your brand."
+                },
+                {
+                    "action": "update_layer_property",
+                    "comp_name": "SocialPost",
+                    "layer_name": "CTA",
+                    "property": "Text.Source Text",
+                    "value": "Follow for more!"
+                }
+            ]
+        }
+    ]
+}

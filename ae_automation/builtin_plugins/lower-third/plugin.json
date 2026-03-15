@@ -1,0 +1,14 @@
+{
+    "name": "lower-third",
+    "version": "1.0.0",
+    "description": "Simple lower-third title overlay with name and subtitle",
+    "author": "ae-automation",
+    "type": "template",
+    "tags": ["lower-third", "titles", "overlay", "news"],
+    "ae_min_version": 2020,
+    "files": {
+        "config": "config.json",
+        "assets": [],
+        "scripts": []
+    }
+}

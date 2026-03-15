@@ -179,6 +179,164 @@ def cmd_chat(args: argparse.Namespace) -> None:
         sys.exit(1)
 
 
+def cmd_plugins(args: argparse.Namespace) -> None:
+    """Manage plugins"""
+    from ae_automation.plugins import PluginRegistry
+
+    registry = PluginRegistry()
+    sub = args.plugins_action
+
+    if sub == "list":
+        plugins = registry.list_plugins()
+        if not plugins:
+            print("No plugins installed.")
+            return
+        print(f"{'Name':<25} {'Type':<10} {'Version':<10} Description")
+        print("-" * 80)
+        for p in plugins:
+            print(f"{p['name']:<25} {p['type']:<10} {p['version']:<10} {p['description']}")
+
+    elif sub == "install":
+        source = args.source
+        try:
+            result = registry.install_plugin(source)
+            print(f"Installed plugin: {result['name']} v{result['version']}")
+        except ValueError as exc:
+            print(f"Error: {exc}")
+            sys.exit(1)
+
+    elif sub == "uninstall":
+        name = args.name
+        if registry.uninstall_plugin(name):
+            print(f"Uninstalled plugin: {name}")
+        else:
+            print(f"Plugin not found: {name}")
+            sys.exit(1)
+
+    elif sub == "search":
+        tags = args.tag if args.tag else None
+        results = registry.search_plugins(
+            query=args.query or "",
+            plugin_type=args.type or "",
+            tags=tags,
+        )
+        if not results:
+            print("No matching plugins found.")
+            return
+        print(f"{'Name':<25} {'Type':<10} {'Tags'}")
+        print("-" * 70)
+        for p in results:
+            tag_str = ", ".join(p.get("tags", []))
+            print(f"{p['name']:<25} {p['type']:<10} {tag_str}")
+
+    elif sub == "info":
+        name = args.name
+        plugin = registry.get_plugin(name)
+        if plugin is None:
+            print(f"Plugin not found: {name}")
+            sys.exit(1)
+        print(f"Name:        {plugin['name']}")
+        print(f"Version:     {plugin['version']}")
+        print(f"Author:      {plugin['author']}")
+        print(f"Type:        {plugin['type']}")
+        print(f"Description: {plugin['description']}")
+        print(f"Tags:        {', '.join(plugin.get('tags', []))}")
+        print(f"AE Min:      {plugin.get('ae_min_version', 'any')}")
+        print(f"Location:    {plugin.get('_dir', 'unknown')}")
+        compat = registry.check_plugin_compat(name)
+        status = "Yes" if compat.get("compatible") else "No"
+        if compat.get("warning"):
+            status += f" ({compat['warning']})"
+        elif compat.get("error"):
+            status += f" ({compat['error']})"
+        print(f"Compatible:  {status}")
+
+    elif sub == "run":
+        name = args.name
+        plugin = registry.get_plugin(name)
+        if plugin is None:
+            print(f"Plugin not found: {name}")
+            sys.exit(1)
+        if plugin.get("type") not in ("template", "bundle"):
+            print(f"Plugin '{name}' is type '{plugin['type']}' and cannot be run directly.")
+            sys.exit(1)
+
+        from ae_automation import Client
+
+        client = Client()
+        print(f"Running plugin: {name}")
+        client.run_plugin(name)
+
+    else:
+        print("Unknown plugins action. Use: list, install, uninstall, search, info, run")
+        sys.exit(1)
+
+
+def cmd_batch(args: argparse.Namespace) -> None:
+    """Run multiple automation configs sequentially"""
+    import glob as glob_mod
+    import time as time_mod
+
+    from ae_automation import Client
+
+    config_paths: list[str] = []
+
+    if args.dir:
+        pattern = os.path.join(args.dir, "*.json")
+        config_paths = sorted(glob_mod.glob(pattern))
+        if not config_paths:
+            print(f"Error: No .json files found in {args.dir}")
+            sys.exit(1)
+
+    if args.configs:
+        for p in args.configs:
+            if not os.path.isfile(p):
+                print(f"Error: Config file not found: {p}")
+                sys.exit(1)
+            config_paths.append(os.path.abspath(p))
+
+    if not config_paths:
+        print("Error: No config files specified. Use positional args or --dir.")
+        sys.exit(1)
+
+    print(f"Batch processing {len(config_paths)} config(s):")
+    for p in config_paths:
+        print(f"  - {p}")
+    print()
+
+    client = Client()
+    client.queue_configs(config_paths)
+    client.start_batch()
+
+    # Wait for completion by polling status
+    while True:
+        status = client.get_batch_status()
+        if not status["running"]:
+            break
+        print(
+            f"  [{status['current']}/{status['total']}] Processing...",
+            end="\r",
+        )
+        time_mod.sleep(2)
+
+    print()
+    # Report results
+    results = status["results"]
+    successes = sum(1 for r in results if r["status"] == "success")
+    failures = sum(1 for r in results if r["status"] == "error")
+    print(f"\nBatch complete: {successes} succeeded, {failures} failed")
+
+    for r in results:
+        icon = "OK" if r["status"] == "success" else "FAIL"
+        msg = f"  [{icon}] {r['config']}"
+        if r["error"]:
+            msg += f" -- {r['error']}"
+        print(msg)
+
+    if failures > 0:
+        sys.exit(1)
+
+
 def cmd_diagnose(args: argparse.Namespace) -> None:
     """Run diagnostic checks"""
     from ae_automation import Client
@@ -340,6 +498,20 @@ For more information, visit: https://github.com/jhd3197/after-effects-automation
     parser_chat.set_defaults(func=cmd_chat)
 
     # ============================================================
+    # BATCH command
+    # ============================================================
+    parser_batch = subparsers.add_parser(
+        "batch",
+        help="Run multiple configs sequentially",
+        description="Queue and process multiple JSON configuration files in batch",
+    )
+    parser_batch.add_argument("configs", nargs="*", help="Paths to JSON configuration files")
+    parser_batch.add_argument(
+        "--dir", "-d", help="Directory containing .json config files to process"
+    )
+    parser_batch.set_defaults(func=cmd_batch)
+
+    # ============================================================
     # TEST command
     # ============================================================
     parser_test = subparsers.add_parser(
@@ -350,6 +522,43 @@ For more information, visit: https://github.com/jhd3197/after-effects-automation
     parser_test.add_argument("--verbose", "-v", action="store_true", help="Show detailed test output")
     parser_test.add_argument("--version", help="Specify After Effects version for testing")
     parser_test.set_defaults(func=cmd_test)
+
+    # ============================================================
+    # PLUGINS command
+    # ============================================================
+    parser_plugins = subparsers.add_parser(
+        "plugins",
+        help="Manage community plugins",
+        description="Install, list, search, and run community plugins",
+    )
+    plugins_sub = parser_plugins.add_subparsers(dest="plugins_action")
+
+    # plugins list
+    plugins_sub.add_parser("list", help="List installed plugins")
+
+    # plugins install <source>
+    p_install = plugins_sub.add_parser("install", help="Install a plugin from a directory or zip")
+    p_install.add_argument("source", help="Path to a plugin directory or .zip file")
+
+    # plugins uninstall <name>
+    p_uninstall = plugins_sub.add_parser("uninstall", help="Uninstall a plugin by name")
+    p_uninstall.add_argument("name", help="Plugin name to uninstall")
+
+    # plugins search
+    p_search = plugins_sub.add_parser("search", help="Search installed plugins")
+    p_search.add_argument("query", nargs="?", default="", help="Search query")
+    p_search.add_argument("--tag", action="append", help="Filter by tag (can repeat)")
+    p_search.add_argument("--type", help="Filter by plugin type (template, action, bundle)")
+
+    # plugins info <name>
+    p_info = plugins_sub.add_parser("info", help="Show plugin details")
+    p_info.add_argument("name", help="Plugin name")
+
+    # plugins run <name>
+    p_run = plugins_sub.add_parser("run", help="Run a template plugin")
+    p_run.add_argument("name", help="Plugin name to run")
+
+    parser_plugins.set_defaults(func=cmd_plugins)
 
     # ============================================================
     # DIAGNOSE command

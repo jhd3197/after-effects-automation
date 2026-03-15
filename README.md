@@ -103,9 +103,11 @@ Returns clickable **action buttons** that execute directly in AE. Works with any
 |---------|-------------|
 | `ae-automation run config.json` | Run the full automation pipeline |
 | `ae-automation chat` | Start the AI chat panel backend |
+| `ae-automation batch *.json` | Run multiple configs sequentially |
 | `ae-automation editor config.json` | Launch the visual web editor |
 | `ae-automation generate --template tutorial` | Generate .aep from built-in template |
 | `ae-automation export --template social-media` | Generate + render in one step |
+| `ae-automation plugins list` | List, install, search, run community plugins |
 | `ae-automation test` | Run compatibility tests |
 | `ae-automation diagnose` | Check AE installation and scripting setup |
 
@@ -145,7 +147,7 @@ The `Client` class composes seven mixins:
 |----------|----------|
 | **After Effects** | 2020 – 2026+ (auto-detected) |
 | **Python** | 3.7+ |
-| **OS** | Windows, macOS (in progress) |
+| **OS** | Windows, macOS |
 
 ```python
 from ae_automation.settings import get_discovery_report
@@ -193,10 +195,10 @@ print(get_incompatible_scripts(2020))  # check what won't work
 - [x] Auto-discovery — version detection and compatibility layer
 - [x] Web editor — visual config editing
 - [x] Built-in templates — 5 ready-to-use templates
-- [ ] macOS support
-- [ ] Real-time render progress in chat panel
-- [ ] Batch queue — parallel multi-video rendering
-- [ ] Plugin marketplace — community templates and actions
+- [x] macOS support — cross-platform abstraction layer
+- [x] Real-time render progress — live progress bar in chat panel
+- [x] Batch queue — sequential multi-video processing with status tracking
+- [x] Plugin marketplace — community templates and actions with install/search/run
 
 ---
 

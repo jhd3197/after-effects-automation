@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import shutil
 import subprocess
+import threading
 import time
 import uuid
 from typing import Any
@@ -18,6 +20,7 @@ from ae_automation.exceptions import (
     RenderError,
 )
 from ae_automation.logging_config import get_logger
+from ae_automation.platform import hotkey, kill_ae_process, open_file, press_key, save_project_hotkey
 
 logger = get_logger(__name__)
 
@@ -93,7 +96,7 @@ class afterEffectMixin:
         logger.info("File copied to %s", filePath)
 
         if not data["project"]["debug"]:
-            os.startfile(filePath)
+            open_file(filePath)
             # Wait for After Effects to be fully loaded and ready
             if not self.wait_for_after_effects_ready(timeout=120):
                 raise AENotResponsiveError(timeout=120)
@@ -176,9 +179,9 @@ class afterEffectMixin:
                 self.parseCustomActions(custom_edit, scene_folder, itemTimeline, data)
 
         if not data["project"]["debug"]:
-            pyautogui.hotkey("ctrl", "s")
+            save_project_hotkey()
             time.sleep(10)
-            os.system('taskkill /F /FI "WINDOWTITLE eq Adobe After Effects*"')
+            kill_ae_process()
             time.sleep(10)
             self.renderFile(filePath, data["project"]["comp_name"], data["project"]["output_dir"])
 
@@ -247,11 +250,11 @@ class afterEffectMixin:
                 custom_edit["layer_name"],
             )
             if custom_edit["fit_to_screen"]:
-                pyautogui.hotkey("ctrl", "alt", "f")
+                hotkey("ctrl", "alt", "f")
             if custom_edit["fit_to_screen_width"]:
-                pyautogui.hotkey("ctrl", "alt", "shift", "h")
+                hotkey("ctrl", "alt", "shift", "h")
             if custom_edit["fit_to_screen_height"]:
-                pyautogui.hotkey("ctrl", "alt", "shift", "g")
+                hotkey("ctrl", "alt", "shift", "g")
 
         if custom_edit["change_type"] == "add_marker":
             self.addMarker(
@@ -309,9 +312,9 @@ class afterEffectMixin:
         """
         focusOnProjectPanel
         """
-        pyautogui.hotkey("ctrl", "0")
+        hotkey("ctrl", "0")
         time.sleep(2)
-        pyautogui.hotkey("ctrl", "0")
+        hotkey("ctrl", "0")
         time.sleep(2)
 
     def getProjectMap(self) -> dict[str, Any]:
@@ -359,11 +362,11 @@ class afterEffectMixin:
         """
         logger.info("Deleting folder: %s", folderName)
         self.goToItem(folderName)
-        send_keys("{DEL}")
+        press_key("delete")
         time.sleep(1)
-        send_keys("{ENTER}")
+        press_key("enter")
         time.sleep(2)
-        pyautogui.hotkey("ctrl", "s")
+        save_project_hotkey()
 
     def createComp(
         self,
@@ -492,7 +495,7 @@ class afterEffectMixin:
         self.selectItemByName(ItemName)
         time.sleep(2)
         self.selectLayerByIndex(fromCompName, toLayerIndex)
-        pyautogui.hotkey("ctrl", "alt", "/")
+        hotkey("ctrl", "alt", "/")
 
     def addMarker(self, comp_name: str, layer_name: str, marker_name: str, marker_time: float | str) -> None:
         """
@@ -673,7 +676,7 @@ class afterEffectMixin:
         """
         self.focusOnProjectPanel()
         time.sleep(2)
-        pyautogui.hotkey("ctrl", "shift", "a")
+        hotkey("ctrl", "shift", "a")
         time.sleep(2)
 
     def executeCommand(self, cmdId: int | str) -> None:
@@ -877,6 +880,110 @@ class afterEffectMixin:
         self.runCommand(render_command)
 
         return outputPath
+
+    def renderFileWithProgress(self, projectPath: str, compName: str, outputDir: str) -> str:
+        """
+        Render an AE project while tracking progress from aerender stdout.
+
+        Parses lines like ``PROGRESS:  0:00:05:00 (150)`` to update
+        ``self._render_progress`` in real time.  The render runs in a
+        background thread so callers can poll ``get_render_progress()``.
+        """
+        settings.validate_settings()
+        if not os.path.exists(outputDir):
+            os.makedirs(outputDir)
+
+        outputPath = os.path.join(outputDir, f"{compName}.mp4")
+
+        render_command = (
+            f'"{settings.AERENDER_PATH}" -project "{projectPath}" '
+            f'-comp "{compName}" -output "{outputPath}" -mem_usage 20 40'
+        )
+
+        # Initialise progress state
+        self._render_progress: dict[str, Any] = {
+            "percent": 0,
+            "frame": 0,
+            "total_frames": 0,
+            "status": "starting",
+            "output_path": outputPath,
+            "error": None,
+        }
+
+        # Pattern: PROGRESS:  H:MM:SS:FF (frame N)  or just (N)
+        progress_re = re.compile(
+            r"PROGRESS:\s*[\d:]+\s*\((?:frame\s+)?(\d+)\)", re.IGNORECASE
+        )
+        # aerender sometimes outputs total duration / frames
+        total_re = re.compile(
+            r"DURATION:\s*[\d:]+\s*\((?:frame\s+)?(\d+)\)", re.IGNORECASE
+        )
+
+        def _run() -> None:
+            try:
+                self._render_progress["status"] = "rendering"
+                process = subprocess.Popen(
+                    render_command,
+                    shell=True,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                )
+
+                while True:
+                    line_bytes = process.stdout.readline()
+                    if line_bytes == b"" and process.poll() is not None:
+                        break
+                    if line_bytes:
+                        line = line_bytes.decode("utf-8", errors="replace").strip()
+                        logger.info(line)
+
+                        # Try to extract total frames first
+                        tm = total_re.search(line)
+                        if tm:
+                            self._render_progress["total_frames"] = int(tm.group(1))
+
+                        # Extract current frame
+                        pm = progress_re.search(line)
+                        if pm:
+                            current_frame = int(pm.group(1))
+                            self._render_progress["frame"] = current_frame
+                            total = self._render_progress["total_frames"]
+                            if total > 0:
+                                pct = min(int((current_frame / total) * 100), 100)
+                                self._render_progress["percent"] = pct
+
+                stderr = process.communicate()[1]
+
+                if process.returncode != 0:
+                    err_msg = stderr.decode("utf-8", errors="replace")
+                    self._render_progress["status"] = "error"
+                    self._render_progress["error"] = err_msg
+                    logger.error("Render failed: %s", err_msg)
+                else:
+                    self._render_progress["percent"] = 100
+                    self._render_progress["status"] = "complete"
+                    logger.info("Render completed: %s", outputPath)
+            except Exception as exc:
+                self._render_progress["status"] = "error"
+                self._render_progress["error"] = str(exc)
+                logger.error("Render thread error: %s", exc)
+
+        thread = threading.Thread(target=_run, daemon=True)
+        thread.start()
+        return outputPath
+
+    def get_render_progress(self) -> dict[str, Any]:
+        """Return the current render progress state."""
+        if not hasattr(self, "_render_progress"):
+            return {
+                "percent": 0,
+                "frame": 0,
+                "total_frames": 0,
+                "status": "idle",
+                "output_path": None,
+                "error": None,
+            }
+        return dict(self._render_progress)
 
     def time_to_seconds(self, time_str: str) -> float:
         h, m, s = map(float, time_str.split(":"))

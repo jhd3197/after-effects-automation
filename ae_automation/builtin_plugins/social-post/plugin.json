@@ -1,0 +1,14 @@
+{
+    "name": "social-post",
+    "version": "1.0.0",
+    "description": "Social media post template with intro animation and content slide",
+    "author": "ae-automation",
+    "type": "template",
+    "tags": ["social", "instagram", "tiktok", "vertical"],
+    "ae_min_version": 2020,
+    "files": {
+        "config": "config.json",
+        "assets": [],
+        "scripts": []
+    }
+}

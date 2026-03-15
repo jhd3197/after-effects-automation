@@ -39,6 +39,7 @@ You can perform these actions by including them in your response:
 - save_project: Save the current project
 - list_comps: List all compositions
 - get_project_info: Get project details
+- run_plugin: Run an installed community plugin template (params: name)
 
 When the user asks you to do something in AE, respond with a helpful message AND include
 the appropriate actions. Format actions as a JSON array in your response wrapped in
@@ -139,6 +140,74 @@ class ChatPanelMixin:
                 return jsonify(result)
             except Exception as e:
                 logger.error("Execute error: %s", e, exc_info=True)
+                return jsonify({"success": False, "error": str(e)}), 500
+
+        @self.chat_app.route("/api/chat/render-progress", methods=["GET"])
+        def render_progress():
+            """Return current render progress as JSON."""
+            try:
+                progress = self.get_render_progress()
+                return jsonify({"success": True, **progress})
+            except Exception as e:
+                logger.error("Render progress error: %s", e, exc_info=True)
+                return jsonify({"success": False, "error": str(e)}), 500
+
+        @self.chat_app.route("/api/chat/batch", methods=["POST"])
+        def batch_queue():
+            """Accept a list of config paths to queue for batch processing."""
+            try:
+                data = request.json
+                if not data:
+                    return jsonify({"success": False, "error": "Invalid or missing JSON body"}), 400
+                configs = data.get("configs", [])
+                if not configs:
+                    return jsonify({"success": False, "error": "No configs provided"}), 400
+                total = self.queue_configs(configs)
+                self.start_batch()
+                return jsonify({"success": True, "queued": total, "message": f"Queued {total} configs and started batch"})
+            except Exception as e:
+                logger.error("Batch queue error: %s", e, exc_info=True)
+                return jsonify({"success": False, "error": str(e)}), 500
+
+        @self.chat_app.route("/api/chat/batch-status", methods=["GET"])
+        def batch_status():
+            """Return current batch processing status."""
+            try:
+                status = self.get_batch_status()
+                return jsonify({"success": True, **status})
+            except Exception as e:
+                logger.error("Batch status error: %s", e, exc_info=True)
+                return jsonify({"success": False, "error": str(e)}), 500
+
+        @self.chat_app.route("/api/chat/plugins", methods=["GET"])
+        def chat_plugins():
+            """List all installed plugins."""
+            try:
+                from ae_automation.plugins import PluginRegistry
+
+                registry = PluginRegistry()
+                plugins = registry.list_plugins()
+                # Strip internal _dir key before sending to client
+                safe = [{k: v for k, v in p.items() if not k.startswith("_")} for p in plugins]
+                return jsonify({"success": True, "plugins": safe})
+            except Exception as e:
+                logger.error("Plugins list error: %s", e, exc_info=True)
+                return jsonify({"success": False, "error": str(e)}), 500
+
+        @self.chat_app.route("/api/chat/plugins/run", methods=["POST"])
+        def chat_plugins_run():
+            """Run a plugin by name."""
+            try:
+                data = request.json
+                if not data:
+                    return jsonify({"success": False, "error": "Invalid or missing JSON body"}), 400
+                name = data.get("name", "")
+                if not name:
+                    return jsonify({"success": False, "error": "Plugin name required"}), 400
+                result = self._execute_action({"type": "run_plugin", "params": {"name": name}})
+                return jsonify(result)
+            except Exception as e:
+                logger.error("Plugin run error: %s", e, exc_info=True)
                 return jsonify({"success": False, "error": str(e)}), 500
 
         # Also serve static files for the extension (for dev/testing)
@@ -348,6 +417,22 @@ class ChatPanelMixin:
             elif action_type == "get_project_info":
                 data = self.getProjectMap()
                 return {"success": True, "project": data}
+
+            elif action_type == "render":
+                project_path = params.get("project_path", "")
+                comp_name = params.get("comp_name", "")
+                output_dir = params.get("output_dir", "")
+                if not project_path or not comp_name or not output_dir:
+                    return {"success": False, "error": "render requires project_path, comp_name, and output_dir"}
+                output_path = self.renderFileWithProgress(project_path, comp_name, output_dir)
+                return {"success": True, "message": f"Render started, output: {output_path}"}
+
+            elif action_type == "run_plugin":
+                plugin_name = params.get("name", "")
+                if not plugin_name:
+                    return {"success": False, "error": "run_plugin requires a 'name' param"}
+                self.run_plugin(plugin_name)
+                return {"success": True, "message": f"Plugin '{plugin_name}' executed"}
 
             else:
                 return {"success": False, "error": f"Unknown action: {action_type}"}
