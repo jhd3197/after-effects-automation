@@ -164,6 +164,21 @@ def cmd_export(args: argparse.Namespace) -> None:
     print(f"\nExport complete: {output_file}")
 
 
+def cmd_chat(args: argparse.Namespace) -> None:
+    """Start the chat panel backend server"""
+    from ae_automation import Client
+
+    client = Client()
+
+    try:
+        client.runChatPanel(host=args.host, port=args.port)
+    except KeyboardInterrupt:
+        print("\n\nChat server stopped by user")
+    except Exception as e:
+        print(f"Error starting chat server: {e}")
+        sys.exit(1)
+
+
 def cmd_diagnose(args: argparse.Namespace) -> None:
     """Run diagnostic checks"""
     from ae_automation import Client
@@ -226,6 +241,10 @@ Examples:
   ae-automation export --template tutorial
   ae-automation export --template social-media --output-dir renders/
   ae-automation export --template tutorial --comp IntroTemplate --force
+
+  # Start AI chat panel backend
+  ae-automation chat
+  ae-automation chat --port 8080
 
   # Run tests
   ae-automation test
@@ -307,6 +326,18 @@ For more information, visit: https://github.com/jhd3197/after-effects-automation
     )
     parser_export.add_argument("--force", "-f", action="store_true", help="Overwrite existing files")
     parser_export.set_defaults(func=cmd_export)
+
+    # ============================================================
+    # CHAT command
+    # ============================================================
+    parser_chat = subparsers.add_parser(
+        "chat",
+        help="Start the AI chat panel backend",
+        description="Launch the backend server for the AE Automation Chat panel",
+    )
+    parser_chat.add_argument("--host", default="127.0.0.1", help="Host to run the server on (default: 127.0.0.1)")
+    parser_chat.add_argument("--port", type=int, default=5001, help="Port to run the server on (default: 5001)")
+    parser_chat.set_defaults(func=cmd_chat)
 
     # ============================================================
     # TEST command

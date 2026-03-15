@@ -736,6 +736,28 @@ class afterEffectMixin:
         """
         run Script
         """
+        # Check version compatibility before executing
+        from ae_automation.compat import check_script_compat
+
+        ae_version = settings.get_ae_version()
+        compat = check_script_compat(fileName, ae_version)
+        if not compat["compatible"]:
+            logger.error(
+                "Script %s is not compatible with AE %s: %s",
+                fileName, ae_version, "; ".join(compat["issues"]),
+            )
+            if compat["workaround"]:
+                logger.info("Workaround: %s", compat["workaround"])
+            raise RuntimeError(
+                f"Script {fileName} is not compatible with AE {ae_version}. "
+                f"{'; '.join(compat['issues'])}"
+            )
+        if compat["issues"]:
+            logger.warning(
+                "Script %s has known issues on AE %s: %s",
+                fileName, ae_version, "; ".join(compat["issues"]),
+            )
+
         logger.info("Running script: %s", fileName)
         fileContent = self.file_get_contents(os.path.join(settings.JS_DIR, fileName))
         filePath = os.path.join(settings.CACHE_FOLDER, fileName)

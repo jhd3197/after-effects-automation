@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>AE Automation Chat</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <div id="header">
+            <div class="header-title">
+                <span class="logo">AE</span>
+                <span>Automation Chat</span>
+            </div>
+            <div class="header-controls">
+                <button id="settingsBtn" class="icon-btn" title="Settings">&#9881;</button>
+                <div id="statusDot" class="status-dot offline" title="Disconnected"></div>
+            </div>
+        </div>
+
+        <div id="settingsPanel" class="settings-panel hidden">
+            <label>
+                Backend URL
+                <input type="text" id="backendUrl" value="http://localhost:5001" />
+            </label>
+            <label>
+                Model
+                <select id="modelSelect">
+                    <option value="openai/gpt-4o">OpenAI GPT-4o</option>
+                    <option value="openai/gpt-4o-mini">OpenAI GPT-4o Mini</option>
+                    <option value="anthropic/claude-sonnet-4-20250514">Claude Sonnet</option>
+                    <option value="anthropic/claude-haiku-4-5-20251001">Claude Haiku</option>
+                    <option value="ollama/llama3.1:8b">Ollama Llama 3.1</option>
+                </select>
+            </label>
+            <button id="saveSettings" class="btn-small">Save</button>
+        </div>
+
+        <div id="messages">
+            <div class="message system">
+                <div class="message-content">
+                    Welcome! I can help you automate After Effects. Try:
+                    <ul>
+                        <li>"Create a 30s intro comp"</li>
+                        <li>"List all compositions"</li>
+                        <li>"Change the title text to..."</li>
+                        <li>"Generate a color palette"</li>
+                        <li>"Render the main comp"</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="actions-bar" class="hidden">
+            <span id="actionsLabel">Pending actions:</span>
+            <button id="executeActions" class="btn-action">Execute All</button>
+            <button id="dismissActions" class="btn-dismiss">Dismiss</button>
+        </div>
+
+        <div id="inputArea">
+            <textarea id="userInput" placeholder="Ask me anything about your AE project..." rows="1"></textarea>
+            <button id="sendBtn" title="Send">&#9654;</button>
+        </div>
+    </div>
+
+    <script src="lib/CSInterface.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>

@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 
 from ae_automation.mixins.afterEffect import afterEffectMixin
 from ae_automation.mixins.bot import botMixin
+from ae_automation.mixins.chatPanel import ChatPanelMixin
 from ae_automation.mixins.processManager import ProcessManagerMixin
 from ae_automation.mixins.templateGenerator import TemplateGeneratorMixin
 from ae_automation.mixins.tools import ToolsMixin
@@ -23,6 +24,7 @@ class Client(
     ToolsMixin,
     botMixin,
     VideoEditorAppMixin,
+    ChatPanelMixin,
     TemplateGeneratorMixin,
     ProcessManagerMixin,
 ):
