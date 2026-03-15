@@ -13,14 +13,15 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from ae_automation import Client
 
+
 def main():
-    print("="*70)
+    print("=" * 70)
     print("Video Editor Test")
-    print("="*70)
+    print("=" * 70)
     print()
 
     # Get or create a test project file
-    test_project = os.path.join(os.path.dirname(__file__), 'test_project.json')
+    test_project = os.path.join(os.path.dirname(__file__), "test_project.json")
 
     if not os.path.exists(test_project):
         print(f"Creating test project file: {test_project}")
@@ -35,7 +36,7 @@ def main():
                 "height": 1080,
                 "frameRate": 30,
                 "duration": 60,
-                "resources": []
+                "resources": [],
             },
             "timeline": [
                 {
@@ -53,11 +54,11 @@ def main():
                     "template_comp": "",
                     "reverse": False,
                     "custom_actions": [],
-                }
-            ]
+                },
+            ],
         }
 
-        with open(test_project, 'w') as f:
+        with open(test_project, "w") as f:
             json.dump(test_data, f, indent=4)
 
         print(f"Created: {test_project}")
@@ -70,13 +71,14 @@ def main():
     print()
     print("IMPORTANT: Before rendering, set your .aep file path in Project Settings!")
     print()
-    print("-"*70)
+    print("-" * 70)
 
     # Create the client instance
     ae = Client()
 
     # Run the video editor
-    ae.runVideoEditor(test_project, host='127.0.0.1', port=5000)
+    ae.runVideoEditor(test_project, host="127.0.0.1", port=5000)
+
 
 if __name__ == "__main__":
     try:
@@ -87,5 +89,6 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n\nError: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)

@@ -6,7 +6,9 @@ This script must be installed for ae-automation to work with running AE instance
 
 import os
 import shutil
+
 from ae_automation import settings
+
 
 def install_startup_script():
     """Install the ae_command_runner.jsx to After Effects Startup folder"""
@@ -17,14 +19,14 @@ def install_startup_script():
     print()
 
     # Source file
-    source_file = os.path.join(settings.JS_DIR, 'ae_command_runner.jsx')
+    source_file = os.path.join(settings.JS_DIR, "ae_command_runner.jsx")
 
     if not os.path.exists(source_file):
         print(f"ERROR: Source file not found: {source_file}")
         return False
 
     # Destination folder
-    startup_folder = os.path.join(settings.AFTER_EFFECT_FOLDER, 'Scripts', 'Startup')
+    startup_folder = os.path.join(settings.AFTER_EFFECT_FOLDER, "Scripts", "Startup")
 
     if not os.path.exists(startup_folder):
         print(f"ERROR: After Effects Startup folder not found: {startup_folder}")
@@ -33,21 +35,21 @@ def install_startup_script():
         return False
 
     # Destination file
-    dest_file = os.path.join(startup_folder, 'ae_command_runner.jsx')
+    dest_file = os.path.join(startup_folder, "ae_command_runner.jsx")
 
     try:
         # Check if already installed
         if os.path.exists(dest_file):
-            print(f"Command runner already installed at:")
+            print("Command runner already installed at:")
             print(f"  {dest_file}")
             print()
             response = input("Reinstall? (y/n): ").strip().lower()
-            if response != 'y':
+            if response != "y":
                 print("Installation cancelled")
                 return True
 
         # Copy the file
-        print(f"Installing command runner...")
+        print("Installing command runner...")
         print(f"  From: {source_file}")
         print(f"  To:   {dest_file}")
         print()
@@ -88,6 +90,6 @@ def install_startup_script():
         return False
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     success = install_startup_script()
     exit(0 if success else 1)

@@ -11,15 +11,16 @@ This template includes:
 """
 
 import os
+
 from ae_automation import Client
 
 
 def create_template():
     """Create the text animation template"""
 
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("Creating Text Animation Template")
-    print("="*70 + "\n")
+    print("=" * 70 + "\n")
 
     # Initialize client
     client = Client()
@@ -36,20 +37,14 @@ def create_template():
                 "name": "TitleTemplate",
                 "duration": 5,
                 "layers": [
-                    {
-                        "type": "solid",
-                        "name": "Background",
-                        "color": [0.05, 0.05, 0.1],
-                        "width": 1920,
-                        "height": 1080
-                    },
+                    {"type": "solid", "name": "Background", "color": [0.05, 0.05, 0.1], "width": 1920, "height": 1080},
                     {
                         "type": "text",
                         "name": "MainTitle",
                         "text": "Main Title Here",
                         "x": 960,
                         "y": 400,
-                        "fontSize": 120
+                        "fontSize": 120,
                     },
                     {
                         "type": "text",
@@ -57,7 +52,7 @@ def create_template():
                         "text": "Subtitle text goes here",
                         "x": 960,
                         "y": 580,
-                        "fontSize": 60
+                        "fontSize": 60,
                     },
                     {
                         "type": "text",
@@ -65,85 +60,38 @@ def create_template():
                         "text": "Additional info",
                         "x": 960,
                         "y": 720,
-                        "fontSize": 36
-                    }
-                ]
+                        "fontSize": 36,
+                    },
+                ],
             },
             {
                 "name": "DescriptionTemplate",
                 "duration": 5,
                 "layers": [
-                    {
-                        "type": "solid",
-                        "name": "Background",
-                        "color": [0.95, 0.95, 0.97],
-                        "width": 1920,
-                        "height": 1080
-                    },
-                    {
-                        "type": "text",
-                        "name": "Heading",
-                        "text": "Section Title",
-                        "x": 960,
-                        "y": 300,
-                        "fontSize": 84
-                    },
+                    {"type": "solid", "name": "Background", "color": [0.95, 0.95, 0.97], "width": 1920, "height": 1080},
+                    {"type": "text", "name": "Heading", "text": "Section Title", "x": 960, "y": 300, "fontSize": 84},
                     {
                         "type": "text",
                         "name": "Description",
                         "text": "Line 1\nLine 2\nLine 3",
                         "x": 960,
                         "y": 540,
-                        "fontSize": 48
-                    }
-                ]
+                        "fontSize": 48,
+                    },
+                ],
             },
             {
                 "name": "CreditsTemplate",
                 "duration": 5,
                 "layers": [
-                    {
-                        "type": "solid",
-                        "name": "Background",
-                        "color": [0, 0, 0],
-                        "width": 1920,
-                        "height": 1080
-                    },
-                    {
-                        "type": "text",
-                        "name": "Role1",
-                        "text": "Director",
-                        "x": 960,
-                        "y": 300,
-                        "fontSize": 48
-                    },
-                    {
-                        "type": "text",
-                        "name": "Name1",
-                        "text": "John Doe",
-                        "x": 960,
-                        "y": 380,
-                        "fontSize": 64
-                    },
-                    {
-                        "type": "text",
-                        "name": "Role2",
-                        "text": "Producer",
-                        "x": 960,
-                        "y": 550,
-                        "fontSize": 48
-                    },
-                    {
-                        "type": "text",
-                        "name": "Name2",
-                        "text": "Jane Smith",
-                        "x": 960,
-                        "y": 630,
-                        "fontSize": 64
-                    }
-                ]
-            }
-        ]
+                    {"type": "solid", "name": "Background", "color": [0, 0, 0], "width": 1920, "height": 1080},
+                    {"type": "text", "name": "Role1", "text": "Director", "x": 960, "y": 300, "fontSize": 48},
+                    {"type": "text", "name": "Name1", "text": "John Doe", "x": 960, "y": 380, "fontSize": 64},
+                    {"type": "text", "name": "Role2", "text": "Producer", "x": 960, "y": 550, "fontSize": 48},
+                    {"type": "text", "name": "Name2", "text": "Jane Smith", "x": 960, "y": 630, "fontSize": 64},
+                ],
+            },
+        ],
     }
 
     # Output path
@@ -152,9 +100,9 @@ def create_template():
     # Build the template
     client.buildTemplate(template_config, output_path)
 
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("✓ Template Created Successfully!")
-    print("="*70 + "\n")
+    print("=" * 70 + "\n")
     print(f"Template file: {os.path.abspath(output_path)}")
     print()
     print("Template includes:")

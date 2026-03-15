@@ -1,288 +1,242 @@
+<div align="center">
+
 # After Effects Automation
 
-[![PyPI version](https://badge.fury.io/py/after-effects-automation.svg)](https://badge.fury.io/py/after-effects-automation)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.7+](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/)
-[![Downloads](https://static.pepy.tech/badge/after-effects-automation)](https://pepy.tech/project/after-effects-automation)
+<img width="700" alt="ae_automation" src="https://user-images.githubusercontent.com/13461850/204080205-624daba4-9883-429b-aa16-e4bb0b3221d7.png" />
 
-![au_automation](https://user-images.githubusercontent.com/13461850/204080205-624daba4-9883-429b-aa16-e4bb0b3221d7.png)
+**Automate After Effects from Python. Talk to it with AI.**
 
-A unified video automation platform for Adobe After Effects. Define compositions in JSON, drive them from Python or the command line, and render at scale.
+JSON config in, video out. No manual AE interaction required.
 
-**PyPI Package:** [pypi.org/project/after-effects-automation](https://pypi.org/project/after-effects-automation/)
+English | [Español](docs/README.es.md) | [中文版](docs/README.zh-CN.md) | [Português](docs/README.pt.md)
 
----
+<br>
 
-## Why This Tool?
+![Windows](https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white)
+![After Effects](https://img.shields.io/badge/After_Effects-9999FF?style=for-the-badge&logo=adobeaftereffects&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.9+-3776AB?style=for-the-badge&logo=python&logoColor=white)
 
-Most After Effects scripting workflows involve running individual scripts from a menu, managing files by hand, and manually triggering renders. After Effects Automation takes a different approach: you describe what you want in a JSON configuration, and the platform handles everything else — launching AE, building compositions, updating properties, and rendering the final video — in a single automated pipeline.
+[![PyPI](https://img.shields.io/pypi/v/after-effects-automation?style=flat-square&color=blue)](https://pypi.org/project/after-effects-automation/)
+[![Downloads](https://img.shields.io/pepy/dt/after-effects-automation?style=flat-square&color=green)](https://pepy.tech/project/after-effects-automation)
+[![License](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](LICENSE)
+[![GitHub Stars](https://img.shields.io/github/stars/jhd3197/after-effects-automation?style=flat-square&color=f5c542)](https://github.com/jhd3197/after-effects-automation/stargazers)
 
-The entire workflow is **configuration-driven**. A JSON config file defines your project structure, timeline, scenes, and custom actions. Python reads that config and orchestrates every step through a JavaScript bridge into After Effects. No manual AE interaction required.
+<br>
 
-You get **three ways to work**: a Python API for full programmatic control, a CLI for running configs and managing projects from the terminal, and a built-in Web Editor for visually editing configurations without touching JSON directly.
+[Quick Start](#-quick-start) · [AI Chat](#-ai-chat-panel) · [Features](#-features) · [CLI](#-cli) · [Architecture](#-architecture) · [Roadmap](#-roadmap) · [Contributing](#-contributing)
 
-Under the hood, the platform provides **intelligent process management** — automatic AE launching, window readiness detection, crash dialog handling, and responsiveness verification — so your automation runs reliably from start to finish without babysitting.
-
----
-
-## Table of Contents
-- [Quick Start](#quick-start)
-- [Capabilities](#capabilities)
-- [Documentation](#documentation)
-- [Examples](#examples)
-- [How It Works](#how-it-works)
-- [Compatibility](#compatibility)
-- [CLI & Web Editor](#cli-tools)
-- [Troubleshooting](#troubleshooting)
+</div>
 
 ---
 
-## Quick Start
+## 🚀 Quick Start
 
 ```bash
-# 1. Install from PyPI
 pip install after-effects-automation
-
-# 2. Setup After Effects integration
 python install_ae_runner.py
-
-# 3. Run an example
-cd examples/basic_composition
-python run.py
-
+ae-automation run config.json
 ```
 
-**That's it!** A 10-second video will be created automatically.
-
-**PyPI:** [pypi.org/project/after-effects-automation](https://pypi.org/project/after-effects-automation/)
-**Need more help?** See the [Quick Start Guide](QUICK_START.md)
-
----
-
-## Capabilities
-
-### Python API
-
-Full programmatic control over the automation pipeline:
+**No config needed.** Auto-detects every AE version on your machine and picks the latest. Works from 2020 to 2026+ — no hardcoded paths, no `.env` required.
 
 ```python
 from ae_automation import Client
-
-client = Client()
-client.startBot("config.json")
-```
-
-- Build AE templates programmatically
-- Update text layers with dynamic content
-- Assemble complex timelines from template compositions
-- Access all After Effects features via ExtendScript
-- Render final video output
-
-### CLI
-
-Run automation, launch the editor, and diagnose issues from the terminal:
-
-```bash
-# Run automation from a config file
-ae-automation run config.json
-
-# Launch the visual config editor
-ae-automation editor config.json
-
-# Test your setup
-ae-automation test --verbose
-
-# Run diagnostics
-ae-automation diagnose
-```
-
-### Web Editor
-
-A built-in browser-based interface for editing JSON configurations visually — no manual JSON editing required:
-
-```bash
-ae-automation editor config.json
+Client().startBot("config.json")
 ```
 
 ---
 
-## Documentation
+## 🤖 AI Chat Panel
 
-| Guide | Description |
-| --- | --- |
-| [Installation](INSTALLATION.md) | Full setup: Python package, CLI, AE bridge, and environment configuration |
-| [Quick Start](QUICK_START.md) | End-to-end walkthrough from install to rendered video |
-| [Examples](examples/README.md) | Complete automation pipeline examples with config and output |
-| [CLI Guide](CLI_GUIDE.md) | Command-line interface reference for all `ae-automation` subcommands |
-| [Troubleshooting](TROUBLESHOOTING.md) | Common issues, diagnostics, and platform-specific fixes |
-| [Process Management](PROCESS_MANAGEMENT.md) | How the platform manages the After Effects process lifecycle |
-
----
-
-## Examples
-
-### Basic Composition
-
-Create a video with intro and outro in ~2 minutes:
+Control After Effects with natural language — right inside AE. Powered by [Prompture](https://github.com/jhd3197/prompture).
 
 ```bash
-cd examples/basic_composition
-python run.py
-
+python install_extension.py        # install the AE panel
+ae-automation chat                  # start backend
+# In AE: Window > Extensions > AE Automation Chat
 ```
 
-### Text Animation
+| You say | AE does |
+|---------|---------|
+| *"Create a 1080p comp called Intro, 10 seconds"* | Creates the composition |
+| *"Change the title text to Product Launch 2025"* | Updates the text layer |
+| *"Set the background color to #1A1A2E"* | Applies the color |
+| *"List all compositions"* | Returns project structure |
 
-Multi-layer text with dynamic content:
-
-```bash
-cd examples/text_animation
-python run.py
-
-```
-
-### Render Only
-
-Quickly render existing .aep files:
-
-```bash
-cd examples/render_only
-python render.py
-
-```
-
-**More Examples:** See [examples/README.md](examples/README.md)
-
-> [!TIP]
-> Starring this repo helps more developers discover after-effects-automation
->
->![after-effects-automation](https://github.com/user-attachments/assets/ed2e4f26-4e0e-493f-8f80-33a4e9b9299f)
->
->  Also check out my other project [RepoGif](https://github.com/jhd3197/RepoGif) – the tool I used to generate the GIF above!
+Returns clickable **action buttons** that execute directly in AE. Works with any LLM — OpenAI, Claude, Ollama, Groq, and more.
 
 ---
 
-## Compatibility
-
-| Software | Versions |
-| --- | --- |
-| **After Effects** | 2024, 2025, 2026 (CC versions should work) |
-| **Python** | 3.7+ |
-| **OS** | Windows, macOS, Linux (experimental) |
-
----
-
-## How It Works
-
-Your Python code (or a JSON config) describes the desired video. The platform translates that into ExtendScript commands, sends them to After Effects through a file-based command queue, and renders the final output — all without manual intervention.
-
-```mermaid
-graph LR
-    A[Python Script] -->|JSON Commands| B(JS Bridge)
-    B -->|ExtendScript| C{After Effects}
-    C -->|Builds| D[Composition]
-    D -->|aerender| E[Final Video]
-
-```
-
-1. **Python** defines what you want to create
-2. **JavaScript bridge** sends commands to After Effects via a file-based queue
-3. **After Effects** builds the composition
-4. **aerender** renders the final video
-
-**Technical Details:** See [Process Management Guide](PROCESS_MANAGEMENT.md)
-
----
-
-## CLI Tools
+## 🎯 Features
 
 ### Automation
 
-Run automation from a config file using the command line:
+**JSON-Driven** — Describe your video in a config, the platform handles everything else
 
-```bash
-ae-automation config.json
+**10 Action Types** — Update properties, swap layers, add resources, nest comps, apply templates, transitions, markers
+
+**Batch Rendering** — Generate hundreds of video variations from data
+
+**Built-in Templates** — Tutorial, social media, product showcase, slideshow, event promo
+
+### Smart Detection
+
+**Auto-Discovery** — Scans your system for every AE version, always picks the latest. No hardcoded years
+
+**Version Compatibility** — Knowledge base tracks which scripts work on which AE versions. Scripts that would freeze are blocked before execution with workaround suggestions
+
+**Cross-Platform** — Windows supported, macOS in progress. Paths, data dirs, and CEP install all adapt to your OS
+
+### AI & Tools
+
+**Chat Panel** — CEP extension with [Prompture](https://github.com/jhd3197/prompture) backend (any LLM provider)
+
+**Web Editor** — Browser-based visual config editor with undo/redo
+
+**40+ ExtendScript Files** — Direct AE manipulation via file-based command queue
+
+---
+
+## 🖥️ CLI
+
+| Command | Description |
+|---------|-------------|
+| `ae-automation run config.json` | Run the full automation pipeline |
+| `ae-automation chat` | Start the AI chat panel backend |
+| `ae-automation batch *.json` | Run multiple configs sequentially |
+| `ae-automation editor config.json` | Launch the visual web editor |
+| `ae-automation generate --template tutorial` | Generate .aep from built-in template |
+| `ae-automation export --template social-media` | Generate + render in one step |
+| `ae-automation plugins list` | List, install, search, run community plugins |
+| `ae-automation test` | Run compatibility tests |
+| `ae-automation diagnose` | Check AE installation and scripting setup |
+
+---
+
+## 🏗️ Architecture
 
 ```
-
-### Web Editor (Visual Interface)
-
-Prefer a GUI? Launch the visual editor to modify your configs without touching JSON.
-
-```bash
-ae-editor config.json
-
+Python Config (JSON) → JS Bridge → ExtendScript in AE → Composition → aerender → MP4
 ```
 
+The `Client` class composes seven mixins:
+
+| Mixin | Responsibility |
+|-------|---------------|
+| `afterEffectMixin` | Core: launching AE, scripting, compositions, rendering |
+| `botMixin` | JSON config loading and pipeline orchestration |
+| `ChatPanelMixin` | AI chat backend with Prompture |
+| `ProcessManagerMixin` | AE process detection, readiness, crash handling |
+| `TemplateGeneratorMixin` | Programmatic .aep project creation |
+| `VideoEditorAppMixin` | Flask web editor with REST API |
+| `ToolsMixin` | Utilities (hex to RGBA, slug, file ops) |
+
+| Layer | Technology |
+|-------|------------|
+| Backend | Python 3.9+, Flask, Flask-CORS |
+| AI | Prompture (any LLM provider) |
+| AE Bridge | ExtendScript (JSX), file-based command queue |
+| Web Editor | React 18, Vite, Zustand |
+| CEP Panel | HTML/CSS/JS, CSInterface |
+| Rendering | aerender (Adobe CLI) |
+
+<details>
+<summary><strong>Compatibility</strong></summary>
+
+| Software | Versions |
+|----------|----------|
+| **After Effects** | 2020 – 2026+ (auto-detected) |
+| **Python** | 3.9+ |
+| **OS** | Windows, macOS |
+
+```python
+from ae_automation.settings import get_discovery_report
+print(get_discovery_report())  # see all detected AE installs
+
+from ae_automation.compat import get_incompatible_scripts
+print(get_incompatible_scripts(2020))  # check what won't work
+```
+
+</details>
+
+<details>
+<summary><strong>Documentation</strong></summary>
+
+| Guide | Description |
+|-------|-------------|
+| [Installation](INSTALLATION.md) | Full setup: Python, CLI, AE bridge, environment |
+| [Quick Start](QUICK_START.md) | End-to-end walkthrough |
+| [CLI Guide](CLI_GUIDE.md) | Command reference |
+| [Examples](examples/README.md) | Working automation examples |
+| [Process Management](PROCESS_MANAGEMENT.md) | AE process lifecycle |
+| [Troubleshooting](TROUBLESHOOTING.md) | Common issues and fixes |
+
+</details>
+
+<details>
+<summary><strong>Troubleshooting</strong></summary>
+
+**AE not detected?** Run `ae-automation diagnose` or set `AFTER_EFFECT_FOLDER` in `.env`
+
+**Scripts not executing?** Enable scripting in AE: `Edit > Preferences > Scripting & Expressions`
+
+**Chat panel not connecting?** Start the backend: `ae-automation chat`
+
+</details>
+
 ---
 
-## Troubleshooting
+## 🗺️ Roadmap
 
-### Common Issues
-
-**After Effects won't start?**
-
-* Check `.env` has correct AE path
-* Verify AE version matches path (2024 vs 2025)
-
-**Scripts not executing?**
-
-* Enable scripting: `Edit > Preferences > Scripting & Expressions`
-* Install startup script: `python install_ae_runner.py`
-
-**Empty/black video?**
-
-* Update to latest version: `pip install --upgrade after-effects-automation`
-* This was a bug in the batch system (now fixed)
-
-**More Solutions:** See [Troubleshooting Guide](TROUBLESHOOTING.md)
+- [x] Core automation — Python to ExtendScript to AE to render
+- [x] JSON config pipeline — templates, custom actions, resources
+- [x] CLI — run, chat, editor, generate, export, test, diagnose
+- [x] AI chat panel — CEP extension with Prompture backend
+- [x] Auto-discovery — version detection and compatibility layer
+- [x] Web editor — visual config editing
+- [x] Built-in templates — 5 ready-to-use templates
+- [x] macOS support — cross-platform abstraction layer
+- [x] Real-time render progress — live progress bar in chat panel
+- [x] Batch queue — sequential multi-video processing with status tracking
+- [x] Plugin marketplace — community templates and actions with install/search/run
 
 ---
 
-## Contributing
+## 🤝 Contributing
 
-Contributions welcome! Here's how:
+```
+fork → feature branch → commit → push → pull request
+```
 
-1. **Report bugs** - [GitHub Issues](https://github.com/jhd3197/after-effects-automation/issues)
-2. **Share examples** - Add to `examples/` folder
-3. **Improve docs** - All `.md` files in repo
-4. **Submit PRs** - Bug fixes and features
+**Priority areas:** macOS support, new templates, batch rendering, chat panel improvements.
+
+[Report Bug](https://github.com/jhd3197/after-effects-automation/issues) · [Request Feature](https://github.com/jhd3197/after-effects-automation/issues)
 
 ---
+
+## ⭐ Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=jhd3197/after-effects-automation&type=Date)](https://star-history.com/#jhd3197/after-effects-automation&Date)
+
+> [!TIP]
+> Also check out [RepoGif](https://github.com/jhd3197/RepoGif) — the tool used to generate the banner GIF!
+
+---
+
 ## License
 
-This project is licensed under the **MIT License**.
-See the [LICENSE](LICENSE) file for full details.
+MIT License — see [LICENSE](LICENSE) for details.
 
-**Adobe After Effects** is a trademark of Adobe Inc. This project is **not affiliated with, endorsed by, or sponsored by Adobe Inc.**
+**Adobe After Effects** is a trademark of Adobe Inc. This project is not affiliated with, endorsed by, or sponsored by Adobe Inc.
 
----
-
-### Disclaimer
-
-This project is an **automation and middleware tool** for Adobe After Effects.
-It requires a **valid Adobe Creative Cloud license** to use.
-
-The tool works by translating Python commands into **Adobe-supported ExtendScript (JavaScript)** instructions that After Effects already supports natively.
-
-* It does **not** modify, crack, patch, or bypass Adobe software
-* It does **not** distribute Adobe assets or binaries
-* It does **not** enable use of After Effects without a license
-
-We do **not** support or condone software piracy in any form.
-
-By using this project, you confirm that you have obtained Adobe After Effects through official channels at [https://www.adobe.com/products/aftereffects.html](https://www.adobe.com/products/aftereffects.html).
+This is an automation and middleware tool that translates Python commands into Adobe-supported ExtendScript instructions. It does not modify, crack, or bypass Adobe software. It does not distribute Adobe assets or binaries. It does not enable use of After Effects without a license. A valid Adobe Creative Cloud license is required. We do not support or condone software piracy in any form.
 
 ---
 
-## Get Help
+<div align="center">
 
-* **PyPI Package** - [pypi.org/project/after-effects-automation](https://pypi.org/project/after-effects-automation/)
-* **Documentation** - Guides in the repository root (see [Documentation](#documentation) table above)
-* **Examples** - Working code in `examples/` folder
-* **Issues** - [GitHub Issues](https://github.com/jhd3197/after-effects-automation/issues)
-* **Discussions** - [GitHub Discussions](https://github.com/jhd3197/after-effects-automation/discussions)
+**After Effects Automation** — JSON in, video out.
 
----
+Made with care by [Juan Denis](https://juandenis.com)
 
-**Made with care by the After Effects Automation community**
+</div>

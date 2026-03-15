@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Render Only - Simple AE Project Renderer
 =========================================
@@ -13,27 +12,25 @@ Usage:
 This is useful when you already have a .aep file ready and just want to render it.
 """
 
+import argparse
 import os
 import sys
-import argparse
 import time
 
 # Fix Windows console encoding for Unicode characters
-if sys.platform == 'win32':
+if sys.platform == "win32":
     import codecs
-    if hasattr(sys.stdout, 'buffer'):
-        sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, 'strict')
-        sys.stderr = codecs.getwriter('utf-8')(sys.stderr.buffer, 'strict')
+
+    if hasattr(sys.stdout, "buffer"):
+        sys.stdout = codecs.getwriter("utf-8")(sys.stdout.buffer, "strict")
+        sys.stderr = codecs.getwriter("utf-8")(sys.stderr.buffer, "strict")
 
 
 def find_basic_template():
     """Try to find the basic composition template"""
     # Look in the basic_composition example folder
     basic_comp_path = os.path.join(
-        os.path.dirname(os.path.dirname(__file__)),
-        "basic_composition",
-        "output",
-        "basic_template.aep"
+        os.path.dirname(os.path.dirname(__file__)), "basic_composition", "output", "basic_template.aep"
     )
 
     if os.path.exists(basic_comp_path):
@@ -44,9 +41,9 @@ def find_basic_template():
 
 def create_basic_template():
     """Generate the basic composition template"""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("Template not found. Creating basic composition template...")
-    print("="*70 + "\n")
+    print("=" * 70 + "\n")
 
     # Import the template creator from basic_composition
     sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)), "basic_composition"))
@@ -54,11 +51,7 @@ def create_basic_template():
     try:
         import template
 
-        output_dir = os.path.join(
-            os.path.dirname(os.path.dirname(__file__)),
-            "basic_composition",
-            "output"
-        )
+        output_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "basic_composition", "output")
         os.makedirs(output_dir, exist_ok=True)
 
         template_path = os.path.join(output_dir, "basic_template.aep")
@@ -83,9 +76,9 @@ def get_project_file(provided_path=None):
             return None
 
     # Interactive mode - ask user for file
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("After Effects Project Renderer")
-    print("="*70 + "\n")
+    print("=" * 70 + "\n")
 
     print("Options:")
     print("  1. Enter path to your .aep file")
@@ -140,10 +133,7 @@ def get_project_file(provided_path=None):
     elif choice == "3":
         # Use automation output file
         automation_path = os.path.join(
-            os.path.dirname(os.path.dirname(__file__)),
-            "basic_composition",
-            "output",
-            "ae_automation.aep"
+            os.path.dirname(os.path.dirname(__file__)), "basic_composition", "output", "ae_automation.aep"
         )
 
         if os.path.exists(automation_path):
@@ -171,12 +161,13 @@ def render_project(project_path, comp_name=None, output_dir=None, interactive=Fa
         output_dir: Output directory (None = current_dir/output)
         interactive: If True, prompt for comp name; if False, use default
     """
-    from ae_automation import settings
     import subprocess
 
-    print("\n" + "="*70)
+    from ae_automation import settings
+
+    print("\n" + "=" * 70)
     print("Starting Render")
-    print("="*70 + "\n")
+    print("=" * 70 + "\n")
 
     # Determine output directory
     # Default to current working directory's output folder
@@ -214,7 +205,7 @@ def render_project(project_path, comp_name=None, output_dir=None, interactive=Fa
             comp_name = default_comp
             print(f"Using default composition: {comp_name}")
 
-    print(f"\nConfiguration:")
+    print("\nConfiguration:")
     print(f"  Project:     {project_path}")
     print(f"  Composition: {comp_name}")
     print(f"  Output Dir:  {output_dir}")
@@ -233,11 +224,7 @@ def render_project(project_path, comp_name=None, output_dir=None, interactive=Fa
 
     # Execute aerender
     process = subprocess.Popen(
-        render_command,
-        shell=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        universal_newlines=True
+        render_command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True
     )
 
     # Stream output and collect it for error analysis
@@ -256,14 +243,14 @@ def render_project(project_path, comp_name=None, output_dir=None, interactive=Fa
     render_time = end_time - start_time
 
     # Combine stdout and stderr for error checking
-    all_output = '\n'.join(output_lines) + '\n' + stderr
+    all_output = "\n".join(output_lines) + "\n" + stderr
 
     # Check for composition not found error
     if "No comp was found" in all_output or "No comp was found" in stderr:
         print("-" * 70)
-        print("\n" + "="*70)
+        print("\n" + "=" * 70)
         print("ERROR: Composition Not Found")
-        print("="*70 + "\n")
+        print("=" * 70 + "\n")
         print(f"Could not find composition: '{comp_name}'")
         print()
         print("Possible solutions:")
@@ -272,11 +259,11 @@ def render_project(project_path, comp_name=None, output_dir=None, interactive=Fa
         file_name = os.path.basename(project_path).lower()
         if "basic_template" in file_name:
             print("  For basic_template.aep, try one of these compositions:")
-            print("    python render.py --comp \"IntroTemplate\"")
-            print("    python render.py --comp \"OutroTemplate\"")
+            print('    python render.py --comp "IntroTemplate"')
+            print('    python render.py --comp "OutroTemplate"')
         elif "ae_automation" in file_name:
             print("  For ae_automation.aep, the composition should be:")
-            print("    python render.py --comp \"FinalComposition\"")
+            print('    python render.py --comp "FinalComposition"')
         else:
             print("  1. Open the .aep file in After Effects")
             print("  2. Check the composition names (case-sensitive)")
@@ -290,9 +277,9 @@ def render_project(project_path, comp_name=None, output_dir=None, interactive=Fa
 
     if process.returncode == 0:
         print("-" * 70)
-        print("\n" + "="*70)
+        print("\n" + "=" * 70)
         print("Render Complete!")
-        print("="*70 + "\n")
+        print("=" * 70 + "\n")
         print(f"Output:      {output_file}")
         print(f"Render Time: {render_time:.2f}s")
         print()
@@ -304,9 +291,9 @@ def render_project(project_path, comp_name=None, output_dir=None, interactive=Fa
 
         return output_file
     else:
-        print("\n" + "="*70)
+        print("\n" + "=" * 70)
         print("Render Failed!")
-        print("="*70 + "\n")
+        print("=" * 70 + "\n")
 
         # Print error output
         if stderr:
@@ -327,28 +314,18 @@ Examples:
   python render.py myproject.aep             # Render with default settings
   python render.py myproject.aep --comp "Intro"  # Render specific comp
   python render.py --comp "MyComp"           # Use basic template, render MyComp
-        """
+        """,
     )
 
     parser.add_argument(
-        'project_file',
-        nargs='?',
-        help='Path to .aep project file (optional, will prompt if not provided)'
+        "project_file", nargs="?", help="Path to .aep project file (optional, will prompt if not provided)"
     )
 
     parser.add_argument(
-        '--comp',
-        '-c',
-        default=None,
-        help='Composition name to render (default: FinalComposition or prompt)'
+        "--comp", "-c", default=None, help="Composition name to render (default: FinalComposition or prompt)"
     )
 
-    parser.add_argument(
-        '--output',
-        '-o',
-        default=None,
-        help='Output directory (default: project directory/output)'
-    )
+    parser.add_argument("--output", "-o", default=None, help="Output directory (default: project directory/output)")
 
     args = parser.parse_args()
 
@@ -365,10 +342,7 @@ Examples:
 
         # Render it
         output_file = render_project(
-            project_path,
-            comp_name=args.comp,
-            output_dir=args.output,
-            interactive=is_interactive
+            project_path, comp_name=args.comp, output_dir=args.output, interactive=is_interactive
         )
 
         if output_file:
@@ -385,6 +359,7 @@ Examples:
     except Exception as e:
         print(f"\n\nError: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)
 

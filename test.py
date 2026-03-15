@@ -10,26 +10,27 @@ Usage:
     python test.py --verbose
 """
 
+import json
 import os
 import sys
-import json
 import tempfile
-import traceback
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+
 
 # Color codes for terminal output
 class Colors:
-    GREEN = '\033[92m'
-    RED = '\033[91m'
-    YELLOW = '\033[93m'
-    BLUE = '\033[94m'
-    RESET = '\033[0m'
-    BOLD = '\033[1m'
+    GREEN = "\033[92m"
+    RED = "\033[91m"
+    YELLOW = "\033[93m"
+    BLUE = "\033[94m"
+    RESET = "\033[0m"
+    BOLD = "\033[1m"
 
 
 class TestResult:
     """Store test results"""
+
     def __init__(self):
         self.passed = []
         self.failed = []
@@ -60,12 +61,7 @@ class AfterEffectsCompatibilityTest:
 
     def log(self, message, level="INFO"):
         """Log messages based on verbosity"""
-        colors = {
-            "INFO": Colors.BLUE,
-            "SUCCESS": Colors.GREEN,
-            "ERROR": Colors.RED,
-            "WARNING": Colors.YELLOW
-        }
+        colors = {"INFO": Colors.BLUE, "SUCCESS": Colors.GREEN, "ERROR": Colors.RED, "WARNING": Colors.YELLOW}
 
         if self.verbose or level in ["SUCCESS", "ERROR", "WARNING"]:
             color = colors.get(level, Colors.RESET)
@@ -74,7 +70,6 @@ class AfterEffectsCompatibilityTest:
     def test_import(self):
         """Test if the package can be imported"""
         try:
-            from ae_automation import Client
             self.log("Package import successful", "SUCCESS")
             self.result.add_pass("Package Import", "ae_automation imported successfully")
             return True
@@ -97,6 +92,7 @@ class AfterEffectsCompatibilityTest:
 
             # Check required environment variables
             from ae_automation import settings
+
             required_vars = ["AFTER_EFFECT_FOLDER", "CACHE_FOLDER"]
 
             for var in required_vars:
@@ -118,6 +114,7 @@ class AfterEffectsCompatibilityTest:
         """Test Client initialization"""
         try:
             from ae_automation import Client
+
             self.client = Client()
             self.log("Client initialized successfully", "SUCCESS")
             self.result.add_pass("Client Initialization", "Client created successfully")
@@ -130,7 +127,7 @@ class AfterEffectsCompatibilityTest:
     def test_javascript_framework_loading(self):
         """Test if JavaScript framework loads correctly"""
         try:
-            if self.client and hasattr(self.client, 'JS_FRAMEWORK'):
+            if self.client and hasattr(self.client, "JS_FRAMEWORK"):
                 if self.client.JS_FRAMEWORK:
                     self.log("JavaScript framework loaded", "SUCCESS")
                     self.result.add_pass("JS Framework Loading", "Framework loaded successfully")
@@ -191,19 +188,19 @@ class AfterEffectsCompatibilityTest:
                     "output_dir": tempfile.gettempdir(),
                     "renderComp": False,
                     "debug": True,
-                    "resources": []
+                    "resources": [],
                 },
-                "timeline": []
+                "timeline": [],
             }
 
             # Write to temp file
-            with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+            with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
                 json.dump(test_config, f)
                 temp_file = f.name
 
             # Try to parse it
-            with open(temp_file, 'r') as f:
-                data = json.load(f)
+            with open(temp_file) as f:
+                json.load(f)
 
             # Cleanup
             os.unlink(temp_file)
@@ -219,11 +216,11 @@ class AfterEffectsCompatibilityTest:
         """Test After Effects installation detection"""
         try:
             from ae_automation import settings
+
             ae_path = settings.AFTER_EFFECT_FOLDER
 
             if not ae_path or not os.path.exists(ae_path):
-                self.result.add_warning("After Effects Detection",
-                    f"After Effects not found at: {ae_path}")
+                self.result.add_warning("After Effects Detection", f"After Effects not found at: {ae_path}")
                 self.log(f"After Effects not found at: {ae_path}", "WARNING")
                 return False
 
@@ -233,12 +230,10 @@ class AfterEffectsCompatibilityTest:
                 if str(year) in path_str:
                     self.result.ae_version = str(year)
                     self.log(f"Detected After Effects {year}", "SUCCESS")
-                    self.result.add_pass("After Effects Detection",
-                        f"Found AE {year} at {ae_path}")
+                    self.result.add_pass("After Effects Detection", f"Found AE {year} at {ae_path}")
                     return True
 
-            self.result.add_pass("After Effects Detection",
-                f"Found at {ae_path} (version unknown)")
+            self.result.add_pass("After Effects Detection", f"Found at {ae_path} (version unknown)")
             self.log("After Effects found but version unknown", "SUCCESS")
             return True
 
@@ -260,7 +255,7 @@ class AfterEffectsCompatibilityTest:
                 "add_resource.jsx",
                 "duplicate_comp_2.jsx",
                 "importFile.jsx",
-                "selectItem.jsx"
+                "selectItem.jsx",
             ]
 
             missing_scripts = []
@@ -277,8 +272,7 @@ class AfterEffectsCompatibilityTest:
                 self.result.add_pass("JSX Scripts", f"All {len(jsx_scripts)} scripts found")
                 self.log(f"All {len(jsx_scripts)} JSX scripts found", "SUCCESS")
             else:
-                self.result.add_fail("JSX Scripts",
-                    f"Missing scripts: {', '.join(missing_scripts)}")
+                self.result.add_fail("JSX Scripts", f"Missing scripts: {', '.join(missing_scripts)}")
                 self.log(f"Missing JSX scripts: {missing_scripts}", "ERROR")
 
             if found_scripts:
@@ -300,7 +294,7 @@ class AfterEffectsCompatibilityTest:
             "mutagen": "Audio metadata",
             "moviepy": "Video processing",
             "flask": "Web interface",
-            "slugify": "String slugification"
+            "slugify": "String slugification",
         }
 
         for module, description in dependencies.items():
@@ -309,15 +303,14 @@ class AfterEffectsCompatibilityTest:
                 self.result.add_pass(f"Dependency: {module}", description)
                 self.log(f"{module} installed", "SUCCESS")
             except ImportError:
-                self.result.add_fail(f"Dependency: {module}",
-                    f"{description} - Module not found")
+                self.result.add_fail(f"Dependency: {module}", f"{description} - Module not found")
                 self.log(f"{module} not installed", "ERROR")
 
     def run_all_tests(self):
         """Run all tests"""
-        print(f"\n{Colors.BOLD}{'='*60}")
-        print(f"After Effects Automation - Compatibility Test Suite")
-        print(f"{'='*60}{Colors.RESET}\n")
+        print(f"\n{Colors.BOLD}{'=' * 60}")
+        print("After Effects Automation - Compatibility Test Suite")
+        print(f"{'=' * 60}{Colors.RESET}\n")
 
         # Run tests in order
         if not self.test_import():
@@ -339,9 +332,9 @@ class AfterEffectsCompatibilityTest:
         """Generate a detailed test report"""
         result = self.result
 
-        print(f"\n{Colors.BOLD}{'='*60}")
-        print(f"TEST RESULTS SUMMARY")
-        print(f"{'='*60}{Colors.RESET}\n")
+        print(f"\n{Colors.BOLD}{'=' * 60}")
+        print("TEST RESULTS SUMMARY")
+        print(f"{'=' * 60}{Colors.RESET}\n")
 
         if result.ae_version != "Unknown":
             print(f"{Colors.BLUE}After Effects Version: {result.ae_version}{Colors.RESET}\n")
@@ -375,7 +368,7 @@ class AfterEffectsCompatibilityTest:
             print(f"{Colors.BOLD}{Colors.GREEN}PASSED TESTS:{Colors.RESET}")
             for item in result.passed:
                 print(f"  ✓ {item['name']}")
-                if item['message']:
+                if item["message"]:
                     print(f"    {item['message']}")
             print()
 
@@ -384,9 +377,13 @@ class AfterEffectsCompatibilityTest:
         if result.ae_version in ["2024", "2025"]:
             print(f"{Colors.GREEN}✓ Your After Effects version is officially supported{Colors.RESET}")
         elif result.ae_version != "Unknown":
-            print(f"{Colors.YELLOW}⚠ After Effects {result.ae_version} may work but is not officially tested{Colors.RESET}")
+            print(
+                f"{Colors.YELLOW}⚠ After Effects {result.ae_version} may work but is not officially tested{Colors.RESET}"
+            )
         else:
-            print(f"{Colors.YELLOW}⚠ After Effects not detected - some features require AE to be installed{Colors.RESET}")
+            print(
+                f"{Colors.YELLOW}⚠ After Effects not detected - some features require AE to be installed{Colors.RESET}"
+            )
 
         print()
 
@@ -401,17 +398,17 @@ class AfterEffectsCompatibilityTest:
                 "passed": len(result.passed),
                 "failed": len(result.failed),
                 "skipped": len(result.skipped),
-                "warnings": len(result.warnings)
+                "warnings": len(result.warnings),
             },
             "details": {
                 "passed": result.passed,
                 "failed": result.failed,
                 "skipped": result.skipped,
-                "warnings": result.warnings
-            }
+                "warnings": result.warnings,
+            },
         }
 
-        with open(report_file, 'w') as f:
+        with open(report_file, "w") as f:
             json.dump(report_data, f, indent=2)
 
         print(f"Detailed report saved to: {report_file}\n")
@@ -424,11 +421,9 @@ def main():
     """Main test runner"""
     import argparse
 
-    parser = argparse.ArgumentParser(description='Test After Effects Automation compatibility')
-    parser.add_argument('--verbose', '-v', action='store_true',
-                       help='Show detailed output')
-    parser.add_argument('--version', type=str,
-                       help='Specify After Effects version for testing')
+    parser = argparse.ArgumentParser(description="Test After Effects Automation compatibility")
+    parser.add_argument("--verbose", "-v", action="store_true", help="Show detailed output")
+    parser.add_argument("--version", type=str, help="Specify After Effects version for testing")
 
     args = parser.parse_args()
 

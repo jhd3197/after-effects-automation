@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Basic Composition - Template Creator
 =====================================
@@ -12,22 +11,24 @@ This template includes:
 
 import os
 import sys
+
 from ae_automation import Client
 
 # Fix Windows console encoding for Unicode characters
-if sys.platform == 'win32':
+if sys.platform == "win32":
     import codecs
-    if hasattr(sys.stdout, 'buffer'):
-        sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, 'strict')
-        sys.stderr = codecs.getwriter('utf-8')(sys.stderr.buffer, 'strict')
+
+    if hasattr(sys.stdout, "buffer"):
+        sys.stdout = codecs.getwriter("utf-8")(sys.stdout.buffer, "strict")
+        sys.stderr = codecs.getwriter("utf-8")(sys.stderr.buffer, "strict")
 
 
 def create_template(output_path=None):
     """Create the basic composition template"""
 
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("Creating Basic Composition Template")
-    print("="*70 + "\n")
+    print("=" * 70 + "\n")
 
     # Initialize client
     client = Client()
@@ -49,7 +50,7 @@ def create_template(output_path=None):
                         "name": "Background",
                         "color": [0.1, 0.1, 0.15],  # Dark blue-gray
                         "width": 1920,
-                        "height": 1080
+                        "height": 1080,
                     },
                     {
                         "type": "text",
@@ -57,7 +58,7 @@ def create_template(output_path=None):
                         "text": "Welcome to My Video",
                         "x": 960,
                         "y": 540,
-                        "fontSize": 96
+                        "fontSize": 96,
                     },
                     {
                         "type": "text",
@@ -65,9 +66,9 @@ def create_template(output_path=None):
                         "text": "Let's get started",
                         "x": 960,
                         "y": 700,
-                        "fontSize": 48
-                    }
-                ]
+                        "fontSize": 48,
+                    },
+                ],
             },
             {
                 "name": "OutroTemplate",
@@ -78,7 +79,7 @@ def create_template(output_path=None):
                         "name": "Background",
                         "color": [0.15, 0.1, 0.1],  # Dark red-gray
                         "width": 1920,
-                        "height": 1080
+                        "height": 1080,
                     },
                     {
                         "type": "text",
@@ -86,11 +87,11 @@ def create_template(output_path=None):
                         "text": "Thanks for Watching!",
                         "x": 960,
                         "y": 540,
-                        "fontSize": 84
-                    }
-                ]
-            }
-        ]
+                        "fontSize": 84,
+                    },
+                ],
+            },
+        ],
     }
 
     # Output path
@@ -100,9 +101,9 @@ def create_template(output_path=None):
     # Build the template
     client.buildTemplate(template_config, output_path)
 
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("✓ Template Created Successfully!")
-    print("="*70 + "\n")
+    print("=" * 70 + "\n")
     print(f"Template file: {os.path.abspath(output_path)}")
     print()
     print("Template includes:")

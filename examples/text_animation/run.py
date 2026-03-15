@@ -14,22 +14,24 @@ This shows:
 import os
 import sys
 import time
-from ae_automation import Client
+
 import template
+
+from ae_automation import Client
 
 
 def run_automation():
     """Run the text animation automation"""
-    
+
     # Ensure usage of local paths by switching to the script's directory
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
     start_total_time = time.time()
     template_time = 0
 
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("Running Text Animation Automation")
-    print("="*70 + "\n")
+    print("=" * 70 + "\n")
 
     # Check if template exists
     template_path = os.path.join(os.path.dirname(__file__), "text_animation_template.aep")
@@ -39,7 +41,7 @@ def run_automation():
         start_template_time = time.time()
         try:
             # Pass path to create_template (create_template works with absolute paths)
-            template.create_template() # Modified to not take arguments based on template.py signature
+            template.create_template()  # Modified to not take arguments based on template.py signature
             template_time = time.time() - start_template_time
             print(f"✓ Template created in {template_time:.2f} seconds")
         except Exception as e:
@@ -55,11 +57,7 @@ def run_automation():
     # Define custom content
     video_title = "My Awesome Tutorial"
     video_subtitle = "Learn After Effects Automation"
-    description_lines = [
-        "• Easy to use Python API",
-        "• Template-based workflow",
-        "• Automated video production"
-    ]
+    description_lines = ["• Easy to use Python API", "• Template-based workflow", "• Automated video production"]
 
     # Define the automation configuration
     config = {
@@ -76,7 +74,7 @@ def run_automation():
             "output_dir": ".\\output",
             "renderComp": True,  # Set to True to render
             "debug": True,
-        "resources": []
+            "resources": [],
         },
         "timeline": [
             {
@@ -92,7 +90,7 @@ def run_automation():
                         "layer_name": "MainTitle",
                         "property_name": "Text.Source Text",
                         "property_type": "string",
-                        "value": video_title
+                        "value": video_title,
                     },
                     {
                         "change_type": "update_layer_property",
@@ -100,7 +98,7 @@ def run_automation():
                         "layer_name": "SubtitleText",
                         "property_name": "Text.Source Text",
                         "property_type": "string",
-                        "value": video_subtitle
+                        "value": video_subtitle,
                     },
                     {
                         "change_type": "update_layer_property",
@@ -108,9 +106,9 @@ def run_automation():
                         "layer_name": "SmallText",
                         "property_name": "Text.Source Text",
                         "property_type": "string",
-                        "value": "Episode 1"
-                    }
-                ]
+                        "value": "Episode 1",
+                    },
+                ],
             },
             {
                 "name": "description_scene",
@@ -125,7 +123,7 @@ def run_automation():
                         "layer_name": "Heading",
                         "property_name": "Text.Source Text",
                         "property_type": "string",
-                        "value": "What You'll Learn"
+                        "value": "What You'll Learn",
                     },
                     {
                         "change_type": "update_layer_property",
@@ -133,9 +131,9 @@ def run_automation():
                         "layer_name": "Description",
                         "property_name": "Text.Source Text",
                         "property_type": "string",
-                        "value": "<br>".join(description_lines)  # Multi-line text with HTML breaks
-                    }
-                ]
+                        "value": "<br>".join(description_lines),  # Multi-line text with HTML breaks
+                    },
+                ],
             },
             {
                 "name": "credits_scene",
@@ -150,7 +148,7 @@ def run_automation():
                         "layer_name": "Role1",
                         "property_name": "Text.Source Text",
                         "property_type": "string",
-                        "value": "Created By"
+                        "value": "Created By",
                     },
                     {
                         "change_type": "update_layer_property",
@@ -158,7 +156,7 @@ def run_automation():
                         "layer_name": "Name1",
                         "property_name": "Text.Source Text",
                         "property_type": "string",
-                        "value": "Your Name Here"
+                        "value": "Your Name Here",
                     },
                     {
                         "change_type": "update_layer_property",
@@ -166,7 +164,7 @@ def run_automation():
                         "layer_name": "Role2",
                         "property_name": "Text.Source Text",
                         "property_type": "string",
-                        "value": "Powered By"
+                        "value": "Powered By",
                     },
                     {
                         "change_type": "update_layer_property",
@@ -174,11 +172,11 @@ def run_automation():
                         "layer_name": "Name2",
                         "property_name": "Text.Source Text",
                         "property_type": "string",
-                        "value": "AE Automation"
-                    }
-                ]
-            }
-        ]
+                        "value": "AE Automation",
+                    },
+                ],
+            },
+        ],
     }
 
     print("Configuration:")
@@ -189,18 +187,19 @@ def run_automation():
     print()
 
     # Create output directory
-    os.makedirs(config['project']['output_dir'], exist_ok=True)
+    os.makedirs(config["project"]["output_dir"], exist_ok=True)
 
-    print("="*70)
+    print("=" * 70)
     print("Starting Automation...")
-    print("="*70 + "\n")
+    print("=" * 70 + "\n")
 
     # Run the automation
     try:
         # Save config to file (startBot expects a file path, not a dict)
         import json
+
         config_path = os.path.join(os.path.dirname(__file__), "automation_config.json")
-        with open(config_path, 'w') as f:
+        with open(config_path, "w") as f:
             json.dump(config, f, indent=2)
 
         print(f"Config saved to: {config_path}")
@@ -214,21 +213,21 @@ def run_automation():
         end_automation_time = time.time()
         automation_time = end_automation_time - start_automation_time
 
-        print("\n" + "="*70)
+        print("\n" + "=" * 70)
         print("✓ Automation Complete!")
-        print("="*70 + "\n")
+        print("=" * 70 + "\n")
 
-        if config['project']['renderComp']:
+        if config["project"]["renderComp"]:
             print(f"Output video: {os.path.join(config['project']['output_dir'], config['project']['output_file'])}")
-            
-        print("\n" + "="*70)
+
+        print("\n" + "=" * 70)
         print("Performance Report")
-        print("="*70)
+        print("=" * 70)
         if template_time > 0:
             print(f"Template Creation: {template_time:.2f}s")
         print(f"Automation Run:    {automation_time:.2f}s")
         print(f"Total Time:        {(end_automation_time - start_total_time):.2f}s")
-        print("="*70 + "\n")
+        print("=" * 70 + "\n")
 
     except KeyboardInterrupt:
         print("\n\n⚠ Automation cancelled by user")
@@ -236,6 +235,7 @@ def run_automation():
     except Exception as e:
         print(f"\n\n❌ Error: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)
 

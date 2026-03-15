@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ExtensionManifest Version="7.0"
+    ExtensionBundleId="com.aeautomation.chat"
+    ExtensionBundleVersion="1.0.0"
+    ExtensionBundleName="AE Automation Chat"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <ExtensionList>
+        <Extension Id="com.aeautomation.chat.panel" Version="1.0.0"/>
+    </ExtensionList>
+
+    <ExecutionEnvironment>
+        <HostList>
+            <!-- AEFT = After Effects, support CC 2019 through latest -->
+            <Host Name="AEFT" Version="[16.0,99.0]"/>
+        </HostList>
+        <LocaleList>
+            <Locale Code="All"/>
+        </LocaleList>
+        <RequiredRuntimeList>
+            <RequiredRuntime Name="CSXS" Version="10.0"/>
+        </RequiredRuntimeList>
+    </ExecutionEnvironment>
+
+    <DispatchInfoList>
+        <Extension Id="com.aeautomation.chat.panel">
+            <DispatchInfo>
+                <Resources>
+                    <MainPath>./client/index.html</MainPath>
+                    <ScriptPath>./host/hostscript.jsx</ScriptPath>
+                    <CEFCommandLine>
+                        <Parameter>--enable-nodejs</Parameter>
+                        <Parameter>--mixed-context</Parameter>
+                    </CEFCommandLine>
+                </Resources>
+                <Lifecycle>
+                    <AutoVisible>true</AutoVisible>
+                </Lifecycle>
+                <UI>
+                    <Type>Panel</Type>
+                    <Menu>AE Automation Chat</Menu>
+                    <Geometry>
+                        <Size>
+                            <Height>600</Height>
+                            <Width>380</Width>
+                        </Size>
+                        <MinSize>
+                            <Height>400</Height>
+                            <Width>300</Width>
+                        </MinSize>
+                    </Geometry>
+                    <Icons/>
+                </UI>
+            </DispatchInfo>
+        </Extension>
+    </DispatchInfoList>
+</ExtensionManifest>

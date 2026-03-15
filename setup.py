@@ -1,11 +1,14 @@
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
-with open("README.md", "r", encoding="utf-8") as fh:
+with open("README.md", encoding="utf-8") as fh:
     long_description = fh.read()
+
+with open("VERSION", encoding="utf-8") as fh:
+    version = fh.read().strip()
 
 setup(
     name="after-effects-automation",
-    version='0.1.6',
+    version=version,
     author="Juan Denis",
     author_email="juan@vene.co",
     description="A unified video automation platform for Adobe After Effects",
@@ -18,35 +21,48 @@ setup(
         "Intended Audience :: Developers",
         "Topic :: Multimedia :: Video",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
         "License :: OSI Approved :: MIT License",
         "Operating System :: Microsoft :: Windows",
     ],
-    python_requires=">=3.7",
+    python_requires=">=3.9",
     install_requires=[
         "python-dotenv>=0.19.0",
         "pyautogui>=0.9.53",
         "pydirectinput>=1.0.4",
         "pywinauto>=0.6.8",
-        "pandas>=1.3.0",
-        "pydantic>=1.8.2",
+        "python-slugify>=5.0.0",
+        "Pillow>=12.1.1",
         "jsmin>=3.0.0",
         "mutagen>=1.45.1",
         "moviepy>=1.0.3",
         "flask>=2.0.0",
         "flask-cors>=3.0.0",
         "werkzeug>=2.0.0",
-        "psutil>=5.8.0"
+        "psutil>=5.8.0",
     ],
+    extras_require={
+        "window-detection": ["pygetwindow>=0.0.9"],
+    },
     package_data={
         "ae_automation": [
+            "py.typed",
             "mixins/js/*.js",
             "mixins/js/*.jsx",
             "mixins/videoEditor/dist/**/*",
             "mixins/videoEditor/dist/*",
-            "mixins/videoEditor/script.js" 
+            "mixins/videoEditor/script.js",
+            "extension/**/*",
+            "extension/CSXS/*",
+            "extension/client/*",
+            "extension/client/lib/*",
+            "extension/host/*",
+            "extension/.debug",
+            "builtin_plugins/*/plugin.json",
+            "builtin_plugins/*/config.json",
         ]
     },
     include_package_data=True,
@@ -56,5 +72,5 @@ setup(
             # Legacy aliases for backward compatibility
             "ae-automate=cli:main",
         ],
-    }
+    },
 )

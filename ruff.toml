@@ -1,0 +1,44 @@
+# Ruff linter configuration for after-effects-automation
+
+target-version = "py39"
+line-length = 120
+
+# Exclude build artifacts and vendored code
+exclude = [
+    "build",
+    "dist",
+    "*.egg-info",
+    "ae_automation/mixins/videoEditor/node_modules",
+]
+
+[lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "B",    # flake8-bugbear
+    "UP",   # pyupgrade
+    "S",    # flake8-bandit (security)
+]
+ignore = [
+    "E501",   # line too long (handled by formatter, not linter)
+    "S603",   # subprocess call with shell=False (legitimate use in this project)
+    "S607",   # starting a process with a partial executable path
+    "S602",   # subprocess call with shell=True (needed for AE process management)
+    "S605",   # starting a process with a shell (os.system for AE task management)
+    "S606",   # starting a process without a shell (os.startfile for AE)
+    "S324",   # insecure hash function (not used for security purposes)
+    "S110",   # try-except-pass (used in cleanup paths)
+    "B904",   # raise from within except (too noisy for existing codebase)
+]
+
+[lint.per-file-ignores]
+"tests/*" = ["S101", "S108"]  # allow assert and temp paths in tests
+"examples/*" = ["S101"]      # allow assert in examples
+"playground.py" = ["F401", "E402"]  # scratch file
+"run.py" = ["F401", "E402"]         # runner script
+"app.py" = ["F401", "E402"]         # app script
+
+[lint.isort]
+known-first-party = ["ae_automation"]
