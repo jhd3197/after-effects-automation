@@ -3,9 +3,12 @@ from setuptools import find_packages, setup
 with open("README.md", encoding="utf-8") as fh:
     long_description = fh.read()
 
+with open("VERSION", encoding="utf-8") as fh:
+    version = fh.read().strip()
+
 setup(
     name="after-effects-automation",
-    version='0.1.6',
+    version=version,
     author="Juan Denis",
     author_email="juan@vene.co",
     description="A unified video automation platform for Adobe After Effects",

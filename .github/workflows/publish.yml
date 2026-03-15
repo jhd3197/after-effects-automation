@@ -1,158 +1,117 @@
-name: Publish to PyPI and GitHub Release
+name: Release — PyPI
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      prerelease:
+        description: 'Mark as pre-release'
+        type: boolean
+        default: false
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
 
 permissions:
   contents: write
+  pull-requests: read
 
 jobs:
-  # Run tests before publishing to ensure quality
+  # Gate on existing CI workflows
   test:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.10", "3.11", "3.12"]
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-          cache: "pip"
-          cache-dependency-path: requirements-test.txt
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements-test.txt
-
-      - name: Run tests
-        run: python -m unittest discover tests -v
-
-  # Run linting before publishing
+    uses: ./.github/workflows/test.yml
   lint:
-    runs-on: ubuntu-latest
+    uses: ./.github/workflows/lint.yml
 
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install ruff
-        run: pip install ruff
-
-      - name: Run ruff check
-        run: ruff check .
-
-  # Build, stage on TestPyPI, then publish to PyPI
-  bump-version-and-publish:
+  # =========================================================================
+  # Tag, create GitHub Release, publish to PyPI
+  # =========================================================================
+  release:
     needs: [test, lint]
-    runs-on: ubuntu-latest
-    # Prevent infinite loop from bot commits
     if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
 
     steps:
-      ### Step 1: Checkout Repository ###
-      - name: Checkout Repository
+      - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+        with: { fetch-depth: 0 }
 
-      ### Step 2: Bump Version and Push Tag ###
-      - name: Bump Version and Push Tag
+      - name: Bump version and push tag
         id: bump_version
         uses: mathieudutour/github-tag-action@v6.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           release_branches: main
           default_bump: patch
-          tag_prefix: "v"
+          tag_prefix: 'v'
 
-      ### Step 3: Update VERSION File ###
-      - name: Update VERSION File
+      - name: Update VERSION file
         run: |
           echo "${{ steps.bump_version.outputs.new_version }}" > VERSION
-          git config user.name "github-actions[bot]"
+          git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add VERSION
           git commit -m "chore: bump version to v${{ steps.bump_version.outputs.new_version }} [skip ci]"
-
-      ### Step 4: Update setup.py with the New Version ###
-      - name: Update setup.py Version
-        run: |
-          NEW_VERSION=${{ steps.bump_version.outputs.new_version }}
-          sed -i "s/version=['\"][^'\"]*['\"],/version='${NEW_VERSION}',/" setup.py
-          git add setup.py
-          git commit -m "chore: update setup.py to v${NEW_VERSION} [skip ci]" || echo "No changes to commit"
           git push origin main
 
-      ### Step 5: Create GitHub Release ###
+      - name: Fetch latest PR info
+        id: fetch_pr
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const prs = await github.rest.pulls.list({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'closed', base: 'main',
+              sort: 'updated', direction: 'desc', per_page: 1,
+            });
+            if (prs.data.length > 0) {
+              const pr = prs.data[0];
+              return {
+                title: pr.title,
+                body: (pr.body || 'No description provided').replace(/\r\n/g, '\n'),
+                number: pr.number,
+                url: pr.html_url,
+                author: pr.user.login,
+              };
+            }
+            return null;
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.bump_version.outputs.new_version }}
-          name: Release v${{ steps.bump_version.outputs.new_version }}
-          body: ${{ steps.bump_version.outputs.changelog }}
+          name: v${{ steps.bump_version.outputs.new_version }}
+          body: |
+            ## Install
+
+            ```bash
+            pip install after-effects-automation==${{ steps.bump_version.outputs.new_version }}
+            ```
+
+            ---
+
+            ## Changes
+            ${{ steps.fetch_pr.outputs.result != 'null' && fromJSON(steps.fetch_pr.outputs.result).body || steps.bump_version.outputs.changelog }}
+
+            ## Details
+            - Version: `v${{ steps.bump_version.outputs.new_version }}`
+            ${{ steps.fetch_pr.outputs.result != 'null' && format('- PR: #{0} by @{1}', fromJSON(steps.fetch_pr.outputs.result).number, fromJSON(steps.fetch_pr.outputs.result).author) || '' }}
           draft: false
-          prerelease: false
+          prerelease: ${{ github.event.inputs.prerelease == 'true' }}
 
-      ### Step 6: Set Up Python ###
-      - name: Set up Python
+      - name: Setup Python
         uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-          cache: "pip"
+        with: { python-version: '3.12' }
 
-      ### Step 7: Install Build Dependencies ###
-      - name: Install Build Dependencies
+      - name: Build and publish to PyPI
         run: |
-          python -m pip install --upgrade pip
-          pip install build twine
-
-      ### Step 8: Build Frontend Assets ###
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-
-      - name: Build Frontend
-        working-directory: ae_automation/mixins/videoEditor
-        run: |
-          npm install
-          npm run build
-
-      ### Step 9: Build the Package ###
-      - name: Build Package
-        run: python -m build
-
-      ### Step 10: Publish to TestPyPI (staging) ###
-      - name: Publish to TestPyPI
-        env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.TEST_PYPI_TOKEN }}
-        run: |
-          twine upload --repository-url https://test.pypi.org/legacy/ dist/*
-        continue-on-error: true
-
-      ### Step 11: Verify TestPyPI package ###
-      - name: Verify TestPyPI package
-        run: |
-          sleep 15
-          pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ after-effects-automation==${{ steps.bump_version.outputs.new_version }} || echo "TestPyPI verification skipped"
-        continue-on-error: true
-
-      ### Step 12: Publish to PyPI ###
-      - name: Publish to PyPI
+          pip install --upgrade pip build twine
+          echo "${{ steps.bump_version.outputs.new_version }}" > VERSION
+          python -m build
+          twine upload dist/*
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
-        run: |
-          twine upload dist/*
