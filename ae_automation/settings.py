@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import glob
-import json
 import os
 import re
 import sys
@@ -55,21 +54,25 @@ def discover_all_ae_installs() -> list[dict[str, str | int | None]]:
             for match in glob.glob(pattern):
                 version = _extract_version_from_path(match)
                 exe = os.path.join(match, "aerender.exe")
-                candidates.append({
-                    "path": match,
-                    "version": version,
-                    "has_aerender": os.path.isfile(exe),
-                })
+                candidates.append(
+                    {
+                        "path": match,
+                        "version": version,
+                        "has_aerender": os.path.isfile(exe),
+                    }
+                )
 
     elif IS_MACOS:
         for match in glob.glob("/Applications/Adobe After Effects *"):
             version = _extract_version_from_path(match)
             aerender = os.path.join(match, "aerender")
-            candidates.append({
-                "path": match,
-                "version": version,
-                "has_aerender": os.path.isfile(aerender),
-            })
+            candidates.append(
+                {
+                    "path": match,
+                    "version": version,
+                    "has_aerender": os.path.isfile(aerender),
+                }
+            )
 
     # Sort newest first
     candidates.sort(key=lambda c: c.get("version") or 0, reverse=True)
@@ -148,8 +151,12 @@ def get_cep_extensions_dir() -> str:
         return os.path.join(_appdata, "Adobe", "CEP", "extensions")
     elif IS_MACOS:
         return os.path.join(
-            os.path.expanduser("~"), "Library", "Application Support",
-            "Adobe", "CEP", "extensions",
+            os.path.expanduser("~"),
+            "Library",
+            "Application Support",
+            "Adobe",
+            "CEP",
+            "extensions",
         )
     # Linux (experimental)
     return os.path.join(os.path.expanduser("~"), ".adobe", "CEP", "extensions")

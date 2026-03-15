@@ -79,8 +79,7 @@ class ChatPanelMixin:
             logger.info("Prompture loaded successfully")
         except ImportError:
             logger.warning(
-                "Prompture not found at %s — AI chat will be limited. "
-                "Set PROMPTURE_PATH env var or install prompture.",
+                "Prompture not found at %s — AI chat will be limited. Set PROMPTURE_PATH env var or install prompture.",
                 PROMPTURE_PATH,
             )
 
@@ -113,9 +112,7 @@ class ChatPanelMixin:
                 if not message:
                     return jsonify({"success": False, "error": "Empty message"}), 400
 
-                response_text, actions = self._process_chat(
-                    message, history, model, ae_context
-                )
+                response_text, actions = self._process_chat(message, history, model, ae_context)
 
                 return jsonify(
                     {
@@ -164,7 +161,9 @@ class ChatPanelMixin:
                     return jsonify({"success": False, "error": "No configs provided"}), 400
                 total = self.queue_configs(configs)
                 self.start_batch()
-                return jsonify({"success": True, "queued": total, "message": f"Queued {total} configs and started batch"})
+                return jsonify(
+                    {"success": True, "queued": total, "message": f"Queued {total} configs and started batch"}
+                )
             except Exception as e:
                 logger.error("Batch queue error: %s", e, exc_info=True)
                 return jsonify({"success": False, "error": str(e)}), 500
@@ -241,9 +240,7 @@ class ChatPanelMixin:
             context_block = f"\n\nCurrent AE project context:\n```json\n{json.dumps(ae_context, indent=2)}\n```\n"
 
         if self._prompture_available and self._extract_fn:
-            return self._process_with_prompture(
-                message, history, model, context_block
-            )
+            return self._process_with_prompture(message, history, model, context_block)
         else:
             return self._process_fallback(message, ae_context)
 
@@ -258,7 +255,9 @@ class ChatPanelMixin:
         from pydantic import BaseModel, Field
 
         class AEAction(BaseModel):
-            type: str = Field(description="Action type: create_comp, edit_text, edit_property, set_color, add_marker, save_project, list_comps, get_project_info")
+            type: str = Field(
+                description="Action type: create_comp, edit_text, edit_property, set_color, add_marker, save_project, list_comps, get_project_info"
+            )
             label: str = Field(description="Human-readable description of the action")
             params: dict[str, Any] = Field(default_factory=dict, description="Action parameters")
 
@@ -298,21 +297,15 @@ class ChatPanelMixin:
         actions: list[dict[str, Any]] = []
 
         if "list" in msg_lower and "comp" in msg_lower:
-            actions.append(
-                {"type": "list_comps", "label": "List compositions", "params": {}}
-            )
+            actions.append({"type": "list_comps", "label": "List compositions", "params": {}})
             return "Let me list the compositions in your project.", actions
 
         if "project info" in msg_lower or "project details" in msg_lower:
-            actions.append(
-                {"type": "get_project_info", "label": "Get project info", "params": {}}
-            )
+            actions.append({"type": "get_project_info", "label": "Get project info", "params": {}})
             return "Getting your project information.", actions
 
         if "save" in msg_lower:
-            actions.append(
-                {"type": "save_project", "label": "Save project", "params": {}}
-            )
+            actions.append({"type": "save_project", "label": "Save project", "params": {}})
             return "I'll save your project.", actions
 
         if "create" in msg_lower and "comp" in msg_lower:
@@ -407,11 +400,7 @@ class ChatPanelMixin:
 
             elif action_type == "list_comps":
                 self.getProjectMap()
-                comps = [
-                    item
-                    for item in self.afterEffectItems
-                    if item.get("type") == "CompItem"
-                ]
+                comps = [item for item in self.afterEffectItems if item.get("type") == "CompItem"]
                 return {"success": True, "comps": comps}
 
             elif action_type == "get_project_info":
@@ -440,9 +429,7 @@ class ChatPanelMixin:
         except Exception as e:
             return {"success": False, "error": str(e)}
 
-    def runChatPanel(
-        self, host: str = "127.0.0.1", port: int = 5001
-    ) -> None:
+    def runChatPanel(self, host: str = "127.0.0.1", port: int = 5001) -> None:
         """Start the chat panel backend server."""
         import webbrowser
         from threading import Timer
@@ -451,14 +438,14 @@ class ChatPanelMixin:
 
         self._init_chat()
 
-        print(f"\nAE Automation Chat Backend")
-        print(f"=" * 40)
+        print("\nAE Automation Chat Backend")
+        print("=" * 40)
         print(f"Server:    http://{host}:{port}/")
         print(f"Prompture: {'Available' if self._prompture_available else 'Not found'}")
-        print(f"")
-        print(f"The AE panel connects to this server.")
+        print("")
+        print("The AE panel connects to this server.")
         print(f"Open in browser for testing: http://{host}:{port}/")
-        print(f"Press Ctrl+C to stop.\n")
+        print("Press Ctrl+C to stop.\n")
 
         Timer(1.5, lambda: webbrowser.open(f"http://{host}:{port}/")).start()
         run_simple(host, port, self.chat_app, use_reloader=False, use_debugger=False)

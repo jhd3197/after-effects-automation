@@ -506,9 +506,7 @@ For more information, visit: https://github.com/jhd3197/after-effects-automation
         description="Queue and process multiple JSON configuration files in batch",
     )
     parser_batch.add_argument("configs", nargs="*", help="Paths to JSON configuration files")
-    parser_batch.add_argument(
-        "--dir", "-d", help="Directory containing .json config files to process"
-    )
+    parser_batch.add_argument("--dir", "-d", help="Directory containing .json config files to process")
     parser_batch.set_defaults(func=cmd_batch)
 
     # ============================================================

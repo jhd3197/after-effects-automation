@@ -61,7 +61,6 @@ SCRIPT_COMPAT: dict[str, dict[str, Any]] = {
         "min_version": 2020,
         "notes": "app.executeCommand() — universal.",
     },
-
     # ── Layer Operations ────────────────────────────────────
     "update_properties.jsx": {
         "min_version": 2020,
@@ -98,7 +97,6 @@ SCRIPT_COMPAT: dict[str, dict[str, Any]] = {
         "min_version": 2020,
         "notes": "Item + layer selection — universal.",
     },
-
     # ── Composition Duplication ─────────────────────────────
     "duplicate_comp.jsx": {
         "min_version": 2020,
@@ -125,7 +123,6 @@ SCRIPT_COMPAT: dict[str, dict[str, Any]] = {
         },
         "workaround": "For AE 2020-2021, duplicate items one at a time with duplicate_comp.jsx.",
     },
-
     # ── Layer Creation ──────────────────────────────────────
     "add_text_layer.jsx": {
         "min_version": 2020,
@@ -150,7 +147,6 @@ SCRIPT_COMPAT: dict[str, dict[str, Any]] = {
             2021: "Parametric shape properties have limited scripting access.",
         },
     },
-
     # ── Transitions ─────────────────────────────────────────
     "add_transition.jsx": {
         "min_version": 2022,
@@ -161,7 +157,6 @@ SCRIPT_COMPAT: dict[str, dict[str, Any]] = {
         },
         "workaround": "For AE 2020-2021, apply transitions manually or use simpler opacity keyframes.",
     },
-
     # ── Rendering ───────────────────────────────────────────
     "renderComp.jsx": {
         "min_version": 2020,
@@ -170,7 +165,6 @@ SCRIPT_COMPAT: dict[str, dict[str, Any]] = {
             2020: "Output module templates may have different names than newer versions.",
         },
     },
-
     # ── Project Operations ──────────────────────────────────
     "create_new_project.jsx": {
         "min_version": 2020,
@@ -200,7 +194,6 @@ SCRIPT_COMPAT: dict[str, dict[str, Any]] = {
         "min_version": 2020,
         "notes": "Adds comp to template timeline — universal.",
     },
-
     # ── Debug Scripts ───────────────────────────────────────
     "debug_create_comp.jsx": {
         "min_version": 2020,
@@ -210,7 +203,6 @@ SCRIPT_COMPAT: dict[str, dict[str, Any]] = {
         "min_version": 2020,
         "notes": "Debug version of save with extra logging.",
     },
-
     # ── Background Services ─────────────────────────────────
     "ae_command_runner.jsx": {
         "min_version": 2020,
@@ -269,9 +261,7 @@ def check_script_compat(script_name: str, ae_version: int | None) -> dict[str, A
     min_ver = info.get("min_version", 2020)
     if ae_version < min_ver:
         result["compatible"] = False
-        result["issues"].append(
-            f"Requires AE {min_ver}+, but detected AE {ae_version}."
-        )
+        result["issues"].append(f"Requires AE {min_ver}+, but detected AE {ae_version}.")
         if info.get("workaround"):
             result["workaround"] = info["workaround"]
         return result
@@ -279,9 +269,7 @@ def check_script_compat(script_name: str, ae_version: int | None) -> dict[str, A
     # Check max version
     max_ver = info.get("max_version")
     if max_ver and ae_version > max_ver:
-        result["issues"].append(
-            f"Only tested up to AE {max_ver}. AE {ae_version} may have breaking changes."
-        )
+        result["issues"].append(f"Only tested up to AE {max_ver}. AE {ae_version} may have breaking changes.")
 
     # Check known issues for this specific version
     known = info.get("known_issues", {})
@@ -303,7 +291,4 @@ def get_all_compat(ae_version: int | None) -> list[dict[str, Any]]:
 
 def get_incompatible_scripts(ae_version: int | None) -> list[dict[str, Any]]:
     """Get only scripts with issues for the given AE version."""
-    return [
-        r for r in get_all_compat(ae_version)
-        if not r["compatible"] or r["issues"]
-    ]
+    return [r for r in get_all_compat(ae_version) if not r["compatible"] or r["issues"]]

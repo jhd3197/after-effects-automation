@@ -747,18 +747,21 @@ class afterEffectMixin:
         if not compat["compatible"]:
             logger.error(
                 "Script %s is not compatible with AE %s: %s",
-                fileName, ae_version, "; ".join(compat["issues"]),
+                fileName,
+                ae_version,
+                "; ".join(compat["issues"]),
             )
             if compat["workaround"]:
                 logger.info("Workaround: %s", compat["workaround"])
             raise RuntimeError(
-                f"Script {fileName} is not compatible with AE {ae_version}. "
-                f"{'; '.join(compat['issues'])}"
+                f"Script {fileName} is not compatible with AE {ae_version}. {'; '.join(compat['issues'])}"
             )
         if compat["issues"]:
             logger.warning(
                 "Script %s has known issues on AE %s: %s",
-                fileName, ae_version, "; ".join(compat["issues"]),
+                fileName,
+                ae_version,
+                "; ".join(compat["issues"]),
             )
 
         logger.info("Running script: %s", fileName)
@@ -911,13 +914,9 @@ class afterEffectMixin:
         }
 
         # Pattern: PROGRESS:  H:MM:SS:FF (frame N)  or just (N)
-        progress_re = re.compile(
-            r"PROGRESS:\s*[\d:]+\s*\((?:frame\s+)?(\d+)\)", re.IGNORECASE
-        )
+        progress_re = re.compile(r"PROGRESS:\s*[\d:]+\s*\((?:frame\s+)?(\d+)\)", re.IGNORECASE)
         # aerender sometimes outputs total duration / frames
-        total_re = re.compile(
-            r"DURATION:\s*[\d:]+\s*\((?:frame\s+)?(\d+)\)", re.IGNORECASE
-        )
+        total_re = re.compile(r"DURATION:\s*[\d:]+\s*\((?:frame\s+)?(\d+)\)", re.IGNORECASE)
 
         def _run() -> None:
             try:

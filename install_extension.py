@@ -32,8 +32,12 @@ def _get_cep_dir() -> str:
         return os.path.join(appdata, "Adobe", "CEP", "extensions")
     elif sys.platform == "darwin":
         return os.path.join(
-            os.path.expanduser("~"), "Library", "Application Support",
-            "Adobe", "CEP", "extensions",
+            os.path.expanduser("~"),
+            "Library",
+            "Application Support",
+            "Adobe",
+            "CEP",
+            "extensions",
         )
     # Linux (experimental)
     return os.path.join(os.path.expanduser("~"), ".adobe", "CEP", "extensions")
@@ -70,7 +74,8 @@ def enable_debug_mode() -> None:
             try:
                 subprocess.run(
                     ["defaults", "write", domain, "PlayerDebugMode", "1"],
-                    check=True, capture_output=True,
+                    check=True,
+                    capture_output=True,
                 )
                 print(f"  Enabled debug mode for CEP {ver}")
             except Exception as e:

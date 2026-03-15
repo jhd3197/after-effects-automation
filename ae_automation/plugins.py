@@ -32,9 +32,7 @@ logger = get_logger(__name__)
 
 # ── Paths ────────────────────────────────────────────────────
 PLUGINS_DIR: str = os.path.join(_appdata, "ae_automation", "plugins")
-BUILTIN_PLUGINS_DIR: str = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), "builtin_plugins"
-)
+BUILTIN_PLUGINS_DIR: str = os.path.join(os.path.dirname(os.path.abspath(__file__)), "builtin_plugins")
 
 # Ensure the plugins directory exists
 os.makedirs(PLUGINS_DIR, exist_ok=True)
@@ -46,6 +44,7 @@ REQUIRED_MANIFEST_KEYS = {"name", "version", "description", "author", "type"}
 
 # ── Helpers ──────────────────────────────────────────────────
 
+
 def _read_manifest(plugin_dir: str) -> dict[str, Any] | None:
     """Read and validate a plugin.json manifest from *plugin_dir*.
 
@@ -55,7 +54,7 @@ def _read_manifest(plugin_dir: str) -> dict[str, Any] | None:
     if not os.path.isfile(manifest_path):
         return None
     try:
-        with open(manifest_path, "r", encoding="utf-8") as fh:
+        with open(manifest_path, encoding="utf-8") as fh:
             data: dict[str, Any] = json.load(fh)
     except (json.JSONDecodeError, OSError) as exc:
         logger.warning("Bad manifest in %s: %s", plugin_dir, exc)
@@ -68,9 +67,7 @@ def _read_manifest(plugin_dir: str) -> dict[str, Any] | None:
         return None
 
     if data.get("type") not in VALID_PLUGIN_TYPES:
-        logger.warning(
-            "Manifest in %s has invalid type '%s'", plugin_dir, data.get("type")
-        )
+        logger.warning("Manifest in %s has invalid type '%s'", plugin_dir, data.get("type"))
         return None
 
     # Attach the resolved directory so callers know where files live
@@ -97,6 +94,7 @@ def _ensure_builtins_installed() -> None:
 
 
 # ── Registry ─────────────────────────────────────────────────
+
 
 class PluginRegistry:
     """Manages installed plugins in PLUGINS_DIR."""
@@ -157,11 +155,13 @@ class PluginRegistry:
 
             # Free-text query (matches name, description, or tags)
             if query_lower:
-                haystack = " ".join([
-                    plugin.get("name", ""),
-                    plugin.get("description", ""),
-                    " ".join(plugin.get("tags", [])),
-                ]).lower()
+                haystack = " ".join(
+                    [
+                        plugin.get("name", ""),
+                        plugin.get("description", ""),
+                        " ".join(plugin.get("tags", [])),
+                    ]
+                ).lower()
                 if query_lower not in haystack:
                     continue
 
@@ -178,7 +178,7 @@ class PluginRegistry:
         if not os.path.isfile(config_path):
             return None
         try:
-            with open(config_path, "r", encoding="utf-8") as fh:
+            with open(config_path, encoding="utf-8") as fh:
                 return json.load(fh)
         except (json.JSONDecodeError, OSError) as exc:
             logger.error("Failed to read config for plugin '%s': %s", name, exc)
@@ -217,9 +217,7 @@ class PluginRegistry:
             "ae_min_version": ae_min,
         }
         if not compatible:
-            result["error"] = (
-                f"Plugin requires AE {ae_min}+ but detected AE {ae_version}"
-            )
+            result["error"] = f"Plugin requires AE {ae_min}+ but detected AE {ae_version}"
         return result
 
     # ── Mutations ────────────────────────────────────────────
@@ -237,16 +235,12 @@ class PluginRegistry:
         elif os.path.isdir(source):
             return self._install_from_dir(source)
         else:
-            raise ValueError(
-                f"Source is neither a directory nor a zip file: {source}"
-            )
+            raise ValueError(f"Source is neither a directory nor a zip file: {source}")
 
     def _install_from_dir(self, src_dir: str) -> dict[str, Any]:
         manifest = _read_manifest(src_dir)
         if manifest is None:
-            raise ValueError(
-                f"No valid plugin.json found in {src_dir}"
-            )
+            raise ValueError(f"No valid plugin.json found in {src_dir}")
         name = manifest["name"]
         dest = os.path.join(self.plugins_dir, name)
         if os.path.isdir(dest):
@@ -293,6 +287,7 @@ class PluginRegistry:
 
 # ── Client Mixin ─────────────────────────────────────────────
 
+
 class PluginMixin:
     """Mixin that exposes plugin operations on the Client instance."""
 
@@ -324,9 +319,7 @@ class PluginMixin:
 
         ptype = plugin.get("type", "template")
         if ptype not in ("template", "bundle"):
-            raise ValueError(
-                f"Plugin '{name}' is type '{ptype}' and cannot be run as a template"
-            )
+            raise ValueError(f"Plugin '{name}' is type '{ptype}' and cannot be run as a template")
 
         config = self.plugin_registry.get_plugin_config(name)
         if config is None:
@@ -346,9 +339,7 @@ class PluginMixin:
         # Write a temporary config and run through the bot pipeline
         import tempfile
 
-        with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".json", delete=False, encoding="utf-8"
-        ) as tmp:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False, encoding="utf-8") as tmp:
             json.dump(config, tmp, indent=2)
             tmp_path = tmp.name
 

@@ -112,9 +112,7 @@ def get_ae_executable(ae_folder: str) -> str:
         return os.path.join(ae_folder, "AfterFX.exe")
     elif IS_MACOS:
         # macOS AE lives inside an .app bundle
-        app_binary = os.path.join(
-            ae_folder, "Adobe After Effects.app", "Contents", "MacOS", "After Effects"
-        )
+        app_binary = os.path.join(ae_folder, "Adobe After Effects.app", "Contents", "MacOS", "After Effects")
         if os.path.isfile(app_binary):
             return app_binary
         # Fallback: direct binary in folder
@@ -141,9 +139,7 @@ def hotkey(*keys: str) -> None:
     if pyautogui is not None:
         pyautogui.hotkey(*translated)
     else:
-        raise RuntimeError(
-            "pyautogui is not installed. Install it with: pip install pyautogui"
-        )
+        raise RuntimeError("pyautogui is not installed. Install it with: pip install pyautogui")
 
 
 def press_key(key: str) -> None:
@@ -194,10 +190,7 @@ def press_key(key: str) -> None:
         pyautogui.press(resolved)
         return
 
-    raise RuntimeError(
-        "No keyboard automation library available. "
-        "Install pyautogui: pip install pyautogui"
-    )
+    raise RuntimeError("No keyboard automation library available. Install pyautogui: pip install pyautogui")
 
 
 def save_project_hotkey() -> None:
